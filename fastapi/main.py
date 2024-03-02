@@ -9,7 +9,7 @@ app = FastAPI()
 init_logging()
 
 @app.get("/", response_class=JSONResponse, responses={"301": {"description": "Moved permanently"}})
-def read_root():
+async def read_root():
     """
     A function that reads the root endpoint.
 
@@ -46,7 +46,7 @@ def read_root():
                  },
              }
          }, response_class=JSONResponse)
-def server_info():
+async def server_info():
     """
     Retrieves information about the server.
     
@@ -62,6 +62,50 @@ def server_info():
         return JSONResponse(content={"cpu_load": f"{psutil.cpu_percent()} %", "memory_usage": f"{psutil.virtual_memory().percent} %", "disk_usage": f"{psutil.disk_usage('/').percent} %", "bytes_sent": psutil.net_io_counters().bytes_sent, "bytes_received": psutil.net_io_counters().bytes_recv}, status_code=200)
     except:
         return JSONResponse(content={"detail": "Error retrieving data."}, status_code=500)
+
+@app.get("/generate/{text}", responses={
+    200: {
+        "description": "A successful response",
+        "content": {
+            "application/json": {
+                "example": {"text": "Generate Python code for web request"}
+            }
+        }
+    },
+    500: {
+        "description": "Internal server error",
+        "content": {
+            "application/json": {
+                "example": {"detail": "Internal server error"}
+            }
+        }
+    }
+})
+async def read_item(text: str):
+    '''
+    When receiving a `GET` request on this root with the `text` parameter, the server tries to process the input data (simulating processing by a neural network) and generate the corresponding response. If the processing is successful, a JSON document with the processing result and status 200 is returned to the user.
+
+    If the `ValueError` exception occurs, it is assumed that the user has entered incorrect data. Then the server will return an `HTTPException` exception with a status code of 400 and a detailed description of the error "Invalid input provided".
+
+    If any other exception occurs, an `HTTPException` will be returned to the user with a status code of 500 and a detailed description of the error that occurred.
+
+    ## Input data:
+
+    `text` (str): A user-entered string intended for further processing.
+
+    ## Output data:
+
+    `JSONResponse` with the `text` key, which holds the output (e.g., neural network response or generated code).
+    '''
+    try:
+        # Simulate neural network processing and generating a response
+        neural_network_response = "Response here"
+        return JSONResponse(content={"text": neural_network_response}, status_code=200)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid input provided")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 if __name__ == "__main__":
     # OpenAPI info
