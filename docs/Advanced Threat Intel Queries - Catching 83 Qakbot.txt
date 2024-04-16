@@ -1,0 +1,426 @@
+Advanced Threat Intel Queries - Catching 83 Qakbot
+Servers with Regex, Censys and TLS Certificates
+
+embee-research.ghost.io/advanced-threat-intel-queries-catching-83-qakbot-servers-with-regex-censys-and-tls-
+certificates/
+
+Matthew November 30, 2023
+
+Advanced
+Catching 83 Qakbot Servers using Regular Expressions.
+
+In this post we will leverage regular expressions and TLS certificates to capture 83 dispersed
+Qakbot servers.
+
+These servers are well made and there are minimal traditional patterns (ports, service
+names, ASN's) that can be used for signaturing. Instead we will focus on commonalities
+within the subject_dn and issuer_dn fields to identify servers.
+
+This is a relatively advanced technique that will require a basic understanding of
+regular expressions, and also a paid/researcher license for Censys.
+
+The final query is shown below. A link can be found here.
+
+services.tls.certificates.leaf_data.subject_dn=/C=\w\w, OU=[a-zA-Z0-9 \.]+, CN=[a-
+z]+\.[a-z]+/ and services.tls.certificates.leaf_data.issuer_dn=/C=\w\w, ST=\w\w, L=
+[a-zA-Z]+, O=[a-zA-Z0-9\. ]+, CN=[a-z]+\.[a-z]+/ 
+
+1/20
+
+
+
+Note that this post is primarily a demonstration of technical concepts that can be used
+to identify malware. We have not 100% validated that all results are Qakbot (although
+most appear to be), and we are relying on the initial ThreatFox tag being accurate.
+
+Initial Server From ThreatFox
+The initial server IP of 74.12.147[.]243:2222 was obtained from ThreatFox. Initially shared
+by the Twitter user @drb_ra.
+
+Performing an Initial Search
+Searching the IP Address on Censys, we can quickly identify a suspicious certificate running
+on the reported 2222 port.
+
+This certificate contains seemingly random text. With long values and only alphabetical
+characters.
+
+2/20
+
+
+
+Using "View All Data", we can gather more information about the service running on 2222.
+
+This reveals an empty service banner that can be later used as a pivot point or as a field to
+narrow down search results.
+
+The exact structure of the TLS Certificate can be established with this view.
+
+The search box next to services.tls.certificates.leaf_data.subject_dn can be used
+to pre-build an exact query.
+
+We will use this pre-built query as a base for our regular expression.
+
+3/20
+
+
+
+Converting Hardcoded Values Into Regular Expressions
+We can go ahead and modify the search parameter to a regular expression.
+
+A summary of the changes can be found below.
+
+C=US -> C=\w\w - We will let the C field match on any two characters
+OU=Vzbxanrbu Eivhtmjiabe Qjihwitl -> OU=[a-zA-Z0-9 ]+ - We can let the OU field
+match any sequence of alphabetical characters, allowing for a space inbetween.
+CN=motnooz.biz -> CN=[a-z]+\.[a-z]+ - we will let the CN field match on any domain
+containing only lowercase letters.
+
+After modifying the query as above, we can also add a filter for our original IP. This ensures
+that the same IP is matched and hasn't been lost. This is a means of quickly verifying that a
+regex is working as intended.
+
+We can see below that the same Initial IP is matched, meaning that the regex probably
+works.
+
+4/20
+
+
+
+With the Regex validated, We can now go ahead and remove the IP Address, leaving only
+the subject_dn field.
+
+This modified search results in 778 servers, many of which don't completely follow the
+certificate structure that we want.
+
+Validating Search Results
+If we inspect the first returned result of 75.98.168[.]215, we can see that the subject_dn
+matches our regular expression structure, but the issuer_dn is different to our initial Qakbot.
+
+5/20
+
+
+
+Below is the first returned result (Which does not match our pattern). Note that it contains the
+- character in the CN and O fields.
+
+Below is the original Qakbot C2. Note the lack of special characters and numerical values.
+
+Refining with Extra Fields
+The initial search returns results that match our subject_dn regular expression.
+
+6/20
+
+
+
+But there are results with a completely different (and not matching) structure on the
+issuer_dn.
+
+We can go back to our initial Qakbot C2, and follow the same process as before to build a
+regular expression on the issuer_dn field.
+
+We can then validate the regular expression by including the initial IP address.
+
+Since the issuer_dn field has not been validated, We can now go ahead and add the
+issuer_dn query to the initial subject_dn search. We can also include the initial IP for
+validation.
+
+At this point, we have a total query of
+
+services.tls.certificates.leaf_data.subject_dn=/C=\w\w, OU=[a-zA-Z0-9 \.]+, CN=[a-
+z]+\.[a-z]+/ and services.tls.certificates.leaf_data.issuer_dn=/C=\w\w, ST=\w\w, L=
+[a-zA-Z]+, O=[a-zA-Z0-9\. ]+, CN=[a-z]+\.[a-z]+/ and ip:70.27.15.38
+
+7/20
+
+
+
+The above search confirms that we haven't lost our initial hit, meaning the regex is valid and
+the initial IP can be removed.
+
+By removing the Initial IP Address and including only the subject_dn and issuer_dn, we're
+now down to a manageable number of 83 results.
+
+Inspecting the first two hits, we can confirm that we have matches on our intended certificate
+structure.
+
+8/20
+
+
+
+Further Validation With Report Building
+To save time validating every result individually, we use the "build report" function of Censys
+to hone in on the subject_dn or issuer_dn fields.
+
+This confirms that most of the returned servers are matching our intended structure.
+
+9/20
+
+
+
+Honing in on Domain/Host Names
+We can also use the "build report" function to hone in on common_name fields used in the TLS
+certificates.
+
+10/20
+
+
+
+Query Refinement
+There are potentially some false positives within the 83 returned results, so if we like, we can
+go ahead and add the empty banner hash from the initial IP.
+
+This will reduce the hits down to 49. But it's possible that this may remove some malicious
+results. I did not validate this as it's very time-consuming, and the majority of servers seem to
+be malicious either way.
+
+11/20
+
+
+
+Validating Results With Virustotal
+Performing a quick search on some of the returned hits on Virustotal.
+
+The majority seem to be related to Qakbot, although we did not confirm this 100%. The full
+list of IOC's can be found below.
+
+12/20
+
+
+
+13/20
+
+
+
+Conclusion
+At this stage, we now have a functioning query that capture 83 servers. We have not had to
+rely on port numbers, port ranges, or ASN locations to hone in.
+
+Here is another copy of our final query.
+
+services.tls.certificates.leaf_data.subject_dn=/C=\w\w, OU=[a-zA-Z0-9 \.]+, CN=[a-
+z]+\.[a-z]+/ and services.tls.certificates.leaf_data.issuer_dn=/C=\w\w, ST=\w\w, L=
+[a-zA-Z]+, O=[a-zA-Z0-9\. ]+, CN=[a-z]+\.[a-z]+/ 
+
+If we observe the returned results below, we can see that the ASN's and port numbers vary
+greatly between the results. Meaning that many traditional query styles will not work.
+
+14/20
+
+
+
+Related Content
+If you found this content useful, check out some other related posts over in the free Threat
+Intelligence Section.
+
+Malware Analysis Content
+If you're interested in learning simple and advanced workflows for manually analysing
+Malware. Consider checking out the paid content section.
+
+This section includes tutorials for extracting C2 addresses from real malware samples.
+Manual C2 extraction is a great way to grab c2's for pivoting, prior to them being identified by
+other services.
+
+IOC Lists
+
+IP Addresses
+2[.]50[.]137[.]133
+23[.]93[.]65[.]180 
+24[.]187[.]255[.]11 4
+
+ 
+
+15/20
+
+
+
+24[.]187[.]255[.]116
+24[.]187[.]255[.]117
+24[.]255[.]174[.]187 
+31[.]117[.]63[.]201  
+35[.]134[.]202[.]12 1
+37[.]210[.]162[.]30  
+39[.]40[.]144[.]179 
+41[.]38[.]97[.]237  
+41[.]99[.]46[.]66  
+45[.]65[.]51[.]13 0
+46[.]251[.]130[.]1 64
+47[.]16[.]64[.]215  
+47[.]149[.]234[.]6 
+50[.]99[.]8[.]5  
+60[.]48[.]77[.] 48
+64[.]46[.]22[.]26 
+64[.]229[.]117[.]1 37
+67[.]60[.]147[.]240  
+68[.]160[.]236[.]23 
+68[.]163[.]65[.]72  
+70[.]27[.]15[.]38  
+70[.]29[.]135[.]11 8
+70[.]49[.]34[.]218  
+70[.]52[.]230[.]48 
+70[.]121[.]156[.]3 4
+72[.]190[.]100[.]20 1
+74[.]12[.]145[.]202  
+74[.]12[.]145[.]207 
+74[.]12[.]147[.]243 
+76[.]142[.]13[.]8  
+77[.]124[.]85[.]1 66
+78[.]97[.]123[.]229 
+79[.]130[.]51[.]242 
+80[.]192[.]52[.]128 
+81[.]151[.]251[.]19 6
+82[.]76[.]99[.]171  
+83[.]110[.]196[.]11 1
+83[.]110[.]223[.]89  
+84[.]155[.]8[.]44  
+84[.]215[.]202[.] 8
+85[.]49[.]243[.]23 0
+85[.]243[.]247[.]13 7
+
+16/20
+
+
+
+86[.]97[.]84[.]192
+86[.]207[.]26[.]60
+86[.]236[.]11[.]235 
+87[.]223[.]92[.]180 
+88[.]249[.]231[.]16 1
+90[.]4[.]74[.]222  
+95[.]76[.]193[.]2 23
+95[.]149[.]166[.]38 
+96[.]43[.]115[.]158 
+96[.]248[.]1[.]183  
+97[.]118[.]24[.]246 
+100[.]2[.]41[.]26  
+102[.]157[.]101[ .]136
+102[.]157[.]244[.]251 
+104[.]157[.]102[.]161 
+108[.]4[.]77[.]65  
+108[.]49[.]159[.] 2
+109[.]48[.]28[.]12 9
+121[.]121[.]101[.]3 1
+124[.]13[.]232[.]162 
+125[.]209[.]114[.]181 
+136[.]232[.]179[.]26  
+141[.]164[.]249[.]90 
+149[.]75[.]147[.]46  
+151[.]48[.]137[.]18 4
+161[.]142[.]99[.]88  
+168[.]149[.]47[.]16 4
+172[.]77[.]204[.]25  
+172[.]91[.]3[.]194  
+173[.]30[.]189[.]1 00
+174[.]164[.]68[.]180 
+179[.]158[.]101[.]19 8
+186[.]182[.]15[.]91  
+187[.]147[.]137[.]6 7
+188[.]48[.]72[.]229  
+189[.]253[.]235[.]1 40
+190[.]134[.]148[.]34  
+197[.]2[.]11[.]142  
+201[.]103[.]222[.] 151
+201[.]244[.]108[.]183 
+217[.]165[.]233[.]123 
+
+17/20
+
+
+
+Subject Common Names
+epyhm[.]net
+twmbelz[.]or g
+iene[.]info  
+ctxehfdug [.]net
+utip[.]biz  
+jaonioi[.] org
+vcivoqeqfh[. ]us
+ineieutzvt[.]mob i
+tuayjhrdwg[.]mob i
+oxouy[.]mobi  
+iemjmedtey[.] biz
+ouxtetbtn[.]biz  
+ghoaetksiwo[.] net
+fwoht[.]org  
+tqouhdk[.]m obi
+pidewaeetbu[.]u s
+aihpe[.]mobi  
+zemureisir[.]i nfo
+oialk[.]com  
+ihaknpq[.]u s
+jqseote[.]us  
+gzfjtyr[.]com 
+aeztfeq[.]net 
+qbez[.]info  
+omloeceqiu [.]biz
+ztiorhvb[.]net  
+lfad[.]mobi  
+egatcwojan [.]us
+zcstobno[.]us  
+faexgkbimwe[ .]org
+bdae[.]info  
+xoehdsoea o[.]org
+iekztmiw[.]com  
+oojfkdbgiec[.]in fo
+ioiu[.]us  
+jaouem[ .]info
+xocsuioij[.]biz 
+euydxykaie[.]o rg
+ipzc[.]net  
+lmatetu[.] mobi
+
+ 
+
+18/20
+
+
+
+woaitgja[.]info
+kmeyihr[.]org
+bvgfkdinjla[.]n et
+mrokouejcei[.]m obi
+ztmt[.]org  
+epmsxuv[ .]info
+vsasikavjed[.]b iz
+yieziqg[.]biz  
+zvtilriljat[.]ne t
+vzxei[.]net  
+fbiafxq[.]in fo
+pmeooxard[. ]org
+gimcyeeoof[.]org 
+qocu[.]org  
+eeapissop x[.]biz
+otihelb[.]biz  
+ewaguarw[. ]org
+haeoieee[.]info  
+gokeokaut[.]biz 
+czqphiwowf[.]bi z
+ieaorbuq[.]net  
+tcnzewxk[.]us  
+lynle[.]biz  
+hzlfitjo[.]n et
+alcvi[.]info  
+wcyoloy[.]m obi
+temthdmeo[.]or g
+zufmpz[.]mobi  
+lijivtamo[.]mob i
+kouxe[.]org  
+aidoxovunc x[.]mobi
+rtouaxye[.]biz  
+zevjeo[.]mobi 
+aispzwot[.]biz 
+paod[.]org  
+iqtfotoe[.]m obi
+twdifusycee[.]b iz
+frkneeatb[.]info  
+eehpeplhr[.]us  
+aodkhtecx[.]ne t
+
+ 
+
+19/20
+
+
+
+efpohwf[.]net
+oesyahoixic[.]us
+motnooz[.]biz

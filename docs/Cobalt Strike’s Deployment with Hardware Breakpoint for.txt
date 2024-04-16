@@ -1,0 +1,79 @@
+Cobalt Strike’s Deployment with Hardware Breakpoint for
+AMSI Bypass
+
+labs.k7computing.com/index.php/cobalt-strikes-deployment-with-hardware-breakpoint-for-amsi-bypass/
+
+By Dhanush June 30, 2023
+
+Recently came across a tweet regarding a LNK file creating a hardware breakpoint in the
+Antimalware Scan Interface (AMSI).
+
+Figure
+
+1: Tweet
+ In this blog, we will get into the dig a little deeper into Cobalt Strike’s New TTP for
+bypassing the AMSI using hardware breakpoint.
+
+1/5
+
+
+
+Initial access
+LECmd tool was used to extract LNK file’s argument, which invokes a PowerShell to get
+the code from the malicious site.
+
+Figure 2: lnk File 
+ In this code a hardware breakpoint (Dr0) was enabled in the address of AMSI scan buffer.
+
+ Figure 3: Hardware breakpoint in AMSI
+In order to bypass AMSI, an exception handler for the AMSI scan buffer’s breakpoint is
+registered using  AddVectoredExceptionHandler API. In the Handler Code it collects the
+exception records and the Exception Address. Then proceeds further only if the exception
+has occurred in the address of AMSI Scan Buffer. Then it stores the Stack pointer value in
+the return address, it sets return address in the instruction pointer and return value as 0.
+[1].
+
+2/5
+
+
+
+Figure 4: Exception Handler code
+This code contains a PowerShell script to create persistence using the startup folder and
+download a GZIP compressed Base64 String . It targets only Domain logon users who
+have connected in the mentioned domain list.
+
+Figure 5: Targeted domain and next payload
+By decompressing this Base64 String with GUnZip, there is another code as shown in
+Figure 6.
+
+3/5
+
+
+
+   Figure 6: XOR encoded Base64 string
+This code contains Base64 String which when decoded and XORed int(35) gives out the
+final Cobalt Strike Payload as shown in Figure 7 and 8.
+
+ Figure 7: XOR key
+
+Figure 8: Cobalt Strike
+Here the Cobalt Strike C2 Config extracted using this tool is as shown below.
+
+4/5
+
+
+
+      Figure 9: C2 Config
+We at K7 Labs have detection against such threats. Users are requested to secure their
+devices by installing a reputed security product like “K7 Total Security” and keep it
+updated to stay protected from the latest threats.
+
+IOCs
+
+Hash K7 Detection Name
+
+eb08d873d27b94833e738f0df1d6ed26 Trojan ( 0001140e1 )
+
+6302a90a342db9f2159d8f20f19ebb2e Trojan ( 0001140e1 )
+
+3c9c1be6bdd39820ae3ba34ca7a36f1f Trojan ( 0001140e1 )

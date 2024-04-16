@@ -1,0 +1,100 @@
+Environmental hacktivists publish 2 terabytes of mining
+company emails
+
+cyberscoop.com/environmentalist-hacktivist-collective-mining-company/
+
+August 3, 2022
+
+Government
+
+The group called Guacamaya posted files from public and private mining companies and
+public agencies responsible for environmental oversight.
+
+By AJ Vicens
+
+August 3, 2022
+
+1/4
+
+
+
+A member of the Guatemalan Army patrols in El Estor indigenous municipality, in
+northeastern Guatemala, on Oct. 26, 2021, following the declaration of state of siege after
+protests against a mining company accused of causing environmental damage. (Photo by
+JOHAN ORDONEZ/AFP via Getty Images)
+A hacktivist collective posted more than 2 terabytes of hacked emails and files from a host of
+mining companies in Central and South America on Wednesday, in a move to apparently
+expose environmental damage in the region.
+
+The group — which calls itself Guacamaya, named for a type of bird — posted the files from
+five public and private mining companies and two public agencies responsible for
+environmental oversight, one in Colombia and the other in Guatemala. The material was
+posted to a website called Enlace Hacktivista, a site for documenting hacker history, sharing
+educational resources, and that provides space “for hackers to publish their hacks, leaks,
+and communiques.”
+
+In a Spanish-language statement posted with the materials, the group decried what it
+described as environmental devastation at the hands of U.S. and other international
+governments and firms that plunder the region’s resources.
+
+“All we really want, as our own mother warns us, is for this to stop,” the statement read,
+according to a Google translation. “We want them to stop, to stop once and for all exploiting,
+mining, polluting, that desire for dominance.”
+
+2/4
+
+
+
+The materials come from ENAMI, an Ecuadorian state mining company; the Agencia
+Nacional de Hidrocarburos (ANH) in Colombia; New Granada Energy Corporation in
+Colombia; Quiborax, a mining company in Chile; Oryx, an oil company in Venezuela;
+Tejucana, a Brazilian mining company; and Guatemala’s Ministerio De Ambiente y Recursos
+Naturales.
+
+DDoSecrets, a transparency advocacy website that also hosts hacked materials in the public
+interest, published a release on the files simultaneously Wednesday.
+
+Guacamaya, in March, released 4.2 terabytes of hacked material from mining subsidiaries of
+a Swiss investment group that detailed the companies’ apparent pollution in Guatemala. The
+files became part of a massive reporting project involving 65 journalists around the world that
+exposed not only proof of pollution, but efforts to manipulate local governments and
+surveillance of journalists.
+
+After that hack, the group posted a video detailing how they accessed the systems and stole
+the files and emails. They also gave an interview talking about why they’re going after these
+companies to Forbidden Stories, the organization that coordinated and published a series of
+stories based on the documents.
+
+“The role of a hacker is to take part in the different forms of resistance in any territory where
+there is dignified rage and a joyful desire for radical revolution,” they said.
+
+More Like This
+
+1. AI is helping US spies catch stealthy Chinese hacking ops, NSA official
+says
+By AJ Vicens
+
+2. Russian hackers reportedly breached telecom network months before
+attack
+By AJ Vicens
+
+3. Cyber operations linked to Israel-Hamas fighting gain momentum
+By AJ Vicens
+
+Top Stories
+
+3/4
+
+
+
+1. White House moves to ease education requirements for federal cyber
+contracting jobs
+By Elias Groll
+
+2. Sandworm probably wasn’t behind Danish critical infrastructure
+cyberattack, report says
+By Christian Vasquez
+
+3. Growing pains at the Bureau of Cyberspace and Digital Policy, report
+finds
+By Christian Vasquez

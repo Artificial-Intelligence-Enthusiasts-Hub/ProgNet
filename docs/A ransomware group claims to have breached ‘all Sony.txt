@@ -1,0 +1,128 @@
+A ransomware group claims to have breached ‘all Sony
+systems’
+
+videogameschronicle.com/news/a-ransomware-group-claims-to-have-beached-all-sony-systems/
+
+25 September 2023
+
+Update: Sony is “investigating the situation” after a hacking group threatened to sell allegedly
+stolen data
+
+Video Game News
+25th Sep 2023 / 3:27 pm
+
+Posted by
+
+Tom Ivan
+Ransomware group Ransomed.vc claims to have successfully breached Sony Group and is
+threatening to sell a cache of data stolen from the Japanese company.
+
+While its claims remain unverified, Cyber Security Connect reports that the relative
+ransomware newcomer “has racked up an impressive amount of victims” since bursting onto
+the scene last month.
+
+1/4
+
+
+
+“We have successfully compromissed [sic] all of sony systems,” the group claimed on both
+the clear and dark nets. “We won’t ransom them! We will sell the data. Due to Sony not
+wanting to pay. DATA IS FOR SALE.”
+
+Update26th Sep 2023 / 4:07 pm
+In response to claims it’s been hacked, Sony has said it’s “investigating the situation”.
+
+According to Cyber Security Connect, the group has posted some proof-of-hack data,
+although it says this is “not particularly compelling information on the face of things”.
+
+It includes what appear to be screenshots of an internal log-in page, an internal PowerPoint
+presentation, several Java files, and a file tree of the leak which seemingly includes fewer
+than 6,000 files.
+
+The group listed a “post date” of September 28, after which if nobody purchases the data, is
+presumably when Ransomed.vc will publish the data wholesale.
+
+Ransomed.vc is said to be both a ransomware operator and a ransomware-as-a-service
+organisation.
+
+It claims to be a “secure solution for addressing data security vulnerabilities within
+companies”, and also to be operating “in strict compliance with GDPR and Data Privacy
+Laws”.
+
+“In cases where payment is not received, we are obligated to report a Data Privacy Law
+violation to the GDPR agency!” the group says.
+
+Most of the Ransomed.vc’s members reportedly operate out of Ukraine and Russia.
+
+VGC has contacted Sony for comment on this report and will update it if we hear back from
+the company.
+
+In 2011, Sony’s PlayStation Network suffered a massive breach that resulted in the personal
+details of approximately 77 million accounts being compromised and the service being taken
+offline for 23 days.
+
+Sony initially estimated the hack would cost it more than $100m, and it was forced to
+apologise not only to players, but developers whose game launches were disrupted or
+whose online services were left unavailable.
+
+Notice: To display this embed please allow the use of Functional Cookies in Cookie
+Preferences.
+
+2/4
+
+
+
+Sony eventually faced as many as 55 class action lawsuits and agreed to offer compensation
+for those affected, including free games.
+
+“You are the lifeblood of the company,” PlayStation‘s US boss Jack Tretton said at the time.
+“Without you, there is no PlayStation. I want to apologise personally. It’s you that causes us
+to be humbled and amazed by the support you continue to give.”
+
+To Sony’s third-party publishing partners, Tretton said: “I know the outage has been costly.
+We wouldn’t be where we are without you”. He added: “We are committed more than ever to
+making sure the PlayStation experience is entertaining and secure for everybody”.
+
+22 Comments
+Related VGC Content
+
+In response to claims it’s been hacked, Sony says it’s ‘investigating the situation’
+3 months ago
+
+Related Products
+
+God of War Ragnarök (PS5)
+
+£47.99£69.99 £69.99 $69.99 $75.15
+
+PS5 DualSense Edge wireless controller
+
+$199.99 $199.99 $199 £208
+
+£209.99
+
+3/4
+
+
+
+PlayStation Store Gift Card ($50/£50)
+
+$50
+Other Products
+
+PlayStation Portal
+
+$199 $199 £199.99 £304
+
+$316.83
+
+PlayStation 5
+
+£495 $499.99 $569 $789
+
+PlayStation VR2
+
+£529.99 $549.99 £764.39
+
+Some external links on this page are affiliate links, if you click on our affiliate links and make
+a purchase we might receive a commission.

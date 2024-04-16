@@ -1,0 +1,178 @@
+Approaching stealers devs : a brief interview with Meta
+g0njxa.medium.com/approaching-stealers-devs-a-brief-interview-with-meta-8ae628dfab8c
+
+g0njxa December 8, 2023
+
+g0njxa
+
+--
+
+1/5
+
+
+
+To completely understand what’s going on in a market that has been growing in the last
+years I found mandatory to know which players are dominating it. Always remember that
+behind every user of the Internet there is another human like you, so if you can be kind
+enough to reach them and they agree, you can have a little talk. Asking things is not a crime.
+
+Let’s see, Meta: @meta_stealer
+
+The interview was made in Russian. Since I was using a translator, questions will be shown
+in original english, and answers will be given both in original Russian (in case translation is
+misled) and translations to english.
+
+What is Meta?
+
+Мета это программа-стиллер, ворующий пароли и другие сохраненные данные
+с компьютера.
+
+What is the history of the name META?
+
+Мы хотели назвать наш продукт Мета, по двум причинам:1) чтоб название
+меньше индексировалось поисковиками,2) Мы хотели подчеркнуть что наш
+продукт обладает сверх-большими возможностями и функционалом.
+
+“Meta” is a Greek-origin prefix that means after, beyond, or at a higher level. The same vision
+of this word is shared between Mark Zuckerberg and the Meta Stealer guys.
+
+How is META different from other products?
+
+Все логи меты идут напрямую в панель клиента, мы не храним у себя копии
+украденных данных.
+
+Claims of stolen data from customers are around every product, this is something I would
+like to dive into.
+
+2/5
+
+
+
+When did META started working?
+
+С 2021-ого года. В 2021-ом году, в REDLINE появились новые функции,
+позволяющие работать в одной панели сразу большому количеству людей.
+Спустя месяц, разработчик редлайн пожалел, что создал такую функцию и
+захотел прекратить это. Но так как он имел обязательства перед
+купившими, он со своей командой решели продать часть исходного кода, а всем
+уже купившим данную функцию — просто выдать новую панель. Они нам
+предложили купить часть исходного кода, с условием, что мы бесплатно
+разместим у себя всех их клиентов. На тот момент REDLINE был, подчеркну,
+самым технологичным стиллером в мире. И мы согласились на их
+условия.Цену покупки я оглашать не буду. Так появился метастиллер,
+которым вы его знаете сейчас.
+
+How many people have tried META? approximately
+
+100–150
+
+I have to ask you about the relationship between META and REDLINE. Many
+people confuse their products, but I know they are not the same thing. What do
+you think about it? What is the difference between them?
+
+Мы очень уважаем команду редлайн, но естественно среди нас есть
+конкуренция. Возможно у нас и нет такого опыта в разработке програмного
+обеспечения, как у них, но у нас большая команда, и мы регулярно работаем
+над улучшением своего продукта. В этом году из их команды к нам
+присоединился второй разработчик, и это существенно улучшило скорость и
+качество нашего обслуживания.Сегодня, мы можем смело сказать что наш
+продукт лучше и качественне чем REDLINE.
+
+Meta is not Redline. Meta is not Redline. ….
+
+META is the best choice among teams and individual workers. Do you think this
+is the number 1 option among all the operations on the market?
+
+Да.
+
+DA, very sure, but the owner of something must not say anything bad about his product. Let
+me share to you an objective view:
+
+Now that Infostealers groups seems like a known thing,
+
+KZ Team Reborn — list of operations since October 11th, 2022
+
+359999 META victims vs 30175 REDLINE victims (Stop Redline July 2023)
+
+3/5
+
+
+
+GhostBusters — list of operations since July 19th, 2023
+
+20107 META victims vs 0 REDLINE (They don’t work with Redline)
+
+Failing that, we have
+
+Raven Logs— list of operations since November 9th, 2022
+
+52384 META victims vs 254530 REDLINE (Both active)
+
+Meta is highly used on these teams, as well as Redline or other products such as Lumma or
+Raccoon. Consider Meta a separate threat from Redline.
+
+Does META allows to work on people from the CIS countries? How do you feel
+about people who work with Russians?
+
+В русском сегменте даркнета, существует неписанное правило “ Не работать
+по РУ” ( РУ=Россия и страны СНГ). Но многие не правильно интерпретируют
+это правило. Суть этого правила в том чтоб не привлекать внимание к себе и
+своим клиентам. Так же суть в том, чтоб не грабить свой народ, который и
+без того беден. Наш продукт никак не помогает воровству у бедных, мы не
+продаем и не приветствуем мошенничество среди необеспеченных слоев
+населения. Наш продукт создан для кражи криптовалюты, а ее владеют
+исключительно те люди, которые способны на инвестиции.
+
+Meta is one of those products that doesn’t follow any anti-CIS policies, and I found this
+statement very interesting.
+Some other people with sim ilar thoughts said that “if you have a cryptocurrency amount
+worth a 3-month engineer salary, you are not poor,” and the distribution of wealth should be
+applied to you.
+This is very dan gerous, and being rich is not a justification to be robbed. Don’t mess with
+other people’s money.
+
+What do you think has been the biggest update in META?
+
+Оно будет в следующем месяце.
+
+Indeed, it was out recently, before I expected.
+
+Meta V4 was announced at November 28th, 2023. Please find the statement at
+https://x.com/g0njxa/status/1729538390729834852
+
+What are META’s plans for the future?
+
+Умножить функционал в 10 раз.
+
+4/5
+
+
+
+How do you see the market, is now a good time to work?
+
+Смотря что вы подразумеваете под словом “Рынок” Рынок стиллеров — на
+пике популярности. Рынок даркнета — в упадке, и только за счет единиц, он
+еще продолжает существовать.
+
+At this point, this is the most accurate point of view of the infostealers ecosystem. There are
+too many active people with too many operations that bring too much attention to a business
+that has been abused by too many people in recent years. The market bubble is bleeding bit
+by bit.
+
+Do you have anything to say to the “information security experts” who are trying
+to hunt down META?
+
+В мире существуют гараздо более опасные люди, чем мы. Хакеры одиночки и
+АРТ группировки, способные организовать ядерную катастрофу или
+логистический коллабс. Причем, цели их весьма прагматичны. Не надо искать
+нас. Пусть лучше уделяют больше времени изучению и пресечению тех, кто
+нажатием кнопки может парализовать ядерный реактор или медицинский
+отсек во время операции больного.
+
+The end?
+Remember to check the other interviews at: g0njxa — Medium
+
+Expect more content,
+Best regards.  
+
+@g0njxa

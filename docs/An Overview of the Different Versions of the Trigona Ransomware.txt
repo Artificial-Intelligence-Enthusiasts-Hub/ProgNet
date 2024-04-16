@@ -1,0 +1,255 @@
+An Overview of the Different Versions of the Trigona Ransomware
+trendmicro.com/en_us/research/23/f/an-overview-of-the-trigona-ransomware.html
+
+June 23, 2023
+
+Figure 1. Trigona ransomware detections based on country
+The Trigona ransomware is a relatively new ransomware family that began activities around late October 2022 —
+although samples of it existed as early as June 2022. Since then, Trigona’s operators have remained highly active,
+and in fact have been continuously updating their ransomware binaries. By April 2023, Trigona began targeting
+compromised MSSQL servers by stealing credentials via brute force methods. In May 2023, we found a Linux version
+of Trigona that shared similarities with its Windows counterpart.
+
+The threat actors behind Trigona are allegedly the same group behind the CryLock ransomware due to similarities in
+tools, tactics, and procedures (TTPs). It has also been linked to the ALPHV group (also known as BlackCat), though
+we believe that any similarities between Trigona and BlackCat ransomware are only circumstantial at best (one
+possibility is that ALPHV collaborated with the threat actors deploying Trigona but were not actually involved with its
+development and operation).
+
+Target countries and industries
+Based on Trend Micro™ Smart Protection Network™ data, US and India were the countries with the highest number
+of Trigona ransomware detections, with Israel, Turkey, Brazil, and Italy also having a significant count.
+
+Meanwhile, attacks focused mainly on the technology and healthcare industries, which had the highest number of
+detections.
+
+1/11
+
+
+
+Figure 1. Trigona ransomware detections based on industry
+Infection chain
+
+2/11
+
+
+
+Figure 3. The Trigona ransomware infection chain (based on Palo Alto’s analysis of Trigona)
+Trigona was found to be exploiting the ManageEngine vulnerability CVE-2021-40539 for initial access based on a
+report from Arete. In addition, the threat actors used previously compromised accounts by obtaining access from
+network access brokers.
+
+It uses a variety of tools for lateral movement, including Splashtop (a legitimate remote access tool), which is used to
+drop further additional tools on a compromised machine.
+
+Trigona drops a file called turnoff.bat (detected as Trojan.BAT.TASKILL.AE) to terminate AV-related services and
+processes. It also uses Network Scanner and Advanced Port Scanner to identify network connections.
+
+Based on AhnLab’s analysis, Trigona’s operators use CLR shell on attacks launched against MS-SQL servers. This
+tool is capable of multiple commands, including one that drops additional executables for privilege escalation
+(nt.exe).
+
+3/11
+
+
+
+Figure 4. Infection chain for compromised SQL server (Based on AhnLab’s analysis)
+Trigona encrypts files in infected machines using AES encryption. Furthermore, the ransomware contains an
+encrypted configuration in its resource section which is decrypted upon execution. However, it will only use certain
+strings within its configuration. Trigona also randomizes the file names of encrypted files and appends the ._locked
+extension upon encryption.
+
+Trigona’s operators employ the credential dumper Mimikatz to gather the passwords and credentials found on the
+machines of the victims.
+
+Linux Version
+In May 2023, our threat hunting team found a Linux ransomware binary that had a sparse number of detections.
+Upon further verification, we confirmed these binaries to be a Linux version of Trigona. Like its 32-bit Windows
+counterpart, this binary accepts command-line arguments for execution.
+
+4/11
+
+
+
+ Figure 5. Code snippet showing
+
+command-line arguments from the Linux version of Trigona
+The ransom note dropped by the binary (how_to_decrypt.txt) contains only an email address of the threat actor
+behind the attack. This may indicate that the Linux version is still a work in progress.
+
+ Figure 6. Ransom note dropped by the Linux version of
+
+Trigona
+
+Windows 64-bit version
+In June 2023, we encountered a new version of Trigona ransomware, this time designed for Windows 64-bit
+platforms. This version implements additional command-line arguments that were not present with the Linux version
+and the original 32-bit version (such as /sleep and /debug). 
+
+5/11
+
+
+
+ Figure 7. Snippet showing
+
+command-line arguments from the 64-bit Windows version of Trigona
+
+Command-line arguments
+Table 1 summarizes the command-line arguments used by each of the different versions of Trigona:
+
+32-bit 64-bit
+Windows Windows Linux Description
+
+/r /r  Allows the encryption of files in a random order
+
+/full /full /full Encrypt the whole content of the target file (if not used, only the first
+0x80000 bytes/512kb are encrypted)
+
+/erase /erase /erase Deletes the content of the target files. (By default, only the first 512kb
+is erased unless the argument /full is used)
+
+/!autorun /!autorun  Does not create the autorun registry entry.
+
+/is_testing /is_testing /is_testing Used with /test_cid and /test_vid for testing purposes
+
+/test_cid /test_cid /test_cid Uses the specified Computer ID instead of generating one
+
+/test_vid /test_vid /test_vid Uses the specified Victim ID instead of the one in the configurations
+
+/p /p /p Specifies the path to encrypt
+
+6/11
+
+
+
+/path /path /path Specifies the path to encrypt
+
+/!local /!local  Avoids encrypting local files
+
+/!lan /!lan  Avoids encrypting network shares
+
+/shdwn /shdwn /shutdown Forces shutdown of the machine after encryption
+
+/autorun_only /autorun_only  Creates an autorun registry that will execute the ransomware upon
+logon. This will not perform the encryption yet.
+
+ /sleep  Sleeps for n seconds before execution
+
+ /debug  Executes in debug mode, need to be executed with /p
+
+ /log_f  specifies the log file for logging
+
+ /fast   
+
+ /allow_system  Allows encryption of files in the system directory
+
+Table 1. Command-line arguments used by each Trigona version
+
+Encryption
+All versions of Trigona employ  TDCP_rijndael (AES) to encrypt the target files depending on the configurations set
+in its resource section. 
+
+ Figure 8. The Linux version of
+
+Trigona using AES for encryption
+
+7/11
+
+
+
+Encrypted files are either renamed with encrypted strings or with an additional prepended string available_for_trial,
+then appended by the ._locked extension. 
+
+ Figure 9. Files
+
+encrypted by Trigona
+To pressure victims into paying the ransom, the Trigona leak site contains a countdown timer and bidding options for
+parties interested in acquiring access to the leaked data. The attackers provide each victim with an authorization key
+that they can use to register on the negotiation portal provided by Trigona.
+
+Trigona leak site update
+The Trigona ransomware group employs a double extortion scheme. In addition to the main leak site which displays
+the list of victim companies, Trigona’s operators also use a Tor site where victims can communicate with the threat
+actor group to negotiate for the decryption tool. Interestingly, they also flag those victims that have already paid.
+
+The report from Palo Alto revealed t an IP address hosting the leak site under the name "Trigona Leaks" and using
+port 8000. Additionally, another IP address titled "Leaks" was uncovered, which also employed port 8000 and shared
+the same IP range as the previously mentioned leak site-connected IP address.
+
+During our investigation, we found another IP address on June 3 that was still active at the time of writing. This IP
+address, which uses port 3000 and the title Blog, is within the IP range of the previous addresses. We surmise that
+the threat actor relocates some of its infrastructure when their IP address is exposed. Using this third leak site, we
+were able to find their file storage site (aeey7hxzgl6zowiwhteo5xjbf6sb36tkbn5hptykgmbsjrbiygv4c4id[.]onion). This
+site hosts critical data stolen from victims such as documents, contracts, and other large amounts of data.
+
+The Trigona ransomware group has poor operational security when it comes to the implementation of Tor sites —
+although their aim of targeting poorly-managed SQL servers is not something we usually see with less technically-
+proficient threat actors. Our ransomware spotlight on TargetCompany shows another group using a similar technique
+of targeting SQL servers.
+
+8/11
+
+
+
+Figure 10. Main leak site of Trigona
+
+Figure 11. Trigona leak site found via Shodan on June 3, 2023
+
+9/11
+
+
+
+Figure 12. The file storage Tor site of Trigona using the title “test”
+
+Conclusion and recommendations
+The Trigona ransomware currently maintains a relatively low profile when compared to more widespread families,
+allowing it to operate covertly. Nonetheless, due to its continuous evolution and increased activity, we anticipate that
+Trigona will gain prominence in the near future. Furthermore, it joins the growing list of ransomware groups that have
+developed a Linux version to try and capitalize on the expanding high-value Linux market, adding evidence that
+Trigona’s operators are trying to expand their reach as much as possible. Therefore, it is crucial for individuals and
+organizations to familiarize themselves with this ransomware to prevent potential harm.
+
+To safeguard systems against ransomware attacks, it is advisable for organizations to adopt effective measures.
+These include implementing data protection protocols and establishing backup and recovery procedures to ensure
+that data remains secure and can be restored in case of encryption or even deletion. Conducting routine vulnerability
+assessments and promptly patching systems can significantly reduce the impact of ransomware attacks that exploit
+vulnerabilities.
+
+We recommend the following security precautions:
+
+1. Enable multifactor authentication (MFA) to hinder attackers from moving laterally within a network and
+accessing sensitive information.
+
+2. Follow the 3-2-1 rule when creating backups for important files. This involves generating three backup copies
+stored in two different file formats, with one copy stored in a separate location. This ensures redundancy and
+minimizes the risk of data loss.
+
+3. Update and patch systems regularly. It is important to keep applications and operating systems up to date and
+establish robust patch management protocols to prevent malicious actors from exploiting software
+vulnerabilities.
+
+Indicators of Compromise
+
+SHA256 Detection name
+
+f1e2a7f5fd6ee0c21928b1cae6e66724c4537052f8676feeaa18e84cf3c0c663 Ransom.Linux.TRIGONA.THCBBBC 
+
+951fad30e91adae94ded90c60b80d29654918f90e76b05491b014b8810269f74 Ransom.Linux.TRIGONA.THEAFBC 
+
+d0268d29e6d26d726adb848eff991754486880ebfd7afffb3bb2a9e91a1dbb7c Ransom.Win64.TRIGONA.YXDFIZ
+
+a891d24823796a4ffa2fac76d92fec2c7ffae1ac1c3665be0d4f85e13acd33f9 Ransom.Win64.TRIGONA.THFOIBC
+
+10/11
+
+
+
+2b40a804a6fc99f6643f8320d2668ebd2544f34833701300e34960b048485357 Ransom.Win64.TRIGONA.YXDFOZ
+
+8cbe32f31befe7c4169f25614afd1778006e4bda6c6091531bc7b4ff4bf62376 Ransom.Win32.TRIGONA.YPDDZ
+
+fb128dbd4e945574a2795c2089340467fcf61bb3232cc0886df98d86ff328d1b Ransom.Win32.TRIGONA.YMDBJ
+
+41c9080f9c90e00a431b2fb04b461584abe68576996379a97469a71be42fc6ff Ransom.Win64.TRIGONA.YXDFUZ
+
+c7a930f1ca5670978aa6d323d16c03a97d897c77f5cff68185c8393830a6083f Trojan.MSIL.TRIGONA.YCDCT

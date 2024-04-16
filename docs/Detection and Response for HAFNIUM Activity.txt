@@ -1,0 +1,2 @@
+Detection and Response for HAFNIUM Activity
+discuss.elastic.co/t/detection-and-response-for-hafnium-activity/266289/3

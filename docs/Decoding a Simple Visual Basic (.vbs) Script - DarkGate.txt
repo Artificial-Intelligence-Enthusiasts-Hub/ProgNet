@@ -1,0 +1,198 @@
+Decoding a Simple Visual Basic (.vbs) Script - DarkGate
+Loader
+
+embee-research.ghost.io/decoding-a-simple-visual-basic-vbs-script-darkgate-loader/
+
+Matthew October 16, 2023
+
+Last updated on  Oct 18, 2023
+
+In this post I will demonstrate a process for decoding and demystifying a simple darkgate
+loader vbs script. This script employs minimal obfuscation and is not particularly complex
+however it does deploy some decoy tactics which can be tricky to navigate and may throw off
+an inexperienced analyst.
+
+This post will demonstrate some basic techniques for removing decoy code and identifying
+the final intended functionality of a malicious .vbs script.
+
+The sample hash is
+3a586493131b5a1784e7da751f12fd992bc41f300a28dcc5021d2127d33cb8bc and can be
+found on Malware Bazaar.
+
+Initial Analysis
+I have first downloaded the file and unzipped it using the password infected.
+
+Initial analysis with detect-it-easy shows that it is a plaintext file, so we can largely continue
+analysis with a text editor. I will be using notepad++.
+
+1/13
+
+
+
+An initial review of the strings shows some comments suggesting that the file is related to a
+legitimate windows driver script.
+
+This is used to throw off an inexperienced analyst who may (in a rush) assume that the script
+is legitimate.
+
+2/13
+
+
+
+Reviewing a Malware Script Inside a Text Editor
+Since the file is in plaintext, I can proceed by opening the file in a text editor. This will allow
+me to investigate further and determine if the script is legitimate or contains some kind of
+malicious functionality.
+
+The file initially looks something like this. Note how there is no text highlighting as the initial
+file did not have a file extension.
+
+I always try to add text highlighting as it can significantly improve the readability of the script
+being analyzed.
+
+3/13
+
+
+
+I use the dropdown menu to enable visual basic highlighting.
+
+It can be a slight art to know which language to choose for text highlighting. In this
+case i know to use visual basic because of the use of ' at the start of each of the initial
+lines. This is the visual basic method of declaring a comment.
+
+After looking at a few scripts you'll get a feel for which language is which, usually
+based on comment styles and the ways that variables are created. You an also just
+guess, incorrect highlighting is often better than no highlighting.
+
+4/13
+
+
+
+After enabling text highlighting, the script now looks significantly better. We can clearly see
+which lines are comments and which lines contain code.
+
+The initial piece of the script file contains a bunch of comments, these don't add to
+functionality at all and can be later removed. They are essentially a decoy used to throw off
+strings analysis.
+
+5/13
+
+
+
+Scrolling down, we can also see a bunch of variable creations. These also contain junk
+strings that don't add to functionality.
+
+Scrolling down more, we can see a small blob of code that contains a url and appears to be
+slightly obfuscated.
+
+This is the main piece of code that we are interested in.
+
+6/13
+
+
+
+Cleaning up The script
+Before analysing the "malicious" section, I will go ahead and clean up the rest of the script.
+This makes it easier to view the malicious section and can reveal other smaller malicious
+parts that may have been missed.
+
+To do this, I will perform two actions.
+
+Remove the junk comments
+Remove the junk variables. \
+
+To remove the junk comments, I will use a simple regex and the replace function of
+notepad++ (CTRL+H).
+
+7/13
+
+
+
+Cleaning Up Malware Scripts Using Regex
+Let's break down that regex. The aim is to completely remove any line that starts with a '
+comment.
+
+^ - only look at the start of each line
+' - look for a ' at the start of each line
+.* - grab everything that comes after the '
+\r\n - grab any newlines at the end of each line that we remove.
+
+After hitting enter, the script has been reduced to 143 lines instead of 191. The initial part of
+the script now looks like this.
+
+Not perfect, but much better.
+
+Now we want to remove the const variables, which largely appear to be junk.
+
+To do this, we can add another regex. We can essentially re-use the same regex, swapping
+out the ' for a const. This will completely remove any line that starts with const.
+
+8/13
+
+
+
+After hitting enter, 87 lines are removed from the code.
+
+9/13
+
+
+
+There are a few empty lines that don't add any value to the code. You can go ahead and
+remove these manually or with a regex.
+
+This leaves 34 lines left. and the script is significantly more readable than before.
+
+Now it's relatively intuitive to see that a command is executed which calls out to the url and
+downloads a file.
+
+However, I will instead show some ways of cleaning up the file even further.
+
+Manually Editing A Script To Improve Readability
+The first, is to rename variables like this to something more meaningful.
+
+In this case, I have renamed lxwpges to shell_application
+
+10/13
+
+
+
+I won't go into details about renaming every single variable. It largely doesn't matter what you
+pick, as long as the new variable names provides some kind of meaning to you.
+
+Here is an example where I have renamed the remaining values.
+
+11/13
+
+
+
+It's now easy to see the script contains the following "True" functionality.
+
+Creates a web request object
+Performs some junk to display or not display a message box
+Creates a shell application object (used to launch commands)
+Makes a web request to a url
+Uses ShellExecute to execute the response from the web request. (indicating the
+result is most likely another script)
+
+Now at this point, you could go ahead and perform some manual cleaning up. This would
+leave you with something like this.
+
+12/13
+
+
+
+At this point you could go ahead and analyse the malicious domain or go hunting for
+indications of successful execution in your environment. These indicators could be the
+domain/url, or potentially the command being executed by the cmd at the end.
+
+Conclusion
+
+At this point, the script is cleaned up and significantly easier to read. We have removed basic
+forms of obfuscation used to throw off analysis, and have reduced the script from 191 lines
+down to only 13.
+
+Although this obfuscation was very basic, hopefully you've learnt a new technique or two for
+analysing script malware.
+
+If you found this useful, consider signing up for the site. Signing up will provide you with
+access to a discord server, bonus content and early access to future posts.

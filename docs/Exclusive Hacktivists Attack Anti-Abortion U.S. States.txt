@@ -1,0 +1,94 @@
+Exclusive: Hacktivists Attack Anti-Abortion U.S. States
+webz.io/dwp/exclusive-hacktivists-attack-anti-abortion-u-s-states/
+
+Last week’s controversial ruling of the U.S. Supreme Court, which overturned Roe v. Wade,
+sent shockwaves through the world and the web. It came as no surprise to us to see that the
+heated debate around abortion rights moved to the dark web. But one group, took it a step
+further by launching an attack against “pro-life” states in the U.S.
+
+Using our Cyber API, we were able to detect the first cyber attack since the ruling. A new
+hacktivist group, SiegedSec, targeted states that support the ban on abortions, in a show of
+support to “pro-choice” groups.
+
+A day after the ruling, on June 25, the group posted internal documents and files they stole
+from the servers of the states of Kentucky and Arkansas on their Telegram channel:
+
+1/6
+
+
+
+The announcement the group made on the attack on their Telegram account 
+They leaked between 7-8GB of documents, including PIIs of employees of these states.
+
+2/6
+
+
+
+A screenshot of the file host sharing platform the leak was uploaded to 
+SiegedSec claimed they will continue to target servers of the states that support a ban on
+abortion.
+
+Who is SiegedSec?
+The group first appeared a few months ago, and has since attacked several different
+companies from various industries around the world including information technology,
+insurance, and finance. 
+
+They then leaked databases belonging to their victims, which include usernames, emails,
+hashed/plaintext passwords, PII, sensitive information, and more. We have not seen any
+proof that they extort their victims for the data they steal.
+
+To show the extent of their attacks, the groups also claimed they had defaced over 100+
+domains, but they were stopped by the companies who detected the activity and took action:
+
+3/6
+
+
+
+Where is the group active?
+Hacking Forums
+
+A user named YourAnonWolf posted several leaks on behalf of SiegedSec, linking himself
+to the group. He published on breached.co, the new popular hacking forum that attempts to
+replace Raidforums.
+
+A post YourAnonWolf published on breached.co
+We took a closer look at YourAnonWolf and were able to find a post he had published before
+he was publicly linked to SiegedSec. A little over a year ago, he posted a leak of a domain
+that belongs to an Israeli organization on pastebin:
+
+Twitter account
+
+4/6
+
+
+
+The group also created a new account, on Twitter earlier this year, as the last one was
+suspended:
+
+An image of the new Siegedsec account on Twitter
+
+Hacktivism against abortion ban
+This is not the first time a hacktivist group targeted a U.S. state that moved to ban abortions.
+In October 2021, Anonymous launched a series of attacks as part of their Operation Jane
+campaign against a Texas law that prohibited abortions.
+
+The famous attack was against Epik, a web hosting company used by large right-wing
+clients, such as Parler, Gab, 8chan as well as the Republican Party of Texas. In total, over
+480GB of data belonging to Epik was stolen and leaked.
+
+As the new Supreme Court ruling sets a new phase in the battle over abortion rights, we may
+continue to see more hacktivists taking a clear stance by launching new attacks against “pro-
+life” groups and states.
+
+Hacking GroupsTrending
+
+5/6
+
+
+
+Avishag Yulevich
+
+Senior Cyber Analyst
+
+Not subscribed to our Dark Web Pulse updates?
+By submitting you agree to Webz.io's Privacy Policy and further marketing communications.

@@ -1,0 +1,1189 @@
+A Tale of Two Markets: Investigating the
+Ransomware Payments Economy
+
+Kris Oosthoek Jack Cable Georgios Smaragdakis
+Delft University of Technology Independent Researcher Delft University of Technology
+
+ABSTRACT Kingdom [37], Australia [22], Canada [12], and law en-
+Ransomware attacks are among the most severe cy- forcement agencies, such as the FBI [38] and Europol [11],
+ber threats. They have made headlines in recent years have also launched similar programs to defend against
+by threatening the operation of governments, critical ransomware and offer help to victims.
+
+infrastructure, and corporations. Collecting and ana- To the criminal actors behind these attacks, the result-
+
+lyzing ransomware data is an important step towards ing disruption is just ‘collateral damage’. A handful of
+
+understanding the spread of ransomware and design- groups and individuals, with names such as NetWalker,
+
+ing effective defense and mitigation mechanisms. We Conti, REvil and DarkSide, have received tens of millions
+
+report on our experience operating Ransomwhere, an in USD as ransom. But this is just the top of the food
+
+open crowdsourced ransomware payment tracker to col- chain in an ecosystem with many grey areas, especially
+lect information from victims of ransomware attacks. when it comes to laundering illicit proceedings. In this
+With Ransomwhere, we have gathered 13.5k ransom pay- article, we will provide a closer look at the ecosystem
+ments to more than 87 ransomware criminal actors with behind many of the attacks plaguing businesses and
+total payments of more than $101 million. Leveraging societies, known as Ransomware as a Service (RaaS).
+
+the transparent nature of Bitcoin, the cryptocurrency Cryptocurrencies remain the payment method of choice
+used for most ransomware payments, we characterize for criminal ransomware actors. While many cryptocur-
+the evolving ransomware criminal structure and ransom rencies exist, Bitcoin is preferred due to its network
+laundering strategies. Our analysis shows that there are effects, resulting in wide exchange options. Bitcoin’s
+two parallel ransomware criminal markets: commodity sound monetary features as a medium of exchange, unit
+ransomware and Ransomware as a Service (RaaS). We of account and store of value make it as attractive to
+notice that there are striking differences between the two criminals as it is to regular citizens. According to the
+markets in the way that cryptocurrency resources are U.S. Department of Treasury, based on data from the
+
+utilized, revenue per transaction, and ransom laundering first half of 2021, the “vast majority” of reported ran-
+efficiency. Although it is relatively easy to identify choke somware payments were made in Bitcoin [28]. Law en-
+points in commodity ransomware payment activity, it is forcement agencies have started to disrupt ransomware
+more difficult to do the same for RaaS. actors by obtaining personal information of users from
+
+Bitcoin exchange platforms. This is realized through
+anti-money laundering regulations such as Know Your
+
+1 INTRODUCTION Customer (KYC), which require legal identity verifica-
+tion during registration with the service. While cryp-
+
+Ransomware, a form of malware designed to encrypt
+tocurrencies such as Bitcoin are enablers of ransomware,
+
+a victim’s files and make them unusable without pay-
+blockchain technology also offers unprecedented oppor-
+
+ment, has quickly become a threat to the functioning of
+tunities for forensic analysis and intelligence gathering.
+
+many institutions and corporations around the globe. In
+Using our crowdsourced ransomware payment tracker,
+
+2021 alone, ransomware caused major hospital disrup-
+Ransomwhere, we compile a dataset of 7,321 Bitcoin
+
+tions in Ireland [3], empty supermarket shelves in the
+addresses which received ransom payments, based on
+
+Netherlands [8], the closing of 800 supermarket stores
+which we shed light on the structure and state of the
+
+in Sweden [4], and gasoline shortages in the United
+ransomware ecosystem.
+
+States [20]. In a recent report, the European Union
+Our contributions are as follows:
+
+Agency for Cybersecurity (ENISA) ranked ransomware
+• We collect and analyze the largest public dataset of
+
+as the “prime threat for 2020-2021” [13]. The U.S. govern-
+ransomware activity to date, which includes 13,497
+
+ment reacted to high profile attacks against U.S. indus-
+ransom payments to 87 criminal actors over the last
+
+tries by declaring ransomware a national security threat
+five years, worth more than 101 million USD.
+
+and announcing a “coordinated campaign to counter ran-
+somware” [21]. Other governments, including the United
+
+arXiv:2205.05028v1  [cs.CR]  10 May 2022
+
+
+
+• We characterize the evolving ransomware ecosystem. initial philosophy was that a quick ability to restore
+Our analysis shows that there are two parallel ran- would make it unnecessary to pay, impairing the financial
+somware markets: commodity and RaaS. After 2019, incentive of ransomware operators. But it turned out
+we observe the rapid rise of RaaS, which achieves that what we now regard a commodity was just a proving
+higher revenue per address and transaction, and higher ground for a higher-impact utilization of ransomware.
+overall revenue.
+
+• We also characterize ransom laundering strategies by
+commodity ransomware and RaaS actors. Our analysis 2.2 Ransomware as a Service (RaaS)
+of more than 13k transfers shows striking differences While the first reports of Ransomware as a Service (RaaS)
+in laundering time, utilization of exchanges and other emerged in 2016, it wasn’t until 2019 that RaaS became
+means to cash out ransom payments. widespread, rapidly capturing a large share of the ran-
+
+• We discuss the difficulties defending against profession- somware market. We define RaaS as ransomware created
+ally operated RaaS and we propose possible ways to by a core team of developers who license their malware
+trace back RaaS activity in cryptocurrency systems. on an affiliate basis. They often provide a payment portal
+
+• To enable future research in this area, we make our (typically over Tor, an anonymous web protocol), allow-
+tracker, Ransomwhere, and the tracked ransomware ing negotiation with victims and dynamic generation of
+payments of our analysis publicly available at [6]. payment addresses (typically Bitcoin). RaaS frequently
+
+employs a double extortion scheme, not only encrypting
+2 THE RANSOMWARE ECOSYSTEM victims’ data, but also threatening to leak their data
+
+publicly.
+The ransomware ecosystem and its payment traffic can
+
+The rise of RaaS has enabled existing criminal groups
+be largely recognized in two categories: commodity ran-
+
+to shift to a new lucrative business model where lower-
+somware and ransomware as a service (RaaS).
+
+skilled affiliates can access exploits and techniques pre-
+viously reserved for highly-skilled criminals. This was
+
+2.1 Commodity Ransomware exemplified by a leaked playbook from the RaaS group
+In the early years of ransomware, the majority of ran- Conti, which enables novice actors to compromise enter-
+somware that spread can be characterized as ‘commodity’ prise networks [34]. RaaS affiliates can differ markedly in
+ransomware. Commodity ransomware is characterized their approaches. Some scan the entire internet and com-
+by widespread targeting, fixed ransom demands, and promise any victims they can. Once they have identified
+technically-adept operators. It usually targets a single the victim, they engage in price discrimination based on
+device [17]. Actors behind commodity ransomware are the victim company’s size. Affiliates may even use finan-
+usually technically savvy, as most of the time it is devel- cial documents obtained in the attack to justify higher
+oped and spread by the same person. Commodity ran- prices [19]. Another strategy, known as big game hunting,
+somware operators take advantage of preexisting work, targets big corporations that can afford paying a high
+often copying and modifying leaked or shared source ransom. Darkside is one of most notable RaaS families
+code, causing the formation of ransomware families. His- whose affiliates practice big game hunting, including the
+torically, most commodity ransomware campaigns uti- notable Colonial Pipeline attack in 2021 [18].
+lized phishing emails as the primary delivery vector and RaaS families often rely on spear-phishing over the
+exploited vulnerabilities in common word processing and mass phishing mails utilized by commodity ransomware
+spreadsheet software, if not directly via malicious exe- groups. They also exploit recently disclosed vulnerabil-
+cutables. The modus operandi was mass exploitation, ities, leaving remote and virtual desktop services vul-
+rather than targeting specific victims. nerable [9]. RaaS has lowered the barrier to entry into
+
+Exemplary are WannaCry and NotPetya ransomware cyber-criminality, as it has removed the initial expendi-
+families, which over a course of only two months im- ture to develop effective ransomware. As a result, attacks
+pacted tens of thousands of organizations in over 150 can be performed with near zero cost. Combined with
+countries by exploiting a vulnerability allegedly stolen high ransom demands, this has led to a low-risk, high
+from the NSA [15]. In today’s standards, both families reward criminal scheme.
+were poorly coded and their payment systems weren’t RaaS has effectively weaponized the unpatched internet-
+ready for business, although allegedly on purpose for facing technology of many unwitting organizations. Such
+NotPetya [14]. organizations have significant financial interest to have
+
+With regards to its mitigation, the conventional advice systems restored and get back to business after a ran-
+is to have a proper backup and contingency plan. The somware attack. Cryptocurrencies enable ransomware
+
+2
+
+
+
+How ransom payments are executed and laundered To seed the dataset, we collected data from several
+public sources. We imported addresses from Paquet-
+
+1 Victim assets are infected, 
+ransom notice is displayed 2 RaaS: negotiation through Tor 3 Victim exchanges legal 
+
+payment portal / chat support tender for Bitcoin
+Clouston et al. [30], who collected 7,222 addresses and
+labeled families representing approximately $12.7 million
+in payments. This dataset provides us with, among other
+ransomware families, 7,014 addresses belonging to Locky.
+We further collected 37 addresses and associated families
+from the AT&T Alien Labs Open Threat Exchange, an
+
+4 Victim sends Bitcoin to 
+attacker wallet 5 Attacker launders funds through 
+
+illicit services and exchanges 6 Attacker cashing out legal
+tender and/or giftcards open threat intelligence sharing platform [1].
+
+Members of the public may submit reports at our
+crowdsourced payment tracker Ransomwhere [6]. We re-
+ceived 99 reports containing 198 addresses over a 6-
+month period from June 2021 to December 2021. While
+this is a lower number of addresses, they represent the
+
+Figure 1: General course of a ransom payment and its majority of ransomware payment value in our dataset. In
+
+laundering. order to verify reports, the reporter must include the rel-
+evant Bitcoin addresses and the associated ransomware
+family. In addition, they have to provide evidence of
+the ransom demand, such as a screenshot of the ransom
+
+actors to directly monetize these vulnerabilities at a payment portal or a ransom message on an infected com-
+
+scale never seen before. In this paper, we regard the puter. Some addresses were involved in more than one
+
+functioning of ransomware actors through what usually report. All reports were manually reviewed before being
+
+is the last mile of the attack. added to the dataset. We did not accept reports that
+
+Figure 1 shows the general course of events after a were inaccurate or were not related to ransomware (e.g.,
+
+ransomware infection, when the victim decides to pay addresses involved in extortion scam emails).
+
+the attacker (step 1 ). In the case of commodity ran- All reported ransom addresses were Bitcoin addresses.
+
+somware families, the ransom demand price is fixed and Due to the transparent nature of Bitcoin it is possible
+
+negotiation with the attacker isn’t necessary. With RaaS, to verify that the collected addresses indeed received
+
+attackers usually run chat-based services to interact with payments. Using our own Bitcoin full node, we scraped
+
+victims and negotiate the final ransom amount (step 2 ). all transactions for the addresses in our dataset. Overall,
+7,323 out of 7,454 Bitcoin addresses were involved in at
+
+After this, a victim will usually exchange fiat legal ten-
+least one ransom payment. We discarded 134 addresses
+
+der for cryptocurrency such as Bitcoin at an exchange
+that did not receive any payment. We have queried Tor
+
+platform (step 3 ) and then send it to the attacker’s
+using a solution from a peer researcher [33] for all Bitcoin
+
+wallet (step 4 ). The attacker will then usually route addresses in our dataset to rule out the chance of an
+the obtained Bitcoin through various services (step 5 ) address being used for cybercrime purposes other than
+in order to obfuscate ownership and reduce the risk of ransomware. Based on this, we excluded 2 addresses
+deanonymization before cashing out (step 6 ). belonging to a cache of Bitcoin seized by the U.S. De-
+
+partment of Justice after the closing of the SilkRoad
+3 METHODOLOGY darkweb market [23]. After these steps, the final number
+
+of addresses considered for our analysis is 7,321. For a
+In this section, we describe how we collected data of
+
+summary of our dataset we refer to Table 1.
+ransom payments and ransomware actors in our study.
+
+3.1 Addresses involved in Ransom Payments
+We obtain ransomware Bitcoin addresses from our crowd- 3.2 Ransom Payments and Laundering
+sourced payment tracker Ransomwhere. The Ransomwhere The transparency of Bitcoin also allows us to collect
+dataset contains Bitcoin addresses and associated fami- information about (ransom) payments, i.e., the amount
+lies collected from open-source datasets and publicly- of Bitcoin received. For each address we collected the
+submitted crowd-sourced reports. In total, the Ran- number of incoming (payments) and outgoing (transfers)
+somwhere dataset contains 7,457 Bitcoin addresses and transactions, their value in Bitcoin, and their timestamp.
+their corresponding ransomware families. We calculated the USD value of each transaction using
+
+3
+
+
+
+Table 1: Ransomware Dataset Statistics Table 2: Ransomware criminal actors in our Dataset
+
+Name #Addrs. Name (contd.) #Addrs.
+Data Commodity RaaS Total Locky 7037 DarkSide 3
+Unique Actors 71 16 87 NetWalker 66 MedusaLocker 3
+
+Bitcoin Addresses 161 7,160 7,321 SamSam 48 NotPetya 3
+Ryuk 40 GlobeImposter 3
+
+Received Transactions 4,799 8,698 13,497 Conti 27 ThunderCrypt 3
+(Payments) Qlocker 22 Nemucod 3
+Transferred Transactions 4,557 8,540 13,097 JigSaw 11 LockBit 2.0 2
+
+(Laundering) CryptConsole 10 Globe v2 2
+Egregor 9 EDA2 2
+DMALocker v3 9 Flyper 2
+Globe v3 7 Black Kingdom 2
+REvil 7 CryptoLocker 2
+CryptoTorLocker2015 7 AvosLocker 2
+HC6/HC7 6 NoobCrypt 2
+
+the BTC-USD daily closing rate on the day of the trans- Globe 5 VenusLocker 2
+action. This serves as an approximate ransom payment WannaCry 5 XLocker v5 2
+
+and not the exact amount in USD the criminal actors TeslaCrypt 5 Chimera 2
+CTB-Locker 5 Badblock 2
+
+requested or later profited. The total ransom paid to Xorist 4 Other Groups/Families* 50
+
+addresses in our dataset is $101,297,569. The lowest pay- * 50 families with 1 address each. RaaS actors are highlighted.
+
+ment received is $1, and the highest is $11,042,163. The
+median payment value is $1,176. 3.4 Limitations
+
+In collaboration with Crystal Blockchain [5], we tracked
+Our dataset of Bitcoin addresses is the largest public
+
+the destination of outgoing transactions, i.e., transfers.
+collection of ransomware payment addresses collected to
+
+In order to estimate addresses’ potential for illicit use,
+date, based on total USD value. While this allows for a
+
+Crystal Blockchain utilizes clustering heuristics such as
+unique view on the ransomware financial ecosystem, it
+
+one-time change address and common-input-ownership
+is not exhaustive. An inherent limitation of any research
+
+[40], as well as human collection of off-chain data from
+using adversary artifacts is its dependence on the avail-
+
+various cryptocurrency services. In addition to this, Crys-
+ability of artifacts that bad actors have an interest to
+
+tal Blockchain scrapes online forums and other Inter-
+hide. Furthermore victims might have an interest not to
+
+net services for Bitcoin addresses and their associated
+report addresses, as they prefer keeping attacks undis-
+
+real-world entity. Based on this, it is possible to track
+closed. We note that certain families, such as NetWalker,
+
+payments several hops from the original deposit address.
+may be overrepresented in our dataset due to us having
+
+To have the most reliable view, in our analysis we have
+more complete data on these families. Despite this limi-
+
+only regarded the direct destination of ransom payments
+tation, we believe that our dataset provides a valuable,
+
+(first hop). Based on the characterization of the involved
+if incomplete, representation of ransomware payments
+
+addresses across the path, we are able to study the laun-
+over many years. This broad view provides a better re-
+
+dering strategies of ransomware groups as well as the
+flection of the state of affairs than simply focusing on
+
+time needed to wash out the money (see Section 5).
+a few families. We hope that this can lay the ground-
+work for further public data collection in the future, and
+
+3.3 Ransomware Actors encourage anyone to submit data at Ransomwhere [6].
+We obtained addresses and labeled families as described
+in Section 3.1. We categorized each ransomware fam- 4 RANSOM PAYMENT ANALYSIS
+ily as used by either commodity ransomware or RaaS In this section, we analyze 13,497 payments to the Bitcoin
+actors. Ransomware is generally categorized as RaaS addresses owned by ransomware actors in our dataset
+due to the use of an affiliate structure, with the ran- (see Table 1). A payment is a transaction received by
+somware developer (operator) selling the ransomware to an address in our dataset. Table 2 lists the ransomware
+criminal actors either based on a commission for each families used by the actors in our dataset. Our dataset
+ransom paid, or a flat monthly fee (as a service, like contains Bitcoin addresses associated with 87 commod-
+many subscription-based services). As there does not ity ransomware or RaaS actors. For reasons of brevity,
+exist any comprehensive public list of RaaS groups, we families for which our dataset contains just 1 address are
+have labeled a family as RaaS if a reliable industry or law excluded from Table 2. The 16 actors that are classified
+enforcement source claims that a given ransomware is as RaaS, highlighted in Table 2, account for 7,160 out of
+sold as a service. A list of commodity and RaaS families 7,321 addresses in our dataset. As mentioned previously,
+in our dataset is presented in Table 2. for full review our dataset is publicly available [6].
+
+4
+
+
+
+14.0M
+25.0M Commodity Ransomware
+
+12.0M Ransomware­as­a­Service
+20.0M Total Revenue (Commodity+RaaS)
+
+10.0M
+15.0M
+
+8.0M
+10.0M
+
+6.0M
+5.0M
+
+4.0M
+0.0M
+
+2.0M
+
+0.0M
+69000
+46000 BTC­USD Exchange Rate
+
+Ransomware Actor 23000
+
+2015
+2016
+
+2017
+2018
+
+2019
+2020
+
+2021
+2022
+
+Figure 2: Revenue per ransomware actor. Year
+
+Figure 3: USD revenue for commodity and RaaS.
+Ransomware victims typically create an account with
+
+a reputable exchange platform to buy Bitcoin with fiat
+currency. Then, victims perform a transaction (payment) a novelty at the time. This is evident in our analysis, with
+to the address provided by the ransomware actor. In our many addresses with only 2 or 3 incoming transactions.
+dataset, payment transactions to ransomware addresses According to French court documents, Locky’s developer
+tend to originate one to two hops away from reputable is the same individual who owned BTC-e, a fraudulent
+exchange platforms, such as Coinbase and Kraken. exchange [7]. Hence, the actor was able to set up a new
+
+address for each payment without raising compliance
+4.1 Ransomware Revenue alarms. Locky is an early, less sophisticated example of
+
+In Figure 2 we list 15 ransomware families with the high- a RaaS operation which would serve as an example to
+
+est revenue. The top-grossing families are dominated many cybercriminal actors to follow.
+
+by RaaS: NetWalker has the highest revenue, $26.7 mil-
+lion, followed by Conti ($16.4 million), REvil/Sodinokibi 4.2 Ransomware Payment Characteristics
+($12.1 million), DarkSide ($9.1 million) and Locky ($8.1 RaaS actors are not only more effective in terms of
+million). All commodity actors combined account for a profits, but also in handling payments. They typically
+total revenue of $5.5 million. Although the number of have higher revenue per address, while also generating
+RaaS actors is lower, they together earned $95.7 million. unique addresses for victims. In Figure 4 we show the
+
+Figure 3 shows the accumulated revenue of both com- cumulative distribution of received payments between
+modity ransomware and RaaS actors. It shows that, from commodity and RaaS actors. Commodity ransomware
+2015 until 2019, early RaaS actors, primarily Locky, were actors typically use single wallet addresses to receive
+gaining significant but still relatively low revenues. Com- hundreds of ransom payments. The highest amount of
+modity actors were also active, but with even lower rev- payments to a single address is 697 to AES-NI, followed
+enues. As seen in Figure 3, RaaS revenue reached $8.2 by 496 to SynAck and 441 to File-Locker. While these
+million in April 2020. This can be primarily attributed to are outliers, Figure 4 shows that using a single address
+NetWalker, which actively targeted hospitals and health to receive upwards of 100 payments is not unusual.
+care institutions during the first COVID-19 lockdown in In contrast, RaaS actors almost exclusively use a new
+that period [24]. Other revenue peaks caused by RaaS wallet address to receive each payment, as observed in
+groups are in May and June of 2021, with peaks of $13.5 Figure 4 (right). An outlier is an address associated
+million and $12.8 million respectively. These spikes are with NetWalker which has received 138 payments. This
+caused by large ransom payments by individual victims. address is likely an intermediate payment address, com-
+One example of this is a payment to REvil/Sodinokibi bining payments from many victims, discovered during
+on June 1st, 2021, accounting for $11 million. This is McAfee Labs’ investigation into NetWalker [35].
+a payment by the Brazilian meat processing company The distribution of unique addresses per commodity
+JBS, which dominated headlines at the time [16]. ransomware and RaaS actor is presented in Figure 5.
+
+Locky has a notorious reputation as one of the biggest In stark contrast to the revenue from ransom activities,
+ransomware strains in 2016-2017. It’s also one of the presented in Figure 3, the number of addresses used in
+earliest, if not the first, RaaS family. What stands out recent years are low, on the order of tens per month. We
+apart from its high revenue is its address usage. The suspect that RaaS actors prefer to create new addresses
+actors behind Locky issued addresses to each new victim, for each new ransom payment in order to ensure their
+
+5
+
+Revenue in million USD
+
+Netwalker
+(Mailto)
+
+Conti
+REvil/
+
+Sodinokibi
+DarkSide
+
+Locky
+
+Ryuk
+Ragnar-
+Locker
+Mount-
+Locker
+Black-
+Matter
+
+Egregor
+
+HelloKitty
+BitPaymer/
+Doppel
+Paymer
+
+AES-NI
+DMA-
+
+Lockerv3
+Medusa-
+Locker
+
+Revenue in million USD
+
+
+
+Type = commodity Type = RaaS
+1.0 these groups have a specific interest in operational secu-
+
+ NetWalker (Mailto)
+rity, as transactions usually aren’t supported by exchange
+
+0.8 platforms. Another address format is Pay-to-Witness-
+Public-Key-Hash (P2WPKH), or Segregated Witness
+(SegWit) protocols, with prefix bc1q. 72 addresses in our
+
+0.6
+dataset, belonging to Conti, Netwalker, SunCrypt, Dark-
+Side and HelloKitty. These are RaaS actors and could
+
+0.4 imply that they deliberately use SegWit for additional
+security instead of a traditional address format.
+
+0.2
+
+5 MONEY LAUNDERING ANALYSIS
+0.0
+
+0 200 400 600 0 200 400 600 In the previous section, we investigated ransom payments
+Received Payments Received Payments
+
+by victims to ransomware actors. In the next section, we
+investigate 13,097 laundering transactions in our dataset
+
+Figure 4: ECDF of payments per address for commodity
+(see Table 1) to shed light on how these actors liquidate
+
+ransomware and RaaS actors.
+their illicit earnings.
+
+2600 Commodity Ransomware Addresses 5.1 Laundering Strategies
+Ransomware-as-a-Service Addresses
+
+2400
+800 To avoid exposing their identity, ransomware actors
+
+will usually launder their revenue. After routing funds
+600
+30 through one or more services to obfuscate the money trail,
+25 it is cashed out as legal tender or monetized through the
+20 purchase of voucher codes or physical goods. In Figure 6
+15 we show the number of transfer transactions per address.
+10 The number of transfer (outgoing) transactions provides
+5 insights on how actors prefer to initialize their launder-
+0 ing. In short, we see that RaaS actors mostly prefer to
+
+2015
+2016
+
+2017
+2018
+
+2019
+2020
+
+2021
+2022
+
+Year empty the deposit address in one transaction, whereas
+commodity actors prefer multiple smaller transactions,
+
+Figure 5: Number of unique payment addresses for com- up to hundreds, in some cases more. Hence commodity
+modity ransomware and RaaS. ransomware actors are less sophisticated. For example,
+
+three commodity ransomware actors with the most pay-
+ments per address (File-Locker, SynAck, AES-NI) also
+
+pseudo-anonymity, and thus make legal investigations have the most outgoing transactions. While the motiva-
+and takedowns more difficult. tion for this behavior remains unclear, given that law
+
+Moreover, our analysis shows that RaaS groups apply enforcement scrutiny was relatively low, it is likely that
+better operational security practices when using native the commodity actors took advantage of the ability to
+Bitcoin functionality for wallets (payment addresses). cash out more frequently with little risk. This is further
+Bitcoin uses Bitcoin Script to handle transactions be- supported by their choice of laundering entities.
+tween addresses. The script type used defines the wallet Almost all ransomware actors in our dataset launder
+type. Pay-to-Public-Key-Hash (P2PKH) addresses have their proceedings entirely. The speed with which this
+the prefix 1. This is Bitcoin’s legacy address format and happens can be inferred from the time between the first
+the most common address format in our dataset with incoming payment to and the last outgoing transaction
+7,339 addresses. 46 addresses in our dataset are Pay-to- from the deposit address. We define this time duration in
+Script-Hash (P2SH) formatted, recognized by the prefix which ransomware actors start laundering after having
+3. To spend received payments in Bitcoin, the recipient received the payment as collect-to-laundry time. Note
+must specify a redeem script matching the hash. The that this is not the total duration for caching the ransom,
+script can contain functionalities to increase security, but rather the time spent between start receiving the
+such as time-locks or requiring co-signatures. We only ransom payment and transferring the payment received.
+observe this for select actors in our dataset: Qlocker, Net- Figure 7 shows the ECDF of the collect-to-laundry time
+walker, REvil, Ryuk and Phobos. This could mean that (in days) for the commodity ransomware and the RaaS
+
+6
+
+Number of Addresses Proportion
+
+File-Locker
+SynAck
+
+AES-NI
+
+MedusaLocker
+
+
+
+Table 3: Laundering Entities Overview
+
+Entity Description Evidence
+ATM / Payment Provider Payment gateways for physical/online merchants or ATMs, usually used to launder small amounts [27]
+Dark Market / Illegal Services Illegal services available on Tor or other Internet services, used to buy illegal server hosting etc. [10]
+Fraudulent Exchange Exchange platforms officially sanctioned by the US Office of Foreign Assets Control (OFAC) [7]
+Gambling Online casinos and gambling platforms, used to launder small amounts anonymously [36]
+Low/Moderate ML-Risk Exchange Exchanges with strict AML/KYC policies might still be used for laundering criminal funds [32]
+Mixers These services take and ‘mix’ Bitcoin from various parties to obfuscate ownership [26]
+(Very) High ML-Risk Exchange Exchanges with lax or no AML/KYC implementations are popular for money laundering [31]
+Wallet Service Custodial/online wallets, some might have also have privacy features such as mixers. [36]
+
+Type = commodity Type = RaaS
+1.0 dataset (Ryuk, Conti). As the illicit funds received by
+
+ NetWalker (Mailto)
+RaaS are washed out quickly and, typically, in full, this
+
+0.8 suggests that it is more difficult to track payments to
+RaaS and lowering the odds of recovery.
+
+Only a small set of families still have significant por-
+0.6
+
+tions of their proceedings on the original address. This
+is the case for NetWalker, which has 20.36% still on an
+
+0.4 address, MedusaLocker (7.98%) and WannaCry (7.92%).
+In this case, it is likely that the actor has lost the private
+
+0.2 key or is incapable to safely launder the ransom, for
+example due to law enforcement scrutiny. It is known
+
+0.0 that NetWalker’s proceedings have been seized by law en-
+0 200 400 600 0 200 400 600
+
+Outgoing Transactions Outgoing Transactions forcement [24], with WannaCry under heavy monitoring
+and most of the laundering failed [2].
+
+Figure 6: Transfer transactions per Address for com-
+modity and RaaS actors. 5.2 Challenges in Fighting Laundering
+
+Contrary to popular belief, Bitcoin isn’t anonymous
+Type = commodity Type = RaaS
+
+1.0 but pseudo-anonymous. Forensic analysis might link a
+ Ryuk
+
+ NetWalker (Mailto) Bitcoin address to a real-world identity, especially when
+an exchange platform is used to convert between fiat
+
+0.8
+currency and Bitcoin. In most jurisdictions, legal entities
+behind such platforms are held to Know Your Customer
+
+0.6 (KYC) legislation, which requires them to verify the
+identity of every user signing up on their service. During
+
+0.4 an investigation, when known illicit Bitcoin is routed
+through an exchange that requires KYC, authorities have
+
+0.2 a chance to identify the culprit. Several industry players
+support law enforcement in such AML investigations,
+
+0.0 with technology based on clustering algorithms which
+0 500 1000 1500 0 500 1000 1500
+
+Days Days can link addresses to a service such as an exchange
+platform. As seen in Figure 8, we have grouped the data
+
+Figure 7: Collect-to-Laundry time for commodity ran- we obtained through Crystal Blockchain in a select set
+somware and RaaS actors. of entities, which are explained in Table 3.
+
+Laundering can involve routing illicit funds through
+several hops before cashing out. As it is difficult to know
+
+actors in our dataset. RaaS actors have a significantly where actual ownership has terminated after several hops,
+lower collect-to-laundry time compared to commodity in this analysis we only regard the first hop, i.e., the first
+actors. Typically, payments to RaaS actors are trans- transfer transaction. This is the service to which actors
+ferred away from the deposit address in the first minutes transfer funds directly after having obtained them at the
+to hours after payment. The few outliers in RaaS are deposit address shared with the victim. As this has the
+caused by NetWalker and individual addresses associated closest link to the payment address, this is the first point
+with actors for which we have multiple addresses in our of investigation for law enforcement. An actor choosing
+
+7
+
+Proportion Proportion
+
+File-Locker
+SynAck
+
+ Cryptohitman  WannaCry
+
+AES-NI
+ NotPetya
+
+MedusaLocker MedusaLocker
+
+
+
+Commodity that cybercriminals have wound down the use of fraud-
+Low/Moderate ML­Risk
+Exchange (40.66%) ulent exchanges [29]. In a sense, commodity actors do
+
+not partake in any systematic laundering at all, whereas
+RaaS actors use fraudulent (non-KYC) exchanges and
+mixers, a clear laundering strategy. Based on this, we
+
+Mixer (1.99%) Gambling (2.24%)
+hypothesize that the chances of recovering payments
+
+Wallet Service (11.12%) Fraudulent through law enforcement intervention are higher with
+Exchange (11.97%) commodity ransomware than with RaaS. The services
+
+(Very) High ML­Risk of their choice logically leave more user traces (IP ad-
+Exchange (5.54%) dress, login session) than mixer services and fraudulent
+
+ATM / Payment
+Provider (1.35%) Dark Market / Illegal
+
+Services (25.13%) exchanges designed to obfuscate ownership.
+When an actor’s collect-to-laundry time is high, a law
+
+enforcement investigation may be able to successfully
+RaaS recover the funds. However, in many such cases there
+
+Low/Moderate ML­Risk
+Exchange (1.11%) is less incentive to intercept transactions due to the
+
+Mixer (25.02%)
+comparatively low ransom amounts. The speed with
+which RaaS groups transfer funds out suggests criminal
+sophistication, which is also reflected in their preferred
+
+Wallet Service (0.27%)
+(Very) High ML­Risk means of laundering. Given this, it is difficult to intercept
+
+Exchange (3.36%)
+ATM / Payment funds unless law enforcement is already involved at the
+
+Provider (0.43%)
+very moment the payment is made [25].
+
+Fraudulent
+Exchange (69.78%)
+
+6 CONCLUSION
+Ransomware is a severe, growing threat plaguing our
+
+Figure 8: Pie chart of one-hop laundering entities. world. In this paper, we take a data-driven and “follow
+the money” approach to characterize the structure and
+evolution of the ransomware ecosystem. To this end, we
+
+to use a service implies that they trust the service, at report on our experience in operating Ransomwhere, our
+least enough not to disclose their identity. open crowdsourced ransomware payment tracker to col-
+
+Figure 8 shows the proportion of estimated USD value lect information from victims of ransomware attacks. By
+of Bitcoin directly transferred (first hop) to the entities analyzing a corpus of more than 13.5k ransom payments
+explained in Table 3 for commodity and RaaS actors. with a total revenue of more than $101 million, we shed
+Due to limitations in reliably establishing (legal) entities light on the practices of these criminal actors over the
+behind an address, the direct transactions in our dataset last years. Our analysis unveils that there are two sym-
+account for a subset of the total revenue generated by the biotic, parallel markets. Commodity ransomware actors,
+actors in our dataset. Hence we report using percentages, and (dominant since 2019) Ransomware as a Service
+a best practice used with comparable datasets [39]. (RaaS) actors. The first is operated by individuals or a
+
+Our core observation is that commodity actors don’t small group of programmers, the second by professional
+exhibit a specific laundering strategy, while RaaS actors criminals who offer it on an affiliate basis to typically
+primarily use fraudulent exchanges and mixers. Mixers less technical criminal actors. Due to differences in vic-
+are services which take in Bitcoin from cybercriminals or timization, the first has low ransom amounts, the latter
+simply privacy-aware users and combine these in many higher ransom amounts depending on the victim profile.
+transactions. Through this the accurate tracking of Bit- Our analysis of ransom payments (all in Bitcoin) shows
+coin is hindered, as every client gets their initial deposit that RaaS actors have adopted more sophisticated cryp-
+(minus service fee) back as a mix from other users’ Bit- tographic techniques, compared to commodity actors,
+coin. Thus, it is more difficult to trace the laundering in their operation and typically generate one address
+activity of RaaS criminal actors. per victim to hide their identity. This allows RaaS to
+
+When considering fraudulent exchanges together with generate more revenue and with higher level of protec-
+low- and high-risk exchanges, commodity authors seem tion, attracting more criminal groups to use RaaS to
+to prefer exchanges, and thus perhaps cash-out to fiat cur- perform high profile attacks in recent years. RaaS ac-
+rency or other cryptocurrencies. It is however also known tors are also more efficient to launder ransom payments,
+
+8
+
+
+
+as they move to launder funds within hours or days. Vulnerability Assessment. Springer, 3–24.
+
+RaaS actors also transfer revenue from ransom payments [18] Eric Loui and Josh Reynolds. 2021. CARBON
+
+to mixers and other sophisticated laundry entities that SPIDER Embraces Big Game Hunting, Part 2.
+https://www.crowdstrike.com/blog/carbon-spider-
+
+make difficult for law enforcement agencies to recover embraces-big-game-hunting-part-2/.
+ransom payments. [19] Microsoft. 2021. How cyberattacks are changing ac-
+
+cording to new Microsoft Digital Defense Report.
+REFERENCES https://www.microsoft.com/security/blog/2021/10/11/how-
+
+[1] 2021. AT&T Alien Labs Open Threat Exchange. https: cyberattacks-are-changing-according-to-new-microsoft-
+
+//cybersecurity.att.com/open-threat-exchange. digital-defense-report/
+
+[2] BBC. 2017. Wannacry money laundering attempt thwarted. [20] NPR. 2021. Panic Drives Gas Shortages Af-
+
+https://www.bbc.com/news/technology-40826056 ter Colonial Pipeline Ransomware Attack. https:
+
+[3] BBC. 2021. HSE cyber-attack: Irish health service still recov- //www.npr.org/2021/05/11/996044288/panic-drives-
+
+ering months after hack. https://www.bbc.com/news/world- gas-shortages-after-colonial-pipeline-ransomware-attack.
+
+europe-58413448. [21] National Security Agency (NSA). 2022. 2021 Cybersecurity
+
+[4] BBC. 2021. Swedish Coop supermarkets shut due to Year in Review. https://www.nsa.gov/Press-Room/Press-
+
+US ransomware cyber-attack. https://www.bbc.com/news/ Releases-Statements/Press-Release-View/Article/2921744/
+
+technology-57707530. nsa-releases-2021-cybersecurity-year-in-review/.
+
+[5] Crystal Blockchain. 2021. Crystal Expert. https:// [22] Australian Government Department of Home Af-
+
+crystalblockchain.com/crystal-expert/. fairs. 2021. Australia’s Ransomware Action Plan.
+
+[6] Jack Cable. 2022. Ransomwhere: A Crowdsourced Ran- https://www.homeaffairs.gov.au/cyber-security-
+
+somware Payment Dataset. https://doi.org/10.5281/zenodo. subsite/files/ransomware-action-plan.pdf.
+
+6512123 [23] U.S. Department of Justice. 2020. United States Files A Civil
+
+[7] Catalin Cimpanu. 2021. BTC-e founder sentenced to Action To Forfeit Cryptocurrency Valued At Over One Billion
+
+five years in prison for laundering ransomware funds. U.S. Dollars. https://www.justice.gov/usao-ndca/pr/united-
+
+https://www.zdnet.com/article/btc-e-founder-sentenced-to- states-files-civil-action-forfeit-cryptocurrency-valued-over-
+
+five-years-in-prison-for-laundering-ransomware-funds/ one-billion-us.
+
+[8] Bleeping Computer. 2021. Dutch supermar- [24] U.S. Department of Justice. 2021. Department of Justice
+
+kets run out of cheese after ransomware attack. Launches Global Action Against NetWalker Ransomware.
+
+https://www.bleepingcomputer.com/news/security/dutch- https://www.justice.gov/opa/pr/department-justice-
+
+supermarkets-run-out-of-cheese-after-ransomware-attack/. launches-global-action-against-netwalker-ransomware.
+
+[9] U.S. Cybersecurity and Infrastructure Security Agency [25] U.S. Department of Justice. 2021. Department
+
+(CISA). 2021. Alert (AA21-209A): Top Routinely Exploited of Justice Seizes $2.3 Million in Cryptocurrency
+
+Vulnerabilities. https://www.cisa.gov/uscert/ncas/alerts/ Paid to the Ransomware Extortionists Darkside.
+
+aa21-209a https://www.justice.gov/opa/pr/department-justice-seizes-
+
+[10] Europol. 2021. darkmarket: world’s largest illegal dark web 23-million-cryptocurrency-paid-ransomware-extortionists-
+
+marketplace taken down. https://www.europol.europa.eu/ darkside.
+
+media-press/newsroom/news/darkmarket-worlds-largest- [26] U.S. Department of Justice. 2021. individual arrested and
+
+illegal-dark-web-marketplace-taken-down charged with operating notorious darknet cryptocurrency
+
+[11] Europol. 2021. Ransomware: What you need to mixer. https://www.justice.gov/opa/pr/individual-arrested-
+
+know. https://www.europol.europa.eu/publications-events/ and-charged-operating-notorious-darknet-cryptocurrency-
+
+publications/ransomware-what-you-need-to-know. mixer
+
+[12] Canadian Centre for Cyber Security. 2021. Ransomware. [27] U.S. Department of Justice. 2021. six charged with
+
+https://cyber.gc.ca/en/ransomware. crimes related to virtual currency exchange business.
+
+[13] European Union Agency for Cybersecurity (ENISA). 2021. https://www.justice.gov/usao-nh/pr/six-charged-crimes-
+
+Threat Landscape report - 2021. https://www.enisa.europa. related-virtual-currency-exchange-business
+
+eu/topics/threat-risk-management/threats-and-trends. [28] U.S. Department of Treasury Financial Crimes Enforce-
+
+[14] Andy Greenberg. 2018. The Untold Story of Not- ment Network. 2021. Ransomware Trends in Bank Secrecy
+
+Petya, the Most Devastating Cyberattack in History. Act Data Between January 2021 and June 2021. https:
+
+https://www.wired.com/story/notpetya-cyberattack- //www.fincen.gov/sites/default/files/2021-10/Financial%
+
+ukraine-russia-code-crashed-the-world/ 20Trend%20Analysis_Ransomware%20508%20FINAL.pdf.
+
+[15] The Guardian. 2017. WannaCry, Petya, Not- [29] Kris Oosthoek and Christian Doerr. 2020. Cyber Security
+
+Petya: how ransomware hit the big time in 2017. Threats to Bitcoin Exchanges: Adversary Exploitation and
+
+https://www.theguardian.com/technology/2017/dec/ Laundering Techniques. IEEE Transactions on Network and
+
+30/wannacry-petya-notpetya-ransomware Service Management 18, 2 (2020), 1616–1628.
+
+[16] The Wall Street Journal. 2021. JBS Paid $11 Million to Re- [30] Masarah Paquet-Clouston, Bernhard Haslhofer, and Benoit
+
+solve Ransomware Attack. https://www.wsj.com/articles/jbs- Dupont. 2018. Ransomware Payments in the Bitcoin Ecosys-
+
+paid-11-million-to-resolve-ransomware-attack-11623280781. tem. arXiv:1804.04080 [cs.CR]
+
+[17] Amin Kharraz, William Robertson, Davide Balzarotti, Leyla [31] Robert Poulsen. 2021. U.S. Accuses Russian of
+
+Bilge, and Engin Kirda. 2015. Cutting the gordian knot: A Money Laundering for Ryuk Ransomware Gang.
+
+look under the hood of ransomware attacks. In International https://www.wsj.com/articles/u-s-accuses-russian-of-
+
+Conference on Detection of Intrusions and Malware, and money-laundering-for-ryuk-ransomware-gang-11636741333
+
+9
+
+
+
+[32] Reuters. 2022. Crypto Giant Binance Kept Weak Money- 4169ea4b-d6d7-4a2e-bc91-480550c2f539.
+Laundering Checks Even As It Promised Tougher Compliance, [37] UK National Cyber Secuirty Centre. 2021. Mitigating malware
+Documents Show. https://www.reuters.com/investigates/ and ransomware attacks. https://www.ncsc.gov.uk/guidance/
+special-report/finance-crypto-currency-binance/ mitigating-malware-and-ransomware-attacks.
+
+[33] Dark Web Solutions. [n.d.]. Dark Web Monitor. https://dws. [38] U.S. Federal Bureau of Investigation (FBI). 2021. Common
+pm/. Scams and Crimes: Ransomware. https://www.fbi.gov/scams-
+
+[34] Cisco Talos. 2021. Translated: Talos’ insights from the re- and-safety/common-scams-and-crimes/ransomware.
+cently leaked Conti ransomware playbook. https://blog. [39] Kai Wang, Jun Pang, Dingjie Chen, Yu Zhao, Dapeng Huang,
+talosintelligence.com/2021/09/Conti-leak-translation.html Chen Chen, and Weili Han. 2021. A Large-scale Empirical
+
+[35] McAfee ATR Operational Intelligence Team. 2020. Take a Analysis of Ransomware Activities in Bitcoin. ACM Transac-
+“NetWalk” on the Wild Side. https://www.mcafee.com/blogs/ tions on the Web (TWEB) 16, 2 (2021), 1–29.
+other-blogs/mcafee-labs/take-a-netwalk-on-the-wild-side/ [40] Official Bitcoin Wiki. 2021. Blockchain attacks on privacy.
+
+[36] Financial Times. 2022. the rise of crypto laundries: how https://en.bitcoin.it/wiki/Privacy.
+criminals cash out of bitcoin. https://www.ft.com/content/
+
+10
+
+
+
+Detecting a MUMMY SPIDER campaign and Emotet
+infection
+
+ironnet.com/blog/detecting-a-mummyspider-campaign-and-emotet-infection
+
+May 11, 2022
+
+1/9
+
+
+
+Key findings:
+
+At the start of the Eid Al-Fitr (Islamic holiday) weekend in early May 2022, IronNet
+Threat Research detected a thread hijacking attack carrying Emotet malware against
+an organization located in the Asia Pacific region.
+This cyber attack is likely part of a new campaign by the MUMMY SPIDER threat
+group, designed to test a new bypass for Microsoft disabling macros by default for use
+in future large-scale campaigns.
+This finding supports recent open-source reporting that MUMMY SPIDER has begun to
+conduct more targeted operations, and it is likely the threat actors will continue to use
+their access to enterprise emails to conduct further phishing attacks.
+
+2/9
+
+
+
+IronNet’s Network Detection and Response
+
+(NDR) platform, in combination with our cybersecurity experts, detected an Emotet infection
+in the network of a customer located in the Asia Pacific region at the start of the Eid Al-Fitr
+(Islamic holiday) weekend in early May 2022. We were able to detect the aftermath of a
+successful phishing attack against an employee at the company, which resulted in an
+infection of a host in the client enterprise by Emotet malware. While we are still working with
+our partner to assist in triage and remediation, we wanted to share our findings to increase
+the communities ability to collectively defend against these types of attacks. We posit that
+this attack is part of a new campaign by the MUMMY SPIDER threat group, designed to test
+updated techniques, tactics, and procedures (TTP) for future campaigns.
+
+3/9
+
+
+
+This article discusses the threat group behind the attack and breaks down the post-
+compromise activity that occurred within the client enterprise. This attack bypassed the client
+enterprise’s anti-virus protection and security products; however, IronNet’s behavioral
+analytics were able to detect the post-compromise activity and quickly alert the customer to
+the infection.
+
+MUMMY SPIDER returns
+MUMMY SPIDER (also known as TA54) is a threat group that utilizes various malicious
+spam (malspam) email campaigns to deploy Emotet malware. First detected in 2014, Emotet
+is a modular, polymorphic trojan that is capable of evading signature-based detection and
+spreading throughout a victim network to compromise additional systems. Emotet often
+serves as a first–or second–stage malware that can drop and download further payloads,
+which could ultimately lead to data theft, remote control of systems, financial losses, and
+operational disruptions. An international law enforcement effort succeeded in taking down
+the Emotet botnet in 2021, but it has since resurfaced with a new focus on targeted attacks
+rather than the previous “spray and pray” tactics it was once known for. We cannot claim with
+absolute certainty that the group is linked to Russia; however, on April 20th 2022, a joint alert
+issued by cybersecurity agencies from Australia, Canada, New Zealand, the U.S., and the
+U.K. mentioned the MUMMY SPIDER threat group when warning organizations of the threat
+of Russian cyber attacks on critical infrastructure.
+
+Unlike most threat groups, MUMMY SPIDER operates atypically; they will hibernate for
+months at a time and conduct operations in short bursts over a several month period.
+Additionally, recent reports attributed to this group have coincided with holiday seasons.
+Historically, when the group resumed operations, they utilized new variants of Emotet in an
+attempt to bypass security efforts. In the case of the compromise detailed in this article, we
+believe that the MUMMY SPIDER threat group may have been testing a new bypass for
+Microsoft disabling macros by default. This capability involves using OneDrive URLs or XLL
+files instead of traditional macro-enabled documents.ProofPoint believes that the reason for
+the lower-than-normal target volume is because MUMMY SPIDER is testing the success of
+this new technique before adopting it on a larger scale.
+
+Behavioral detection and incident analysis
+On April 29th, 2022,  at 0100UTC, an enterprise user received a phishing email with a zip file
+attached. The archive contained an XLL file that the victim accidentally executed on the host
+computer. This triggered a series of requests to multiple external domains, which hosted the
+new Emotet malware. While a majority of these outbound requests were blocked by
+enterprise security products, an outbound session succeeded to
+gla[.]ge:80/old/PuVaff/  at 0151UTC and a DLL (Emotet) was downloaded. The
+
+sample was not flagged as malicious by VirusTotal at the time of detection. IronNet observed
+the host making a large volume of outbound requests to various remote servers in an
+
+4/9
+
+
+
+attempt to establish command and control (C2) communications. Similar to the domain
+requests, a majority of these attempts were blocked, but a small number were successful.
+IronDefense was able to generate alerts based on the anomalous nature of the domains, two
+instances of C2 beaconing activity, and numerous threat-intelligence-based alerts.
+
+After reporting this activity to the customer, we were informed that the attack occurred on the
+Friday before a major holiday weekend; this suggests a potential attack of opportunity, which
+corroborates with the new TTP that MUMMY SPIDER is assumed to be operating under.
+IronNet was able to alert the customer shortly after their workday ended Friday, enabling
+isolation of the infected host and mitigation during the long weekend. There is no evidence of
+lateral movement attempts from the infected host, supporting the assessment that this was
+isolated and thus part of MUMMY SPIDER’s new test campaign model.
+
+Thread Hijacking
+After initial triage, IronNet’s threat hunters and intel analysts requested a copy of the
+phishing email used and were able to categorize this as a thread hijacking attack. Thread
+Hijacking is a process in which a threat actor compromises and injects themselves into an
+email thread in an effort to increase legitimacy and trust. In this instance, the actors
+leveraged an email chain that involved updating a spreadsheet of delivery information,
+providing a legitimate use case for the phishing target to open the attached file. While the
+sender's address was not from a legitimate enterprise domain, the email was able to avoid
+suspicion from the user. 
+
+When we categorized this as a thread hijacking attack, we uncovered additional concerns
+that we began to investigate. Palo Alto released an article in 2020 detailing this type of
+attack, which indicates the post-infection goal is exfiltrating host data via C2. This discovery
+suggests the enterprise user was likely targeted, evidenced by the email being sent
+specifically to the user. We were able to use this information to inform the customer that
+
+5/9
+
+
+
+there were likely additional infections of one or more personnel from the original email chain,
+making them aware of additional thread hijacking attacks that would be likely using emails
+from the victim user.
+
+IronNet conducted a review of indicators of compromise (IOC) associated with recent
+MUMMY SPIDER campaigns and identified external scanning attempts against several
+enterprise customers. While most of these appeared to be generic scanning, one instance
+involved a large volume of scanning against customer Simple Mail Transfer Protocol (SMTP)
+servers. We conclude this was likely an attempt to identify more malspam targets. IronNet
+has since deployed Threat Intelligence Rules (TIR) and propagated the incident alerts
+throughout the IronDome, enabling other IronNet customers to have increased detection
+capability and reduced response time through collective defense.
+
+Conclusion
+Recent reporting indicates that MUMMY SPIDER and other actors that use Emotet have
+begun to conduct more targeted operations, increasing the likelihood of spear-phishing
+against enterprise employees. While preventing all enterprise users from being the victim of
+a phishing attack would be ideal, it is statistically unlikely. Awareness training is
+recommended and effective, but having additional layers of security in the event of
+compromise is critical. This incident highlights the importance of behavioral detections as
+threat actors work to evade traditional security tools and signature-based detections.
+IronNet’s ability to detect the behavioral aspects of this attack prevented the threat group
+from having extended access to the customer’s enterprise over a long weekend and
+potentially causing further damage.
+
+IOCs
+URLs:
+
+gakudou[.]com:80/photo06/hEu/
+giasotti[.]com:80/js/Khc6mb0zx4KoWX/
+plresende[.]com:80/pcinfor/cq/
+thomasmanton[.]com:80/wp-includes/owZnpWmH4D8j/
+gla[.]ge:80/old/PuVaff/
+gccon[.]in/UploadedFiles/UYtJNrT2llxy1/
+
+Extract from C2 Config via Tria.ge
+
+176.31.73.90:443
+45.76.159.214:8080
+138.197.147.101:443
+104.168.154.79:8080
+149.56.131.28:8080
+
+6/9
+
+
+
+5.9.116.246:8080
+77.81.247.144:8080
+172.104.251.154:8080
+50.30.40.196:8080
+173.212.193.249:8080
+51.91.76.89:8080
+197.242.150.244:8080
+103.75.201.2:443
+51.254.140.238:7080
+79.137.35.198:8080
+72.15.201.15:8080
+27.54.89.58:8080
+189.126.111.200:7080
+196.218.30.83:443
+82.165.152.127:8080
+164.68.99.3:8080
+183.111.227.137:8080
+167.172.253.162:8080
+153.126.146.25:7080
+129.232.188.93:443
+151.106.112.196:8080
+188.44.20.25:443
+167.99.115.35:8080
+134.122.66.193:8080
+185.4.135.165:8080
+212.24.98.99:8080
+51.91.7.5:8080
+146.59.226.45:443
+131.100.24.231:80
+212.237.17.99:8080
+201.94.166.162:443
+45.176.232.124:443
+159.65.88.10:8080
+160.16.142.56:8080
+216.158.226.206:443
+203.114.109.124:443
+103.43.46.182:443
+46.55.222.11:443
+209.126.98.206:8080
+91.207.28.33:8080
+1.234.2.232:8080
+45.118.115.99:8080
+
+7/9
+
+
+
+206.189.28.199:8080
+94.23.45.86:4143
+158.69.222.101:443
+103.70.28.102:8080
+101.50.0.91:8080
+58.227.42.236:80
+119.193.124.41:7080
+107.182.225.142:8080
+185.157.82.211:8080
+45.235.8.30:8080
+103.132.242.26:8080
+1.234.21.73:7080
+110.232.117.186:8080
+209.97.163.214:443
+185.8.212.130:7080
+209.250.246.206:443
+
+Tria.ge:
+
+https://tria.ge/220428-23e5saffg3/behavioral1#report
+
+IronNet Analytics Mapped to MITRE TTPs
+
+ MITRE ATT&CK
+
+IronNet Analytic Tactic Technique
+
+Consistent Beaconing HTTP/TLS Command and Control Application Layer Protocol
+
+Domain Analysis HTTP/TLS Command and Control Application Layer Protocol
+
+About Ironnet
+Founded in 2014 by GEN (Ret.) Keith Alexander, IronNet, Inc. (NYSE: IRNT) is a global
+cybersecurity leader that is transforming how organizations secure their networks by
+delivering the first-ever Collective Defense platform operating at scale. Employing a number
+of former NSA cybersecurity operators with offensive and defensive cyber experience,
+IronNet integrates deep tradecraft knowledge into its industry-leading products to solve the
+most challenging cyber problems facing the world today.
+
+8/9
+
+
+
+Back to IronNet Blog

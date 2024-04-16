@@ -1,0 +1,70 @@
+Anonymous Affiliate NB65 Breach State-Run Russian
+Broadcaster; Leak 786GB of Data
+
+hackread.com/anonymous-affiliate-nb65-russia-broadcaster-data-breach/
+
+April 6, 2022
+
+The data leaked by the Anonymous affiliate group contains 4,000 files and more than 900,000
+emails from Russian state-run television and radio broadcaster VGTRK (aka All-Russia State
+Television and Radio Broadcasting Company).
+NB65 (Network Battalion 65) is a hacker group linked with the Anonymous hacktivist
+collective. The group claims to have breached the servers of Russian state-run television
+and radio broadcaster called the “All-Russia State Television and Radio Broadcasting
+Company” (VGTRK).
+
+Anonymous’ Twitter account (@YourAnonTV) also tweeted about the hack on their handle
+this week, revealing that hackers have leaked around 800 GB of data online.
+
+Anonymous-linked group ‘NB65’ ( @xxNB65 ) released via #DDoSecrets over 20 years
+and 900K emails from VGTRK, a Russian, state-owned broadcaster which operates 5
+national TV stations, 2 international networks, 5 radio stations, and over 80 regional TV
+and radio networks.
+
+@YourAnonTV
+
+Hackers Leak 786GB Worth of Data
+VGTRK is Russia’s largest media corporation and manages dozens of national and regional
+television and radio stations and online channels in Russia and other languages. According
+to NB65, they hacked the All-Russia State TV a few days after Anonymous
+announced hacking of the Central Bank of Russia and leaked 22GB worth of data online.
+
+What Data Was Stolen?
+According to a tweet from Emma Best, journalist, and co-founder of a non-profit
+whistleblower organization DDoSecrets, the data provided by the hackers is more than 800
+GB, and the total comes to 786.2GB after “de-duplication” and sorting.
+
+Best wrote that apart from over 900,000 emails, the data contains more than 4,000
+documents stolen from VGTRK’s cloud service. The files mostly comprise media clips and
+assets. It is worth noting that its primary assets include TV channels Russia-1, Russia 24,
+and RTR Planeta.
+
+1/2
+
+
+
+On the other hand, @YourAnonNews, one of the largest social media representatives of the
+Anonymous movement urged people to download the data from the DDoSecrets website via
+torrent and translate the leaked emails.
+
+Anonymous Vows More Attacks on Russia
+It is no secret that Anonymous is standing strong with Ukraine over the ongoing conflict
+between the two countries. The collectives have so far targeted both the government and the
+private sector to spread their message.
+
+On March 26th, 2022, Anonymous not only confirmed breaching the Central Bank of Russia,
+but also leaked 28GB worth of banking data via DDoSecrets. The list and timeline of some of
+the cyberattacks reported by Hackread.com on the ongoing conflict between Russia and
+Ukraine are as follow:
+
+1. Feb 28th: Anonymous hacks EV charging station + TV channels
+2. March 4th: Anonymous hacks Russian space research institute website
+3. March 7th: Anonymous hacks Russian TV & streaming sites with war footage
+4. March 10th: Anonymous hacks 90% of misconfigured Russian cloud databases
+5. March 11th: Anonymous Hacks Roskomnadzor
+6. Match 12th: Anonymous sent 7M texts & hacked 400 Russian security cams
+7. March 15th: Anonymous DDoSd Russian Fed Security Service & other sites
+8. March 19th: Anonymous hacked & leaked 79GB of Russian pipeline giant data
+9. March 23rd: Anonymous hacks printers in Russia to send anti-war messages
+
+10. March 29th: Anonymous Hacks 2 Russian Industrial Firms, Leak 112GB of Data

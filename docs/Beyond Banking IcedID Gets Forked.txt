@@ -1,0 +1,28 @@
+Beyond Banking: IcedID Gets Forked
+spreaker.com/user/16860719/proofpoint-e29-mix-v1
+
+At least three threat actors are ushering in a new era for IcedID, originally classified as
+banking malware in 2017. In this episode, Proofpoint researchers, Joe Wise and Pim
+Trouerbach, are here to share their research on the Lite and Forked IcedID variants
+
+Join us as we discuss the following:
+Lite IcedID Variant  
+Forked IcedID Variant
+
+1/2
+
+
+
+The key differences between the variants
+Which operators the Proofpoint team hypothesizes are behind the attacks
+
+Resources:
+https://www .proofpoint.com/us/blog/threat-insight/fork-ice-new-era-icedid
+
+Copyright 2023 - Spreaker Inc. an iHeartMedia Company
+
+Privacy
+
+Terms
+
+Cookie Settings

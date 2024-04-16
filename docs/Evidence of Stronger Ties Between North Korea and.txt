@@ -1,0 +1,178 @@
+Evidence of Stronger Ties Between North Korea and
+SWIFT Banking Attacks
+
+anomali.com/blog/evidence-of-stronger-ties-between-north-korea-and-swift-banking-attacks
+
+May 27, 2016
+
+-
+
+Aaron Shelmire
+
+Cyber Threat Intelligence
+
+Malware
+
+<p><strong>Five new additional pieces of malware code discovered that contain unique
+portions of code related to the the SWIFT attacks.</strong></p><p>Recently, malware <a
+href="http://www.symantec.com/connect/blogs/swift-attackers-malware-linked-more-financial-
+attacks" target="_blank">analysts at Symantec</a> discovered two subroutines that were
+shared amongst North Korea’s Lazarus’ groups Operation Blockbuster malware and two
+samples of malware from the recent SWIFT attacks.</p><p>The shared subroutines are
+displayed as evidence to relate the SWIFT intrusion activity to the Lazarus group.
+Symantec’s analysis was utilized in the <a
+href="http://www.nytimes.com/2016/05/27/business/dealbook/north-korea-linked-to-digital-
+thefts-from-global-banks.html?_r=0" target="_blank">The New York Times story</a> on May
+27, 2016. Their findings supported a claim that these were the only two pieces of software
+with this shared code.</p><p>The Anomali Labs team has conducted deeper research into a
+very large malware data repository. This process utilized the yara signature below to search
+for the shared subroutines. At first, we believed it would produce a lot of false positives.
+Instead, this search not only failed to result in any false positives, but also turned up five
+other pieces of malware which share this code. We see this as a possible attribution of the
+Lazarus group attacks to other attacks that involved these same five pieces of malware
+code.</p><table border="1" width="100%"><tbody><tr><td style="width: 86px; text-align:
+center; vertical-align: top;" width="86">Malware Family</td><td style="width: 86px; text-align:
+center; vertical-align: top;" width="160">Md5 hash</td><td style="width: 86px; text-align:
+center; vertical-align: top;" width="221">Notes</td></tr><tr><td style="width: 86px; text-align:
+center; vertical-align: top;" width="86">SWIFT BanSwift</td><td style="width: 86px; text-
+align: center; vertical-align: top;" width="160">5d0ffbc8389f27b0649696f0ef5b3cfe</td><td
+style="width: 86px; text-align: center; vertical-align: top;" width="221">evchk.bat
+dropper</td></tr><tr><td style="width: 86px; text-align: center; vertical-align: top;"
+width="86">SWIFT Fake Foxit Reader</td><td style="width: 86px; text-align: center; vertical-
+align: top;" width="160">0b9bf941e2539eaa34756a9e2c0d5343</td><td style="width: 86px;
+
+1/4
+
+
+
+text-align: center; vertical-align: top;" width="221">A Fake Foxit Reader submitted to
+Virustotal from Vietnam in December 2015 (similar sample detailed at <a
+href="https://blogs.mcafee.com/mcafee-labs/attacks-swift-banking-system-benefit-insider-
+knowledge/" target="_blank">https://blogs.mcafee.com/mcafee-labs/attacks-swift-banking-
+system-benefit-insider-knowledge/</a>)</td></tr><tr><td style="width: 86px; text-align:
+center; vertical-align: top;" width="86">SMBWorm</td><td style="width: 86px; text-align:
+center; vertical-align: top;" width="160">558b020ce2c80710605ed30678b6fd0c</td><td
+style="width: 86px; text-align: center; vertical-align: top;" width="221">Known North Korean
+Malware</td></tr><tr><td style="width: 86px; text-align: center; vertical-align: top;"
+width="86">Memory dump with SMBWorm</td><td style="width: 86px; text-align: center;
+vertical-align: top;" width="160">96f4e767aa6bb1a1a5ab22e0662eec86</td><td
+style="width: 86px; text-align: center; vertical-align: top;" width="221"> </td></tr><tr><td
+style="width: 86px; text-align: center; vertical-align: top;" width="86">Unknown “hkcmd”
+tool</td><td style="width: 86px; text-align: center; vertical-align: top;"
+width="160">b0ec717aeece8d5d865a4f7481e941c5</td><td style="width: 86px; text-align:
+center; vertical-align: top;" width="221">1st Submitted from Canada, likely from an AV
+organization. 2016/04/22. PE Build Date of December 2010.</td></tr><tr><td style="width:
+86px; text-align: center; vertical-align: top;" width="86">imkrmig.exe</td><td style="width:
+86px; text-align: center; vertical-align: top;"
+width="160">5a85ea837323554a0578f78f4e7febd8</td><td style="width: 86px; text-align:
+center; vertical-align: top;" width="221">An unknown backdoor posing as a Korean sample of
+Microsoft Office 2007.</td></tr></tbody></table><p><em>Table 1. Malware families and
+samples known to include the Lazarus Wipe File routine.</em></p><p>Our approach to
+code comparison was to utilize Position Independent Code function hashes to compare the
+samples against one another. This process utilizes cryptographic hash values derived from
+the instruction mnemonics within the binary code. By performing this comparison, we can
+see the direct overlap of these shared functions between the various samples.</p><p><img
+alt="" sizes="(max-width: 860px) 100vw, 860px"
+src="https://wwwlegacy.anomali.com/images/uploads/blog/Picture50.png"
+srcset="https://blog.anomali.com/hs-fs/hubfs/Picture50.png?
+t=1478873412701&width=430&height=69&name=Picture50.png 430w,
+https://blog.anomali.com/hs-fs/hubfs/Picture50.png?
+t=1478873412701&width=860&height=138&name=Picture50.png 860w,
+https://blog.anomali.com/hs-fs/hubfs/Picture50.png?
+t=1478873412701&width=1290&height=207&name=Picture50.png 1290w,
+https://blog.anomali.com/hs-fs/hubfs/Picture50.png?
+t=1478873412701&width=1720&height=276&name=Picture50.png 1720w,
+https://blog.anomali.com/hs-fs/hubfs/Picture50.png?
+t=1478873412701&width=2150&height=345&name=Picture50.png 2150w,
+https://blog.anomali.com/hs-fs/hubfs/Picture50.png?
+t=1478873412701&width=2580&height=414&name=Picture50.png 2580w" style="display:
+block; margin-left: auto; margin-right: auto;" title="Picture50.png" /></p><p><em>Figure 1:
+
+2/4
+
+
+
+The function overlap viewed from
+ae086350239380f56470c19d6a200f7d251c7422c7bc5ce74730ee8bab8e6283 as veiwed
+within IDAPro</em></p><p><em><em>Additionally, there are other function hashes (seven)
+that are shared amongst the Trojan.Filmis and various SWIFT-related malware samples.
+Anomali LABS is unsure of how rare these functions are at this point.</em></em></p><p>
+<em><em><strong>Investigative Process</strong></em></em></p><p><em><em>We
+began by taking a look at the two subroutines that are reported to be unique by Symantec.
+We retrieved the API names and added those to a yara signature. In some cases, the APIs
+are MoveFileExA instead of MoveFileEx.</em></em></p><p><em><em>We then took a
+look at the code used. There is a small portion of code where a file name consisting of
+randomly generated lowercase letters is created. This was used as part of the criteria.</em>
+</em></p><p><em><em>Using this criteria, we began a search of a large malware
+database starting on Thursday night. On Friday morning, we thought we’d be faced with a
+sea of false positives. But it only returned 10 matches! Four of those were known samples of
+the SWIFT malware, and one sample was a zip file that includes a known SWIFT sample.
+The other five samples are detailed above.</em></em></p><p><em><em>
+<strong>Appendix</strong></em></em></p><p><em><em>Additional Samples related to
+the SWIFT intrusions (ref: <a href="http://baesystemsai.blogspot.com/2016/04/two-bytes-to-
+951m.html" target="_blank">http://baesystemsai.blogspot.com/2016/04/two-bytes-to-
+951m.html</a>)</em></em></p><table border="1" width="100%"><tbody><tr><td
+style="width: 74px; text-align: center; vertical-align: top;" width="74"><em><em>
+<strong>Filename</strong> </em></em></td><td style="width: 74px; text-align: center;
+vertical-align: top;" width="287"><em><em><strong>md5</strong> </em></em></td><td
+style="width: 74px; text-align: center; vertical-align: top;" width="107"><em><em>
+<strong>AntiVirus Name</strong> </em></em></td></tr><tr><td style="width: 74px; text-
+align: center; vertical-align: top;" width="74"><em><em>evtsys.exe </em></em></td><td
+style="width: 74px; text-align: center; vertical-align: top;" width="287"><em>
+<em>5d0ffbc8389f27b0649696f0ef5b3cfe </em></em></td><td style="width: 74px; text-
+align: center; vertical-align: top;" width="107"><em><em>BanSwift </em></em></td></tr>
+<tr><td style="width: 74px; text-align: center; vertical-align: top;" width="74"><em>
+<em>evtdiag.exe </em></em></td><td style="width: 74px; text-align: center; vertical-align:
+top;" width="287"><em><em>24d76abbc0a10e4c977a28b33c879248 </em></em></td><td
+style="width: 74px; text-align: center; vertical-align: top;" width="107"><em><em>BanSwift
+</em></em></td></tr><tr><td style="width: 74px; text-align: center; vertical-align: top;"
+width="74"><em><em>nroff_b.exe </em></em></td><td style="width: 74px; text-align:
+center; vertical-align: top;" width="287"><em><em>1d0e79feb6d7ed23eb1bf7f257ce4fee 
+</em></em></td><td style="width: 74px; text-align: center; vertical-align: top;" width="107">
+<em><em>BanSwift </em></em></td></tr><tr><td style="width: 74px; text-align: center;
+vertical-align: top;" width="74"><em><em>gpca.dat </em></em></td><td style="width: 74px;
+text-align: center; vertical-align: top;" width="287"><em>
+<em>f7272bb1374bf3af193ea1d1845b27fd </em></em></td><td style="width: 74px; text-
+align: center; vertical-align: top;" width="107"><em><em>  </em></em></td></tr><tr><td
+
+3/4
+
+
+
+style="width: 74px; text-align: center; vertical-align: top;" width="74"><em><em>mspdclr.exe
+</em></em></td><td style="width: 74px; text-align: center; vertical-align: top;" width="287">
+<em><em>909e1b840909522fe6ba3d4dfd197d93</em></em></td><td style="width: 74px;
+text-align: center; vertical-align: top;" width="107"><em><em>BanSwift </em></em></td>
+</tr></tbody></table><p><em><em>Other previously known Lazarus Group samples:</em>
+</em></p><p><em>
+<em>138464214c78a73e3714d784697745acbf692ef40419d31418e4018e752cb92b<br />
+bdcfa3b6ca6b351e76241bca17e8f30cc8f35bed0309cee91966be9bd01cb848<br />
+ddebee8fe97252203e6c943fb4f9b37ade3d5fefe90edba7a37e4856056f8cd6<br />
+4d4b17ddbcf4ce397f76cf0a2e230c9d513b23065f746a5ee2de74f447be39b9<br />
+e2ecec43da974db02f624ecadc94baf1d21fd1a5c4990c15863bb9929f781a0a<br />
+eff542ac8e37db48821cb4e5a7d95c044fff27557763de3a891b40ebeb52cc55<br />
+f6cb8343444771c3d03cc90e3ac5f76ff9a4cb9cd41e65c3b7f52b38b20c0c27</em></em>
+</p><p><em><em>rule AnomaliLABS_Lazarus_wipe_file_routine {<br />  meta:<br />    
+ author = "aaron shelmire"<br />      date = "2015 May 26"<br />      desc = “Yara sig to detect
+File Wiping routine of the Lazarus group”<br />  strings:<br />      $rand_name_routine = { 99
+B9 1A 00 00 00 F7 F9 80 C2 61 88 16 8A 46 01 46 84 C0 }<br />      /* imports for overwrite
+function */<br />      $imp_getTick = "GetTickCount"<br />      $imp_srand = "srand"<br />    
+ $imp_CreateFile = "CreateFileA"<br />      $imp_SetFilePointer = "SetFilePointer"<br />    
+ $imp_WriteFile = "WriteFile"<br />      $imp_FlushFileBuffers = "FlushFileBuffers"<br />    
+ $imp_GetFileSizeEx = "GetFileSizeEx"<br />      $imp_CloseHandle = "CloseHandle"<br />  
+   /* imports for rename function */<br />      $imp_strrchr = "strrchr"<br />      $imp_rand =
+"rand"<br />      $Move_File = "MoveFileA"<br />      $Move_FileEx = "MoveFileEx"<br />    
+ $imp_RemoveDir = "RemoveDirectoryA"<br />      $imp_DeleteFile = "DeleteFileA"<br />    
+ $imp_GetLastError = "GetLastError"<br /> condition:<br />      $rand_name_routine and (11
+of ($imp_*)) and ( 1 of ($Move_*))<br /> }</em></em></p>
+
+Get the Latest Anomali Updates and Cybersecurity News – Straight
+To Your Inbox
+
+ 
+Become a subscriber to the Anomali Newsletter
+
+Receive a monthly summary of our latest threat intelligence content, research, news, events,
+and more.
+
+Subscribe Today

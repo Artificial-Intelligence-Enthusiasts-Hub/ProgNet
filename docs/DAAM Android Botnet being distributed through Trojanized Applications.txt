@@ -1,0 +1,313 @@
+DAAM Android Botnet being distributed through Trojanized Applications
+blog.cyble.com/2023/04/20/daam-android-botnet-being-distributed-through-trojanized-applications/
+
+April 20, 2023
+
+Botnet With Ransomware And Data Theft Capabilities
+In recent years, the widespread use of Android devices has made them a prime target for cybercriminals. Android
+botnet is a common malware type that cybercriminals use to gain access to targeted devices. These devices can be
+controlled remotely to carry out various malicious activities.
+
+Cyble Research & Intelligence Labs (CRIL) recently analyzed an Android Botnet shared by MalwareHunterTeam. The
+mentioned malicious sample is the Trojanized version of the Psiphon application and identified as DAAM Android
+Botnet, which provides below features:
+
+Keylogger
+Ransomware
+VOIP call recordings
+Executing code at runtime
+Collects browser history
+Records incoming calls
+Steals PII data
+Opens phishing URL
+Capture photos
+Steal clipboard data
+Switch WiFi and Data status
+
+The DAAM Android botnet provides an APK binding service wherein a Threat Actor (TA) can bind malicious code with a
+legitimate app. CRIL analyzed an APK file named PsiphonAndroid.s.apk with the hash value of
+“184356d900a545a2d545ab96fa6dd7b46f881a1a80ed134db1c65225e8fa902b” which contains DAAM botnet
+malicious code bonded with a legitimate Psiphon application.
+
+The malware connects to the Command and Control (C&C) server hxxp://192.99.251[.]51:3000, and the figure below
+shows the DAAM Android botnet admin panel.
+
+1/12
+
+
+
+Figure 1 – Admin panel of DAAM Android botnet
+The C&C server is also present in various malicious applications, some of which were initially identified in August 2021.
+This indicates that the DAAM Android botnet has been operational since 2021 and constantly targeting Android users.
+
+Figure 2 – C&C server present in several malicious applications
+
+Technical Analysis 
+APK Metadata Information
+
+App Name: Psiphon
+Package Name: com.psiphon3
+SHA256 Hash: 184356d900a545a2d545ab96fa6dd7b46f881a1a80ed134db1c65225e8fa902b
+
+The figure below shows the metadata information of the application. 
+
+2/12
+
+
+
+Figure 3 – Application metadata information
+Initially, the malware establishes a socket connection and communicates with the C&C server at
+hxxp://192.99.251[.]51:3000 to obtain commands for carrying out a range of malicious activities, as depicted in the
+figure below.
+
+Figure 4 – Socket connection
+
+Figure 5 – Malware receiving commands
+The DAAM Android botnet provides various command operations, which are explained below:
+
+3/12
+
+
+
+Keylogger:
+Malware uses the Accessibility Service to monitor users’ activity. It saves the captured keystrokes along with the
+application’s package name into a database, as shown in the figure below.
+
+Figure 6 – Keylogger activity
+
+Ransomware:
+The DAAM botnet provides a Ransomware module that leverages the AES algorithm to encrypt and decrypt files on
+the infected device. It retrieves the password required for encryption and decryption from the C&C server. The malware
+also saves a ransom note in the “readme_now.txt” file.
+
+The Ransomware activity is illustrated in the figure below.
+
+4/12
+
+
+
+Figure 7 – Ransomware encryption and decryption module
+
+Figure 8 – Receiving password from C&C server and writes ransom message into a readme_now.txt file
+
+VOIP call Recordings:
+The DAAM botnet exploits the Accessibility service to monitor the components of social media applications such as
+WhatsApp, Skype, Telegram, and many others responsible for VOIP calls. If the user interacts with the below-
+mentioned components, malware initiates audio recording.
+
+Below is the list of components targeted by the DAAM botnet:
+
+com.whatsapp.VoipActivity
+com.whatsapp.VoipActivityV2
+com.whatsapp.voipcalling.VoipActivityV2
+com.bbm.ui.voice.activities.InCallActivity
+com.bbm.ui.voice.activities.InCallActivityNew
+com.bbm.ui.voice.activities.IncomingCallActivityNew
+com.turkcell.bip.voip.call.InCallActivity
+com.turkcell.bip.voip.call.IncomingCallActivity
+im.thebot.messenger.activity.chat.AudioActivity
+im.thebot.messenger.activity.chat.VideoActivity
+im.thebot.messenger.voip.ui.AudioCallActivity
+im.thebot.messenger.voip.ui.VideoCallActivity
+com.facebook.mlite.rtc.view.CallActivity
+
+5/12
+
+
+
+com.facebook.rtc.activities.WebrtcIncallActivity
+com.facebook.rtc.activities.WebrtcIncallFragmentHostActivity
+com.google. Android.apps.hangouts.hangout.HangoutActivity
+com.google. Android.apps.hangouts.elane.CallActivity
+com.bsb.hike.voip.view.VideoVoiceActivity
+com.imo.android.imoim.av.ui.AudioActivity
+com.imo.android.imoim.av.ui.AVActivity
+com.kakao.talk.vox.activity.VoxFaceTalkActivity
+com.kakao.talk.vox.activity.VoxVoiceTalkActivity
+com.linecorp.linelite.ui.android.voip.FreeCallScreenActivity
+jp.naver.line.android.freecall.FreeCallActivity
+com.linecorp.voip.ui.freecall.FreeCallActivity
+com.linecorp.voip.ui.base.VoIPServiceActivity
+ru.mail.instantmessanger.flat.voip.CallActivity
+ru.mail.instantmessanger.flat.voip.IncallActivity_
+org.telegram.ui.VoIPActivity
+com.microsoft.office.sfb.activity.call.IncomingCallActivity
+com.microsoft.office.sfb.activity.call.CallActivity
+com.skype.m2.views.Call
+com.skype.m2.views.CallScreen
+com.skype.android.app.calling.PreCallActivity
+com.skype.android.app.calling.CallActivity
+com.Slack.ui.CallActivity
+com.sgiggle.call_base.CallActivity
+com.enflick. Android.TextNow.activities.DialerActivity
+com.viber.voip.phone.PhoneFragmentActivity
+com.vonage.TimeToCall.Activities.InCall
+com.vonage.TimeToCall.Activities.CallingIntermediate
+com.tencent.mm.plugin.voip.ui.VideoActivity
+
+Figure 9 – Starting VOIP call recording
+
+Collecting Browser History:
+The malware can gather bookmarks and browsing history stored on the target device and send them to the C&C
+server, as depicted below.
+
+6/12
+
+
+
+Figure 10 – Stealing Browser history
+
+Executing code at runtime:
+The malware can execute the code at runtime using DexClassLoader by receiving the method name, class name, and
+URL from the C&C server. The malware communicates with the received URL to fetch parameters of the targeted
+method, which is responsible for executing other malicious activities. The dynamic code runner module is illustrated in
+the below image.
+
+Figure 11 – Running dynamic code
+
+Stealing PII data:
+In addition to the functionalities mentioned above, the DAAM botnet gathers Personally Identifiable Information (PII)
+from the infected device, including but not limited to contacts, SMS messages, call logs, files, basic device details, and
+location data.
+
+7/12
+
+
+
+Figure 12 – Collecting call logs
+
+Figure
+
+13 – Collecting basic device information
+
+8/12
+
+
+
+Figure 14 – Collecting SMSs Figure 15 – Stealing
+
+location
+
+Opening URL:
+Malware can receive a phishing URL from a C&C server, then load it into a WebView component to steal the victim’s
+login information. The TA can use this feature to launch a social engineering attack by sending a phishing URL of their
+choice from the C&C panel.
+
+9/12
+
+
+
+Figure
+
+16 – Opening Phishing URL
+
+Collecting Screenshots:
+The code in the below image is used by malware to steal screenshots saved at the external Storage path
+“/Pictures/Screenshots” of an infected device and sends them to the C&C server.
+
+Figure 17 –
+
+Collecting screenshots
+
+Capturing Photos:
+Additionally, the malware captures pictures by opening the camera of the victim’s device upon receiving a command
+from the admin panel and subsequently sending pictures to the C&C server.
+
+10/12
+
+
+
+Figure 18 –
+
+Capturing photos
+In addition to the main functionalities mentioned earlier, the DAAM botnet can carry out additional tasks such as
+switching WiFi and data, showing random toast, and collecting clipboard data.
+
+Conclusion
+Malware authors often leverage genuine applications to distribute malicious code to avoid suspicion. DAAM Android
+botnet also provides a similar APK binding service where TA can bind malicious code with a legitimate APK to appear
+genuine.
+
+Detailed analysis of the DAAM Android botnet indicates that it offers several intriguing capabilities, such as
+Ransomware, runtime code execution, and Keylogger, among others. Although relatively fewer samples have been
+identified so far, based on the malware’s capability, it may target a wide number of users in the coming days.
+
+ 
+Our Recommendations
+We have listed some essential cybersecurity best practices that create the first line of control against attackers. We
+recommend that our readers follow the best practices given below:
+
+Download and install software only from official app stores like Google Play Store or the iOS App Store.
+Use a reputed antivirus and internet security software package on your connected devices, such as PCs, laptops,
+and mobile devices.
+Never share your Card Details, CVV number, Card PIN, and Net Banking Credentials with an untrusted source.
+Use strong passwords and enforce multi-factor authentication wherever possible.
+Enable biometric security features such as fingerprint or facial recognition for unlocking the mobile device
+wherever possible.
+Be wary of opening any links received via SMS or emails delivered to your phone.
+Ensure that Google Play Protect is enabled on Android devices.
+Be careful while enabling any permissions.
+Keep your devices, operating systems, and applications updated.
+
+MITRE ATT&CK® Techniques
+
+Tactic Technique ID Technique Name
+
+11/12
+
+
+
+Initial Access T1476 Deliver Malicious App via Other Means.
+
+Initial Access T1444 Masquerade as a Legitimate Application
+
+Collection T1433 Access Call Log
+
+Collection T1432 Access Contact List
+
+Collection T1429 Capture Audio
+
+Collection T1512 Capture Camera
+
+Collection T1414 Capture Clipboard Data
+
+Discovery T1418 Application Discovery
+
+Persistence T1402 Broadcast Receivers
+
+Collection T1412 Capture SMS Messages
+
+Impact T1471 Data Encrypted for Impact
+
+Collection T1533 Data from Local System
+
+Collection T1417 Input Capture
+
+Indicators of Compromise (IOCs)
+
+Indicators Indicator Description
+Type
+
+SHA256 Currency_Pro_v3.2.6.apk
+0fdfbf20e59b28181801274ad23b951106c6f7a516eb914efd427b6617630f30  
+ 
+
+f3b135555ae731b5499502f3b69724944ab367d5 SHA1  Currency_Pro_v3.2.6.apk
+
+ee6aec48e19191ba6efc4c65ff45a88e MD5 Currency_Pro_v3.2.6.apk
+
+hxxp://192.99.251[.]51:3000/socket.io/ URL C&C server
+
+184356d900a545a2d545ab96fa6dd7b46f881a1a80ed134db1c65225e8fa902b SHA256 PsiphonAndroid.s.apk
+ 
+
+bc826967c90acc08f1f70aa018f5d13f31521b92 SHA1  PsiphonAndroid.s.apk
+
+99580a341b486a2f8b177f20dc6f782e MD5 PsiphonAndroid.s.apk
+
+37d4c5a0ea070fe0a1a2703914bf442b4285658b31d220f974adcf953b041e11 SHA256 Boulder.s.apk
+ 
+
+67a3def7ad736df94c8c50947f785c0926142b69 SHA1  Boulder.s.apk
+
+49cfc64d9f0355fadc93679a86e92982 MD5 Boulder.s.apk

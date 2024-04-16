@@ -1,0 +1,662 @@
+Cuba ransomware gang
+securelist.com/cuba-ransomware/110533/
+
+Authors
+
+ Alexander Kirichenko
+
+ Gleb Ivanov
+
+Introduction
+Knowledge is our best weapon in the fight against cybercrime. An understanding of how
+various gangs operate and what tools they use helps build competent defenses and
+investigate incidents. This report takes a close look at the history of the Cuba group, and
+their attack tactics, techniques and procedures. We hope this article will help you to stay one
+step ahead of threats like this one.
+
+1/27
+
+
+
+Cuba data leak site
+
+The group’s offensives first got on our radar in late 2020. Back then, the cybercriminals had
+not yet adopted the moniker “Cuba”; they were known as “Tropical Scorpius”.
+
+Cuba mostly targets organizations in the United States, Canada and Europe. The gang has
+scored a series of resonant attacks on oil companies, financial services, government
+agencies and healthcare providers.
+
+As with most cyberextortionists lately, the Cuba gang encrypts victims’ files and demands a
+ransom in exchange for a decryption key. The gang infamously uses complex tactics and
+techniques to penetrate victim networks, such as exploitation of software vulnerabilities and
+social engineering. They have been known to use compromised remote desktop (RDP)
+connections for initial access.
+
+The Cuba gang’s exact origins and the identities of its members are unknown, although
+some researchers believe it might be a successor to another ill-famed extortion gang, Babuk.
+The Cuba group, like many others of its kind, is a ransomware-as-a-service (RaaS) outfit,
+letting its partners use the ransomware and associated infrastructure in exchange for a share
+of any ransom they collect.
+
+The group has changed names several times since its inception. We are currently aware of
+the following aliases it has used:
+
+ColdDraw
+Tropical Scorpius
+
+2/27
+
+
+
+Fidel
+Cuba
+
+This past February, we came across another name for the gang — “V Is Vendetta”, which
+deviated from the hackers’ favorite Cuban theme. This might have been a moniker used by a
+sub-group or affiliate.
+
+There is an obvious connection with the Cuba gang: the newly discovered group’s website is
+hosted in the Cuba domain:
+
+http[:]//test[.]cuba4ikm4jakjgmkezytyawtdgr2xymvy6nvzgw5cglswg3si76icnqd[.]onion/
+
+Website of V IS VENDETTA
+
+Cuba remains active as at the time of writing this, and we keep hearing about new extortion
+victims.
+
+Victimology
+In this section, we used data consensually provided by our users and information about
+victims from open sources, such as other security vendors’ reports and the data leak site of
+the ransomware gang itself.
+
+The group has attacked numerous companies around the world. Industry affiliation does not
+seem to be a factor: victims have included retailers, financial and logistical services,
+government agencies, manufacturers, and others. In terms of geography, most of the
+attacked companies have been located in the United States, but there have been victims in
+Canada, Europe, Asia and Australia.
+
+3/27
+
+
+
+Geographic distribution of Cuba victims
+
+Ransomware
+The Cuba ransomware is a single file without additional libraries. Samples often have a
+forged compilation timestamp: those found in 2020 were stamped with June 4, 2020, and
+more recent ones, June 19th, 1992.
+
+Cuba extortion model
+
+4/27
+
+
+
+Extortion models
+
+Four extortion models exist today in terms of tools used for pressuring the victim.
+
+Single extortion: encrypting data and demanding a ransom just for decryption.
+Double extortion: besides encrypting, attackers steal sensitive information. They
+threaten to both withhold the encryption key and publish the stolen information online
+unless the victim pays up. This is the most popular model among ransomware gangs
+today.
+
+5/27
+
+
+
+Triple extortion: adding a threat to expose the victim’s internal infrastructure to DDoS
+attacks. The model became widespread after the LockBit gang got DDoS’ed, possibly
+by a victim. After getting targeted, the hackers realized that DDoS was an effective
+pressure tool, something they stated openly, setting an example for others. To be fair,
+isolated cases of triple extortion predate the LockBit case.
+The fourth model is the least common one, as it implies maximum pressure and is thus
+more costly. It adds spreading news of the breach among the victim’s investors,
+shareholders and customers. DDoS attacks in that case are not necessary. This model
+is exemplified by the recent hack of Bluefield University in Virginia, where the
+AvosLocker ransomware gang hijacked the school’s emergency broadcast system to
+send students and staff SMS texts and email alerts that their personal data had been
+stolen. The hackers urged not to trust the school’s management, who they said were
+concealing the true scale of the breach, and to make the situation public knowledge as
+soon as possible.
+
+The Cuba group is using the classic double extortion model, encrypting data with the
+Xsalsa20 symmetric algorithm, and the encryption key, with the RSA-2048 asymmetric
+algorithm. This is known as hybrid encryption, a cryptographically secure method that
+prevents decryption without the key.
+
+Cuba ransomware samples avoid encrypting files with the following name extensions: .exe,
+.dll, .sys, .ini, .lnk, .vbm and .cuba, and the following folders:
+
+\windows\
+\program files\microsoft office\
+\program files (x86)\microsoft office\
+\program files\avs\
+\program files (x86)\avs\
+\$recycle.bin\
+\boot\
+\recovery\
+\system volume information\
+\msocache\
+\users\all users\
+\users\default user\
+\users\default\
+\temp\
+\inetcache\
+\google\
+
+The ransomware saves time by searching for, and encrypting, Microsoft Office documents,
+images, archives and others in the %AppData%\Microsoft\Windows\Recent\ directory, rather
+than all files on the device. It also terminates all SQL services to encrypt any available
+
+6/27
+
+
+
+databases. It looks for data both locally and inside network shares.
+
+List of services that the Cuba ransomware terminates
+
+Besides encrypting, the group steals sensitive data that it discovers inside the victim’s
+organization. The type of data that the hackers are after depends on the industry that the
+target company is active in, but in most cases, they exfiltrate the following:
+
+Financial documents
+Bank statements
+Company accounts details
+Source code, if the company is a software developer
+
+Arsenal
+The group employs both well-known, “classic” credential access tools, such as mimikatz, and
+self-written applications. It exploits vulnerabilities in software used by the victim companies:
+mostly known issues, such as the combination of ProxyShell and ProxyLogon for attacking
+Exchange servers, and security holes in the Veeam data backup and recovery service.
+
+Malware
+
+7/27
+
+
+
+Bughatch
+Burntcigar
+Cobeacon
+Hancitor (Chanitor)
+Termite
+SystemBC
+Veeamp
+Wedgecut
+RomCOM RAT
+
+Tools
+
+Mimikatz
+PowerShell
+PsExec
+Remote Desktop Protocol
+
+8/27
+
+
+
+Vulnerabilities
+
+ProxyShell:
+
+CVE-2021-31207
+CVE-2021-34473
+CVE-2021-34523
+
+ProxyLogon:
+
+CVE-2021-26855
+CVE-2021-26857
+CVE-2021-26858
+CVE-2021-27065
+
+Veeam vulnerabilities:
+
+9/27
+
+
+
+CVE-2022-26501
+CVE-2022-26504
+CVE-2022-26500
+
+ZeroLogon:
+
+CVE-2020-1472
+
+Mapping of the attack arsenal to MITRE ATT&CK® tactics
+
+Profits
+The incoming and outgoing payments in the bitcoin wallets whose identifiers the hackers
+provide in their ransom notes exceed a total of 3,600 BTC, or more than $103,000,000
+converted at the rate of $28,624 for 1 BTC. The gang owns numerous wallets, constantly
+transferring funds between these, and uses bitcoin mixers: services that send bitcoins
+through a series of anonymous transactions to make the origin of the funds harder to trace.
+
+Part of the transaction tree in the BTC network
+
+10/27
+
+
+
+Investigation of a Cuba-related incident and analysis of the malware
+
+Host: SRV_STORAGE
+On December 19, we spotted suspicious activity on a customer host, which we will refer to
+as “SRV_STORAGE” in this report. Telemetry data showed three suspicious new files:
+
+Suspicious events in the telemetry data as discovered by the Kaspersky SOC
+
+An analysis of kk65.bat suggested that it served as a stager that initiated all further activity
+by starting rundll32 and loading the komar65 library into it, which runs the callback function
+DLLGetClassObjectGuid.
+
+Contents of the .bat file that we found
+
+Let us take a look inside the suspicious DLL.
+
+Bughatch
+The komar65.dll library is also known as “Bughatch”, a name it was given in a report by
+Mandiant.
+
+The first thing that caught our attention was the path to the PDB file. There’s a folder named
+“mosquito” in it, which translates into Russian as “komar”. The latter is a part of the DDL
+name suggesting the gang may include Russian speakers.
+
+11/27
+
+
+
+Path to the komar65.dll PDB file
+
+The DLL code presents Mozilla/4.0 as the user agent when connecting to the following two
+addresses:
+
+com, apparently used for checking external connectivity
+The gang’s command-and-control center. The malware will try calling home if the initial
+ping goes through.
+
+Analysis of komar65.dll
+
+12/27
+
+
+
+This is the kind of activity we observed on the infected host. After Bughatch successfully
+established a connection with the C2 server, it began collecting data on network resources.
+
+Bughatch activity
+
+Looking into the C2 servers, we found that in addition to Bughatch, these spread modules
+that extend the malware’s functionality. One of those collects information from the infected
+system and sends it back to the server in the form of an HTTP POST request.
+
+Files we found on the Cuba C2 servers
+
+One could think of Bughatch as a backdoor of sorts, deployed inside the process memory
+and executing a shellcode block within the space it was allocated with the help of Windows
+APIs (VirtualAlloc, CreateThread, WaitForSingleObject), to then connect to the C2 and await
+
+13/27
+
+
+
+further instructions. In particular, the C2 may send a command to download further malware,
+such as Cobalt Strike Beacon, Metasploit, or further Bughatch modules.
+
+Bughatch operating diagram
+
+SRV_Service host
+
+Veeamp
+After some time, we found a malicious process started on a neighboring host; we dubbed
+this “SRV_Service”:
+
+Malicious process starting
+
+Veeamp.exe is a custom-built data dumper written in C#, which leverages security flaws in
+the Veeam backup and recovery service to connect to the VeeamBackup SQL database and
+grab account credentials.
+
+14/27
+
+
+
+Analysis of Veeamp
+
+Veeamp exploits the following Veeam vulnerabilities: CVE-2022-26500, CVE-2022-26501,
+CVE-2022-26504. The first two allow an unauthenticated user to remotely execute arbitrary
+code, and the third one, lets domain users do the same. After any of the three are exploited,
+the malware outputs the following in the control panel:
+
+User name
+Encrypted password
+Decrypted password
+User description in the Credentials table of Veeam: group membership, permissions
+and so on
+
+The malware is not exclusive to the Cuba gang. We spotted it also in attacks by other
+groups, such as Conti and Yanluowang.
+
+Activity we saw on SRV_Service after Veeamp finished its job was similar to what we had
+observed on SRV_STORAGE with Bughatch:
+
+15/27
+
+
+
+Bughatch activity on SRV_Service
+
+As was the case with SRV_STORAGE, the malware dropped three files into the temp folder,
+and then executed these in the same order, connecting to the same addresses.
+
+Avast Anti-Rootkit driver
+After Bughatch successfully established a connection to its C2, we watched as the group
+used an increasingly popular technique: Bring Your Own Vulnerable Driver (BYOVD).
+
+Exploiting a vulnerable driver
+
+The malicious actors install the vulnerable driver in the system and subsequently use it to
+various ends, such as terminating processes or evading defenses through privilege
+escalation to kernel level.
+
+Hackers are drawn to vulnerable drivers because they all run in kernel mode, with a high
+level of system access. Besides, a legitimate driver with a digital signature will not raise any
+red flags with security systems, helping the attackers to stay undetected for longer.
+
+During the attack, the malware created three files in the temp folder:
+
+16/27
+
+
+
+aswarpot.sys: a legitimate anti-rootkit driver by Avast that has two vulnerabilities:
+CVE-2022-26522 and CVE-2022-26523, which allow a user with limited permissions to
+run code at kernel level.
+KK.exe: malware known as Burntcigar. The file we found was a new variety that used
+the flawed driver to terminate processes.
+av.bat batch script: a stager that helps the kernel service to run the Avast driver and
+executes Burntcigar.
+
+Analysis of the BAT file and telemetry data suggests that av.bat uses the sc.exe utility to
+create a service named “aswSP_ArPot2”, specifying the path to the driver in the
+С\windows\temp\ directory and the service type as kernel service. The BAT file then starts
+the service with the help of the same sc.exe utility and runs KK.exe, which connects to the
+vulnerable driver.
+
+Contents of the .bat file that we found
+
+Burntcigar
+The first thing we noticed while looking into Burntcigar was the path to the PDB file, which
+contained a folder curiously named “Musor” (the Russian for “trash”), more indication that the
+members of the Cuba gang may speak Russian.
+
+Path to the KK.exe PDB file
+
+We further discovered that the sample at hand was a new version of Burntcigar,
+undetectable by security systems at the time of the incident. The hackers had apparently
+updated the malware, as in the wake of previous attacks, many vendors were able to easily
+detect the logic run by older versions.
+
+You may have noticed that in the screenshot of our sample below, all data about processes
+to be terminated is encrypted, whereas older versions openly displayed the names of all
+processes that the attackers wanted stopped.
+
+17/27
+
+
+
+Comparison between the old and new version of Burntcigar
+
+The malware searches for process names that suggest a relation to popular AV or EDR
+products and adds their process IDs to the stack to terminate later.
+
+Burntcigar uses the DeviceIoContol function to access the vulnerable Avast driver, specifying
+the location of the code that contains the security issue as an execution option. The piece of
+code contains the ZwTerminateProcess function, which the attackers use for terminating
+processes.
+
+Analysis of Burntcigar
+
+Fortunately, our product’s self-defense was able to cope with the malware by blocking all
+hooks to the driver.
+
+18/27
+
+
+
+Later, we discovered similar activity exploiting the Avast anti-rootkit driver on the Exchange
+server and the SRV_STORAGE host. In both cases, the attackers used a BAT file to install
+the insecure driver and then start Burntcigar.
+
+Burntcigar activity on the neighboring hosts
+
+SRV_MAIL host (Exchange server)
+On December 20, the customer granted our request to add the Exchange server to the
+scope of monitoring. The host must have been used as an entry point to the customer
+network, as the server was missing critical updates, and it was susceptible to most of the
+group’s initial access vectors. In particular, SRV_MAIL had the ProxyLogon, ProxyShell and
+Zerologon vulnerabilities still unremediated. This is why we believe that the attackers
+penetrated the customer network through the Exchange server.
+
+Telemetry data starts coming in
+
+On SRV_MAIL, the SqlDbAdmin user showed the same kind of activity as that which we had
+observed on the previous hosts.
+
+Malicious activity by SqlDbAdmin
+
+We found that the attackers were using the legitimate gotoassistui.exe tool for transferring
+malicious files between the infected hosts.
+
+19/27
+
+
+
+GoToAssist is an RDP support utility often used by technical support teams, but the
+application is often abused to bypass any security defenses or response teams when moving
+files between systems.
+
+Sending malicious files via gotoassistui.exe
+
+We also found that new Bughatch samples were being executed. These used slightly
+different file names, callback functions and C2 servers, as our systems were successfully
+blocking older versions of the malware at that time.
+
+Bughatch activity
+
+SqlDbAdmin
+We wondered who that SqlDbAdmin was. The answer came through a suspicious DLL,
+addp.dll, which we found manually on a compromised host.
+
+20/27
+
+
+
+Suspicious dynamic library
+
+We found that it used the WIN API function NetUserAdd to create the user. The name and
+password were hard-coded inside the DLL.
+
+Analysis of addp.dll
+
+As we looked further into the library, we found that it used the RegCreateKey function to
+enable RDP sessions for the newly created user by modifying a registry setting. The library
+then added the user to the Special Account registry tree to hide it from the system login
+screen, an interesting and fairly unconventional persistence technique. In most cases, bad
+actors add new users with the help of scripts thatsecurity products rarely miss.
+
+Analysis of addp.dll
+
+Cobalt Strike
+
+21/27
+
+
+
+We found a suspicious DLL, ion.dll, running on the Exchange server as part of the rundll32
+process with unusual execution options. At first, we figured that the activity was similar to
+what we had earlier seen with Bughatch. However, further analysis showed that the library
+was, in fact, a Cobalt Strike Beacon.
+
+Execution of the suspicious ion.dll file
+
+When we were looking at the ion.dll code, what caught our attention was execution settings
+and a function that uses the Cobalt Strike configuration. The library used the VirtualAlloc
+function for allocating process memory to execute the Cobalt Strike Beacon payload in, later.
+
+Analysis of ion.dll
+
+22/27
+
+
+
+All configuration data was encrypted, but we did find the function used for decrypting that. To
+find the Cobalt Strike C2 server, we inspected a rundll32 memory dump with ion.dll loaded
+into it, running with the same settings it did on the victim host.
+
+Memory dump of rundll32
+
+Finding out the name of the C2 helped us to locate the history of communications with that
+server within the telemetry data. After the malware connected to the C2, it downloaded two
+suspicious files into the Windows folder on the infected server and then executed these.
+Unfortunately, we were not able to obtain the two files for analysis, as the hackers had failed
+to disable security at the previous step, and the files were wiped off the infected host. We do
+believe, though, that what we were dealing with was the ransomware itself.
+
+23/27
+
+
+
+Communications with the attackers’ C2 server
+
+The customer promptly isolated the affected hosts and forwarded the incident to the
+Kaspersky Incident Response team for further investigation and search for possible artifacts.
+This was the last we saw of the malicious actor’s activity in the customer system. The hosts
+avoided encryption thanks to the customer following our recommendations and directions,
+and responding to the incident in time.
+
+New malware
+We found that VirusTotal contained new samples of the Cuba malware with the same file
+metadata as the ones in the incident described above. Some of those samples had
+successfully evaded detection by all cybersecurity vendors. We ran our analysis on each of
+the samples. As you can see from the screenshot below, these are new versions of
+Burntcigar using encrypted data for anti-malware evasion. We have made Yara rules that
+detect these new samples, and we are providing these in the attachment to this article.
+
+New malware samples
+
+24/27
+
+
+
+BYOVD (Bring Your Own Vulnerable Driver)
+We will now take a closer look at an attack that uses insecure drivers, which we observed as
+we investigated the incident and which is currently growing in popularity as various APT and
+ransomware gangs add it to their arsenals.
+
+Bring Your Own Vulnerable Driver (BYOVD) is a type of attack where the bad actor uses
+legitimate signed drivers that are known to contain a security hole to execute malicious
+actions inside the system. If successful, the attacker will be able to exploit the vulnerabilities
+in the driver code to run any malicious actions at kernel level!
+
+Understanding why this is one of the most dangerous kinds of attacks takes a quick refresher
+on what drivers are. A driver is a type of software that acts as an intermediary between the
+operating system and the device. The driver converts OS instructions into commands that
+the device can interpret and execute. A further use of drivers is supporting applications or
+features that the operating system originally lacks. As you can see from the image below, the
+driver is a layer of sorts between user mode and kernel mode.
+
+User mode and kernel mode interaction diagram. Source:
+https://learn.microsoft.com/en-us/windows-hardware/drivers/gettingstarted/use r-mode-and-kernel-
+
+mode
+
+25/27
+
+
+
+Applications running in user mode have fewer privileges to control the system. All they can
+get access to is a virtualized memory area that is isolated and protected from the rest of the
+system. The driver runs inside the kernel memory, and it can execute any operations just like
+the kernel itself. The driver can get access to critical security structures and modify those.
+Modifications like that make the system liable to attacks that use privilege escalation,
+disabling of OS security services, and arbitrary reading and writing.
+
+The Lazarus gang made use of that technique in 2021 as they gained write access to kernel
+memory and disabled Windows security features by abusing a Dell driver that contained the
+CVE-2021-21551 vulnerability.
+
+There is no sure-fire defense from legitimate drivers, because any driver could prove to have
+a security flaw. Microsoft has published a list of recommendations to protect against this type
+of techniques:
+
+Enable Hypervisor-Protected Code Integrity.
+Enable Memory Integrity.
+Enable validation of driver digital signatures.
+Use the vulnerable driver blocklist.
+
+However, studies suggest that the recommendations are irrelevant even with every Windows
+protection feature enabled, and attacks like these go through anyway.
+
+To counter this technique, many security vendors started adding a self-defense module into
+their products that prevents malware from terminating processes and blocks every attempt at
+exploiting vulnerable drivers. Our products have that feature too, and it proved effective
+during the incident.
+
+Conclusion
+The Cuba cybercrime gang employs an extensive arsenal of both publicly available and
+custom-made tools, which it keeps up to date, and various techniques and methods including
+fairly dangerous ones, such as BYOVD. Combating attacks at this level of complexity calls
+for sophisticated technology capable of detecting advanced threats and protecting security
+features from being disabled, and a massive, continuously updated threat knowledge base
+that helps to detect malicious artifacts manually.
+
+The incident detailed in this article shows that investigation of real-life cyberattacks and
+incident response, such as Managed Detection and Response (MDR), are sources of the
+latest information about malicious tactics, techniques and procedures. In particular, during
+this investigation, we discovered new and previously undetected samples of the Cuba
+malware, and artifacts suggesting that at least some of the gang members spoke Russian.
+
+26/27
+
+
+
+That said, effective investigation and response begin with knowledge of current cyberthreats,
+which is available from Threat Intelligence services. At Kaspersky, the Threat Intelligence
+and MDR teams work closely while exchanging data and enhancing their services all the
+time.
+
+Appendix
+Sigma and YARA rules: https://github.com/BlureL/SigmaYara-Rules
+Indicators of Compromise: Download PDF  
+Mitre ATT&CK matrices: Download PDF  
+
+Backdoor
+Drivers
+Incident response
+Malware
+Malware Descriptions
+Malware Technologies
+Ransomware
+Russian-speaking cybercrime
+Security services
+Trojan
+Vulnerabilities
+
+Authors
+
+ Alexander Kirichenko
+
+ Gleb Ivanov
+
+From Caribbean shores to your devices: analyzing Cuba ransomware
+
+Your email address will not be published. Required fields are marked *

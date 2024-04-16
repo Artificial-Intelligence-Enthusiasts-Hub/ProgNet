@@ -1,0 +1,633 @@
+COBALT DICKENS Goes Back to School…Again
+secureworks.com/blog/cobalt-dickens-goes-back-to-school-again
+
+Counter Threat Unit Research Team
+
+The COBALT DICKENS threat group persists despite law enforcement actions and public
+disclosures, conducting another global campaign targeting universities. Wednesday,
+September 11, 2019 By: Counter Threat Unit Research Team
+In March 2018, the U.S. Department of Justice indicted the Mabna Institute and nine Iranian
+associates for compromising hundreds of universities to steal intellectual property and
+benefit financially. Secureworks® Counter Threat Unit™ (CTU) researchers assigned the
+
+1/14
+
+
+
+name COBALT DICKENS to this likely Iranian government-directed threat group. Despite this
+indictment and other disclosures of COBALT DICKENS campaigns, the threat group (also
+known as Silent Librarian) shows no signs of stopping its activity as of this publication.
+CTU™ researchers have observed the threat actors using free online services as part of
+their operations, including free certificates, domains, and publicly available tools.
+
+In July and August 2019, CTU researchers discovered a new large global phishing operation
+launched by COBALT DICKENS. This operation is similar to the threat group's August 2018
+campaign, using compromised university resources to send library-themed phishing emails.
+The messages contain links to spoofed login pages for resources associated with the
+targeted universities. Unlike previous campaigns that contained shortened links to obscure
+the attackers' infrastructure, these messages contain the spoofed URL (see Figure 1).
+
+ 
+
+Figure 1. Phishing message containing a link to a COBALT DICKENS domain (circled in red).
+(Source: Secureworks)
+
+Recipients who click this link are directed to a web page that looks identical or similar to the
+spoofed library resource. After the victims enter their credentials, their web browsers are
+redirected to the next.php file, where the credentials are stored locally in the pass.txt file. The
+victim's browser is then sent to the legitimate site being spoofed (see Figure 2).
+
+2/14
+
+
+
+ 
+
+Figure 2. Lifecycle of a COBALT DICKENS credential-harvesting phishing operation.
+(Source: Secureworks)
+
+For this campaign, the threat actors registered at least 20 new domains targeting over 60
+universities in Australia, the United States, the United Kingdom, Canada, Hong Kong, and
+Switzerland. These domains were registered using the Freenom domain provider, which
+administers the following free top-level domains (TLDs) unless the domain is considered
+"special":
+
+.ml
+
+.ga
+
+.cf
+
+.gq
+
+.tk
+
+ 
+Many of these domains use valid SSL certificates, likely to make the spoofed pages appear
+authentic. The overwhelming majority of the certificates observed in 2019 were issued by
+Let's Encrypt, a nonprofit organization that programmatically issues free certificates.
+However, past campaigns used certificates issued by the Comodo certificate authority.
+
+3/14
+
+
+
+COBALT DICKENS uses publicly available tools, including the SingleFile plugin available on
+GitHub and the free HTTrack Website Copier standalone application, to copy the login pages
+of targeted university resources. Metadata in a spoofed login page created on August 1
+suggests that COBALT DICKENS sometimes uses older copied versions of target websites.
+A comment left in the source code indicates it was originally copied on May 1, 2017 (see
+Figure 3). However, the university was targeted by numerous COBALT DICKENS operations,
+including the August 2018 and August 2019 campaigns.
+
+ 
+Figure 3. A comment in the source code of a spoofed page created by COBALT DICKENS.
+(Source: Secureworks)
+
+Metadata in other spoofed web pages supports the assessment that the threat actors are of
+Iranian origin. Specifically, a page copied on August 3 reveals an Iranian-related timestamp
+(see Figure 4).
+
+ 
+
+Figure 4. Metadata in COBALT DICKENS spoofed web page indicating that an Iran-based
+threat actor may have copied the legitimate website. (Source: Secureworks)
+
+As of this publication, CTU researchers observed COBALT DICKENS targeting at least 380
+universities in over 30 countries. Many universities have been targeted multiple times. The
+threat actors have not changed their operations despite law enforcement activity, multiple
+public disclosures, and takedown activity.
+
+Some educational institutions have implemented multi-factor authentication (MFA) to
+specifically address this threat. While implementing additional security controls like MFA
+could seem burdensome in environments that value user flexibility and innovation, single-
+password accounts are insecure. CTU researchers recommend that all organizations protect
+Internet-facing resources with MFA to mitigate credential-focused threats.
+
+To provide broader awareness of the threat group's campaigns and curtail its activities, CTU
+researchers listed all known domains associated with COBALT DICKENS operations in Table
+1. Several domains used prior to the indictment remain in use as of this publication. CTU
+researchers recommend that organizations use available controls to review and restrict
+access to these domains. They may contain malicious content, so consider the risks before
+opening them in a browser.
+
+Indicator Type Context
+
+4/14
+
+
+
+mlibo.ml Domain Hosting phishing website used by COBALT DICKENS for
+name August/July 2019 operations
+
+blibo.ga Domain Hosting phishing website used by COBALT DICKENS for
+name August/July 2019 operations
+
+azll.cf Domain Hosting phishing website used by COBALT DICKENS for
+name August/July 2019 operations
+
+azlll.cf Domain Hosting phishing website used by COBALT DICKENS for
+name August/July 2019 operations
+
+lzll.cf Domain Hosting phishing website used by COBALT DICKENS for
+name August/July 2019 operations
+
+jlll.cf Domain Hosting phishing website used by COBALT DICKENS for
+name August/July 2019 operations
+
+elll.cf Domain Hosting phishing website used by COBALT DICKENS for
+name August/July 2019 operations
+
+lllib.cf Domain Hosting phishing website used by COBALT DICKENS for
+name August/July 2019 operations
+
+tsll.cf Domain Hosting phishing website used by COBALT DICKENS for
+name August/July 2019 operations
+
+ulll.tk Domain Hosting phishing website used by COBALT DICKENS for
+name August/July 2019 operations
+
+tlll.cf Domain Hosting phishing website used by COBALT DICKENS for
+name August/July 2019 operations
+
+libt.ga Domain Hosting phishing website used by COBALT DICKENS for
+name August/July 2019 operations
+
+libk.ga Domain Hosting phishing website used by COBALT DICKENS for
+name August/July 2019 operations
+
+libf.ga Domain Hosting phishing website used by COBALT DICKENS for
+name August/July 2019 operations
+
+libe.ga Domain Hosting phishing website used by COBALT DICKENS for
+name August/July 2019 operations
+
+liba.gq Domain Hosting phishing website used by COBALT DICKENS for
+name August/July 2019 operations
+
+libver.ml Domain Hosting phishing website used by COBALT DICKENS for
+name August/July 2019 operations
+
+5/14
+
+
+
+ntll.tk Domain Hosting phishing website used by COBALT DICKENS for
+name August/July 2019 operations
+
+ills.cf Domain Hosting phishing website used by COBALT DICKENS for
+name August/July 2019 operations
+
+vtll.cf Domain Hosting phishing website used by COBALT DICKENS for
+name August/July 2019 operations
+
+clll.tk Domain Hosting phishing website used by COBALT DICKENS for
+name August/July 2019 operations
+
+stll.tk Domain Hosting phishing website used by COBALT DICKENS for
+name August/July 2019 operations
+
+llii.xyz Domain Hosting phishing website used by COBALT DICKENS
+name
+
+lill.pro Domain Hosting phishing website used by COBALT DICKENS
+name
+
+eduv.icu Domain Hosting phishing website used by COBALT DICKENS
+name
+
+univ.red Domain Hosting phishing website used by COBALT DICKENS
+name
+
+unir.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+unir.gq Domain Hosting phishing website used by COBALT DICKENS
+name
+
+unisv.xyz Domain Hosting phishing website used by COBALT DICKENS
+name
+
+unir.ml Domain Hosting phishing website used by COBALT DICKENS
+name
+
+unin.icu Domain Hosting phishing website used by COBALT DICKENS
+name
+
+unie.ml Domain Hosting phishing website used by COBALT DICKENS
+name
+
+unip.gq Domain Hosting phishing website used by COBALT DICKENS
+name
+
+unie.ga Domain Hosting phishing website used by COBALT DICKENS
+name
+
+6/14
+
+
+
+unip.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+nimc.ga Domain Hosting phishing website used by COBALT DICKENS
+name
+
+nimc.ml Domain Hosting phishing website used by COBALT DICKENS
+name
+
+savantaz.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+unie.gq Domain Hosting phishing website used by COBALT DICKENS
+name
+
+unip.ga Domain Hosting phishing website used by COBALT DICKENS
+name
+
+unip.ml Domain Hosting phishing website used by COBALT DICKENS
+name
+
+unir.ga Domain Hosting phishing website used by COBALT DICKENS
+name
+
+untc.me Domain Hosting phishing website used by COBALT DICKENS
+name
+
+jhbn.me Domain Hosting phishing website used by COBALT DICKENS
+name
+
+unts.me Domain Hosting phishing website used by COBALT DICKENS
+name
+
+uncr.me Domain Hosting phishing website used by COBALT DICKENS
+name
+
+lib- Domain Hosting phishing website used by COBALT DICKENS
+service.com name
+
+unvc.me Domain Hosting phishing website used by COBALT DICKENS
+name
+
+untf.me Domain Hosting phishing website used by COBALT DICKENS
+name
+
+nimc.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+anvc.me Domain Hosting phishing website used by COBALT DICKENS
+name
+
+7/14
+
+
+
+ebookfafa.com Domain Hosting phishing website used by COBALT DICKENS
+name
+
+nicn.gq Domain Hosting phishing website used by COBALT DICKENS
+name
+
+untc.ir Domain Hosting phishing website used by COBALT DICKENS
+name
+
+librarylog.in Domain Hosting phishing website used by COBALT DICKENS
+name
+
+llli.nl Domain Hosting phishing website used by COBALT DICKENS
+name
+
+lllf.nl Domain Hosting phishing website used by COBALT DICKENS
+name
+
+libg.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+ttil.nl Domain Hosting phishing website used by COBALT DICKENS
+name
+
+llil.nl Domain Hosting phishing website used by COBALT DICKENS
+name
+
+lliv.nl Domain Hosting phishing website used by COBALT DICKENS
+name
+
+llit.site Domain Hosting phishing website used by COBALT DICKENS
+name
+
+flil.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+e-library.me Domain Hosting phishing website used by COBALT DICKENS
+name
+
+cill.ml Domain Hosting phishing website used by COBALT DICKENS
+name
+
+fill.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+libm.ga Domain Hosting phishing website used by COBALT DICKENS
+name
+
+eill.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+8/14
+
+
+
+llib.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+eill.ga Domain Hosting phishing website used by COBALT DICKENS
+name
+
+nuec.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+illl.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+cnen.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+aill.nl Domain Hosting phishing website used by COBALT DICKENS
+name
+
+eill.nl Domain Hosting phishing website used by COBALT DICKENS
+name
+
+mlib.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+ulll.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+nlll.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+clll.nl Domain Hosting phishing website used by COBALT DICKENS
+name
+
+llii.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+etll.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+1edu.in Domain Hosting phishing website used by COBALT DICKENS
+name
+
+aill.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+atna.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+atti.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+9/14
+
+
+
+aztt.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+cave.gq Domain Hosting phishing website used by COBALT DICKENS
+name
+
+ccli.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+cnma.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+cntt.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+crll.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+csll.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+ctll.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+cvnc.ga Domain Hosting phishing website used by COBALT DICKENS
+name
+
+cvve.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+czll.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+cztt.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+euca.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+euce.in Domain Hosting phishing website used by COBALT DICKENS
+name
+
+ezll.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+ezplog.in Domain Hosting phishing website used by COBALT DICKENS
+name
+
+ezproxy.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+10/14
+
+
+
+eztt.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+flll.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+iell.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+iull.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+izll.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+lett.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+lib1.bid Domain Hosting phishing website used by COBALT DICKENS
+name
+
+lib1.pw Domain Hosting phishing website used by COBALT DICKENS
+name
+
+libb.ga Domain Hosting phishing website used by COBALT DICKENS
+name
+
+libe.ml Domain Hosting phishing website used by COBALT DICKENS
+name
+
+libg.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+libg.ga Domain Hosting phishing website used by COBALT DICKENS
+name
+
+libg.gq Domain Hosting phishing website used by COBALT DICKENS
+name
+
+libloan.xyz Domain Hosting phishing website used by COBALT DICKENS
+name
+
+libnicinfo.xyz Domain Hosting phishing website used by COBALT DICKENS
+name
+
+libraryme.ir Domain Hosting phishing website used by COBALT DICKENS
+name
+
+libt.ml Domain Hosting phishing website used by COBALT DICKENS
+name
+
+11/14
+
+
+
+libu.gq Domain Hosting phishing website used by COBALT DICKENS
+name
+
+lill.gq Domain Hosting phishing website used by COBALT DICKENS
+name
+
+llbt.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+llib.ga Domain Hosting phishing website used by COBALT DICKENS
+name
+
+llic.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+llic.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+llil.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+llit.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+lliv.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+llse.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+ncll.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+ncnc.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+nctt.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+necr.ga Domain Hosting phishing website used by COBALT DICKENS
+name
+
+nika.ga Domain Hosting phishing website used by COBALT DICKENS
+name
+
+nsae.ml Domain Hosting phishing website used by COBALT DICKENS
+name
+
+nuec.ml Domain Hosting phishing website used by COBALT DICKENS
+name
+
+12/14
+
+
+
+rill.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+rnva.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+rtll.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+sctt.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+shibboleth.link Domain Hosting phishing website used by COBALT DICKENS
+name
+
+sitl.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+slli.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+till.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+titt.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+uill.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+uitt.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+ulibe.ml Domain Hosting phishing website used by COBALT DICKENS
+name
+
+ulibr.ga Domain Hosting phishing website used by COBALT DICKENS
+name
+
+umlib.ml Domain Hosting phishing website used by COBALT DICKENS
+name
+
+umll.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+uni-lb.com Domain Hosting phishing website used by COBALT DICKENS
+name
+
+unll.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+13/14
+
+
+
+utll.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+vsre.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+web2lib.info Domain Hosting phishing website used by COBALT DICKENS
+name
+
+xill.tk Domain Hosting phishing website used by COBALT DICKENS
+name
+
+zedviros.ir Domain Hosting phishing website used by COBALT DICKENS
+name
+
+zill.cf Domain Hosting phishing website used by COBALT DICKENS
+name
+
+Table 1. Indicators associated with COBALT DICKENS operations.

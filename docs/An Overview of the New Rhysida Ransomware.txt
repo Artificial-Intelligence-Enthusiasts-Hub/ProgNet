@@ -1,0 +1,524 @@
+An Overview of the New Rhysida Ransomware
+trendmicro.com/en_us/research/23/h/an-overview-of-the-new-rhysida-ransomware.html
+
+August 9, 2023
+
+Ransomware
+
+An Overview of the New Rhysida Ransomware Targeting the
+Healthcare Sector
+In this blog entry, we will provide details on Rhysida, including its targets and what we know
+about its infection chain.
+
+By: Trend Micro Research August 09, 2023 Read time:  ( words)
+
+Updated on August 9, 2023, 9:30 a.m. EDT: We updated the entry to include an analysis of
+current Rhysida ransomware samples’ encryption routine.  
+Updated on August 14, 2023, 6:00 a.m. EDT: We updated t he entry to include Trend XDR
+workbench alerts for Rhysida and its components.
+
+Introduction
+On August 4, 2023, the HHS’ Health Sector Cybersecurity Coordination Center (HC3)
+released a security alert about a relatively new ransomware called Rhysida (detected as
+Ransom.PS1.RHYSIDA.SM), which has been active since May 2023. In this blog entry, we
+will provide details on Rhysida, including its targets and what we know about its infection
+chain.
+
+Who is behind the Rhysida ransomware?
+Not much is currently known about the threat actors behind Rhysida in terms of origin or
+affiliations. According to the HC3 alert, Rhysida poses itself as a “cybersecurity team” that
+offers to assist victims in finding security weaknesses within their networks and system. In
+fact, the group’s first appearance involved the use of a victim chat support portal.
+
+Who are Rhysida’s targets?
+As mentioned earlier, Rhysida, which was previously known for targeting the education,
+government, manufacturing, and tech industries, among others — has begun conducting
+attacks on healthcare and public health organizations. The healthcare industry has seen an
+
+1/13
+
+
+
+increasing number of ransomware attacks over the past five years.  This includes a recent
+incident involving Prospect Medical Holdings, a California-based healthcare system, that
+occurred in early August (although the group behind the attack has yet to be named as of
+writing).
+
+Data from Trend Micro™ Smart Protection Network™ (SPN) shows a similar trend, where
+detections from May to August 2023 show that its operators are targeting multiple industries
+rather than focusing on just a single sector.
+
+The threat actor also targets organizations around the world, with SPN data showing several
+countries where Rhysida binaries were detected, including Indonesia, Germany, and the
+United States.
+
+2/13
+
+
+
+Figure 1. The industry and country detection count for Rhysida ransomware based on Trend
+SPN data from May to August 2023
+How does a Rhysida attack proceed?
+
+3/13
+
+
+
+Figure 2. The Rhysida ransomware infection chain
+Rhysida ransomware usually arrives on a victim’s machine via phishing lures, after which
+Cobalt Strike is used for lateral movement within the system.
+
+Additionally, our telemetry shows that the threat actors execute PsExec to deploy PowerShell
+scripts and the Rhysida ransomware payload itself. The PowerShell script (g.ps1), detected
+as Trojan.PS1.SILENTKILL.A, is used by the threat actors to terminate antivirus-related
+processes and services, delete shadow copies, modify remote desktop protocol (RDP)
+configurations, and change the active directory (AD) password.
+
+Interestingly, it appears that the script (g.ps1) was updated by the threat actors during
+execution, eventually leading us to a PowerShell version of the Rhysida ransomware.
+
+Rhysida ransomware employs a 4096-bit RSA key and AES-CTR for file encryption, which
+we discuss in detail in a succeeding section. After successful encryption, it appends the
+.rhysida extension and drops the ransom note CriticalBreachDetected.pdf.
+
+This ransom note is fairly unusual — instead of an outright ransom demand as seen in most
+ransom notes from other ransomware families, the Rhysida ransom note is presented as an
+alert from the Rhysida “cybersecurity team” notifying victims that their system has been
+
+4/13
+
+
+
+compromised and their files encrypted. The ransom demand comes in the form of a “unique
+key” designed to restore encrypted files, which must be paid for by the victim.
+
+Summary of malware and tools used by Rhysida
+Malware: RHYSIDA, SILENTKILL, Cobalt Strike
+Tools: PsExec
+
+Initial Phishing Based on external reports, Rhysida uses
+Access phishing lures for initial access
+
+Lateral PsExec Microsoft tool used for remote execution
+Movement
+
+Cobalt 3rd party tool abused
+Strike for lateral movement
+
+SILENTKILL Malware deployed to terminate security-related
+processes and services, delete shadow copies,
+
+Defense modify RDP configurations, and change the AD
+Evasion password
+
+Impact Rhysida ransomware Ransomware encryption
+
+Table 1. A summary of the malware, tools, and exploits used by Rhysida
+A closer look at Rhysida’s encryption routine 
+After analyzing current Rhysida samples, we  observed that the ransomware uses
+LibTomCrypt, an open-source cryptographic library, to implement its encryption routine.
+Figure 3 shows the procedures Rhysida follows when initializing its encryption parameters. 
+
+ 
+
+Figure 3. Rhysida’s parameters for encryption
+Rhysida uses LibTomCrypt’s pseudorandom number generator (PRNG) functionalities for
+key and initialization vector (IV) generation. The init_prng function is used to initialize PRNG
+functionalities as shown in Figure 4. The same screenshot also shows how the ransomware
+
+5/13
+
+
+
+uses the library’s ChaCha20 PRNG functionality.
+
+Figure 4. Rhysida’s use of the “init_prng” function
+After the PRNG is initialized, Rhysida then proceeds to import the embedded RSA key and
+declares the encryption algorithm it will use for file encryption:
+
+It will use the register_cipher function to “register” the algorithm (in this case, aes), to
+its table of usable ciphers.
+It will use the find_cipher function to store the algorithm to be used (still aes), in the
+variable CIPHER.
+
+Afterward, it will proceed to also register and declare aes for its Cipher Hash Construction
+(CHC) functionalities. 
+
+Based on our analysis, Rhysida’s encryption routine follows these steps:
+
+1. After it reads file contents for encryption, it will use the initialized PRNG’s function,
+chacha20_prng_read, to generate both a key and an IV that are unique for each file.
+
+2. It will use the ctr_start function to initialize the cipher that will be used, which is aes
+(from the variable CIPHER), in counter or CTR mode.
+
+3. The generated key and IV are then encrypted with the rsa_encrypt_key_ex function.
+4. Once the key and IV are encrypted, Rhysida will proceed to encrypt the file using
+
+LibTomCrypt’s ctr_encrypt function.
+
+6/13
+
+
+
+Figure 5. Rhysida’s encryption routine
+Unfortunately, since each encrypted file has a unique key and IV — and only the attackers
+have a copy of the associated private key — decryption is currently not feasible.
+
+How can organizations protect themselves from Rhysida and other
+ransomware families?
+Although we are still in the process of fully analyzing Rhysida ransomware and its tools,
+tactics, and procedures (TTPs), the best practices for defending against ransomware attacks
+still holds true for Rhysida and other ransomware families.
+
+Here are several recommended measures that organizations implement to safeguard their
+systems from ransomware attacks:
+
+Create an inventory of assets and data
+Review event and incident logs
+Manage hardware and software configurations.
+Grant administrative privileges and access only when relevant to an employee's role
+and responsibilities.
+Enforce security configurations on network infrastructure devices like firewalls and
+routers.
+Establish a software whitelist permitting only legitimate applications
+Perform routine vulnerability assessments
+Apply patches or virtual patches for operating systems and applications
+Keep software and applications up to date using their latest versions
+Integrate data protection, backup, and recovery protocols
+Enable multifactor authentication (MFA) mechanisms
+Utilize sandbox analysis to intercept malicious emails
+Regularly educate and evaluate employees' security aptitude
+
+7/13
+
+
+
+Deploy security tools (such as XDR) which are capable of detecting abuse of legitimate
+applications
+
+Indicators of compromise
+
+Hashes
+The indicators of compromise for this entry can be found here.
+
+MITRE ATT&CK Matrix
+
+Initial T1566 Phishing Based on external reports,
+Access Rhysida uses phishing lures
+
+for initial access.
+
+Execution T1059.003 Command and Scripting It uses cmd.exe to execute
+Interpreter: Windows Command Shell commands for execution.
+
+T1059.001 It uses PowerShell to create
+Command scheduled task named Rhsd pointing
+and to the ransomware.
+Scripting
+Interpreter:
+PowerShell
+
+Persistence T1053.005 Scheduled Task/Job: When executed with the
+Scheduled Task argument -S, it will create a
+
+scheduled task named Rhsd
+that will execute the
+ransomware
+
+Defense T1070.004 Indicator Removal: File Rhysida ransomware deletes
+Evasion Deletion itself after execution. The
+
+scheduled task (Rhsd)
+created would also be
+deleted after execution.
+
+T1070.001 It uses wevtutil.exe to clear Windows
+Indicator event logs.
+Removal:
+Clear
+Windows
+Event Logs
+
+Discovery T1083 File and Directory Discovery It enumerates and looks for
+files to encrypt in all local
+drives.
+
+8/13
+
+
+
+T1082 Obtains the following information:
+System
+Information Number of processors
+Discovery System information
+
+Impact T1490 Inhibit System Recovery It executes uses vssadmin to
+remove volume shadow
+copies
+
+T1486 Data It uses a 4096-bit RSA key and Cha-
+Encrypted cha20 for file encryption.
+for Impact
+
+It avoids encrypting files with the
+following strings in their file name:
+
+.bat
+
+.bin
+
+.cab
+
+.cmd
+
+.com
+
+.cur
+
+.diagcab
+
+.diagcfg
+
+.diagpkg
+
+.drv
+
+.dll
+
+.exe
+
+.hlp
+
+.hta
+
+.ico
+
+.msi
+
+.ocx
+
+.ps1
+
+.psm1
+
+.scr
+
+.sys
+
+.ini
+
+.Thumbs.db
+
+.url
+
+.iso
+It avoids encrypting files found in the
+following folders:
+
+$Recycle.Bin
+Boot
+Documents and Settings
+PerfLogs
+ProgramData
+Recovery
+System Volume Information
+
+9/13
+
+
+
+Windows
+$RECYCLE.BIN
+ApzData
+
+It appends the following extension to
+the file name of the encrypted files:
+.rhysida
+
+It encrypts all system drives from A
+to Z.
+It drops the following ransom note:
+{Encrypted
+Directory}\CriticalBreachDetected.pdf
+
+T1491.001 It changes the desktop wallpaper
+Defacement: after encryption and prevents the
+Internal user from changing it back by
+Defacement modifying the NoChangingWallpaper
+
+registry value.
+
+Trend Micro Solutions
+
+Trend solutions such as Apex One,  Deep Security,  Cloud One Workload Security, Worry-
+Free Business Security,  Deep Discovery Web Inspector, Titanium Internet Security, and
+Cloud Edge can help protect against attacks employed by the Rhysida ransomware.
+
+The following solutions protect Trend customers from Rhysida attacks:
+
+Trend Micro solutions Detection Patterns / Policies / Rules
+
+Trend Micro Apex One Ransom.Win64.RHYSIDA.SM
+Trend Micro Deep Security Ransom.Win64.RHYSIDA.THEBBBC
+Trend Micro Titanium Internet Ransom.Win64.RHYSIDA.THFOHBC
+Security Trojan.PS1.SILENTKILL.SMAJC
+Trend Micro Cloud One Trojan.PS1.SILENTKILL.A
+Workload Security 
+Trend Micro Worry-Free
+Business Security Services
+
+10/13
+
+
+
+Trend Micro Apex One RAN4056T
+Trend Micro Deep Security RAN4052T
+Trend Micro Worry-Free
+Business Security Services
+Trend Micro Titanium Internet
+Security
+  
+
+Trend Micro Apex One DDI Rule ID: 597 - "PsExec tool detected"
+Trend Micro Deep Discovery DDI Rule ID: 1847 - "PsExec tool detected -
+Web Inspector Class 2"
+
+DDI Rule ID: 4524 - "Possible Renamed
+PSEXEC Service - SMB2 (Request)"
+DDI Rule ID: 4466 - "PsExec Clones - SMB2
+(Request)"
+DDI Rule ID: 4571 - "Possible Suspicious
+Named Pipe - SMB2 (REQUEST)"
+
+DDI Rule ID: 4570 - "COBALTSTRIKE -
+DNS(RESPONSE)"
+DDI Rule ID: 4152 - "COBALTSTRIKE - HTTP
+(Response)"
+DDI Rule ID: 4469 - "APT - COBALTSRIKE -
+HTTP (RESPONSE)"
+DDI Rule ID: 4594 - "COBALTSTRIKE -
+HTTP(REQUEST) - Variant 3"
+DDI Rule ID: 4153 - "COBALTSTRIKE - HTTP
+(Request) - Variant 2"
+DDI Rule ID: 2341 - "COBALTSTRIKE - HTTP
+(Request)"
+DDI Rule ID: 4390 - "CobaltStrike - HTTPS
+(Request)"
+DDI Rule ID: 4870 - "COBEACON DEFAULT
+NAMED PIPE - SMB2 (Request)"
+DDI Rule ID: 4861 - "COBEACON - DNS
+(Response) - Variant 3"
+DDI Rule ID: 4860 - "COBEACON - DNS
+(Response) - Variant 2"
+DDI Rule ID: 4391 - "COBEACON - DNS
+(Response)"
+
+Trend Micro Apex One Troj.Win32.TRX.XXPE50FFF071
+Trend Micro Deep Security 
+Trend Micro Worry-Free
+Business Security Services
+Trend Micro Titanium Internet
+Security
+Trend Micro Cloud Edge
+
+11/13
+
+
+
+Trend Micro XDR uses the following workbench alerts to protect customers from Rhysida-
+related attacks:
+
+Cobalt Strike
+
+Workbench Alert ID
+
+Anomalous Regsvr32 Execution Leading to Cobalt 63758d9f-4405-4ec5-b421-
+Strike 64aef7c85dca
+
+COBALT C2 Connection afd1fa1f-b8fc-4979-8bf7-
+136db80aa264
+
+Early Indicator of Attack via Cobalt Strike 0ddda3c1-dd25-4975-a4ab-
+b1fa9065568d
+
+Lateral Movement of Cobalt Strike Beacon 5c7cdb1d-c9fb-4b1d-b71f-
+9a916b10b513
+
+Possible Cobalt Strike Beacon 45ca58cc-671b-42ab-a388-
+d972ff571d68
+
+Possible Cobalt Strike Beacon Active Directory 1f103cab-9517-455d-ad08-
+Database Dumping 70eaa05b8f8d
+
+Possible Cobalt Strike Connection 85c752b8-93c2-4450-81eb-
+52ec6161088e
+
+Possible Cobalt Strike Privilege Escalation Behavior 2c997bac-4fc0-43b4-8279-
+6f2e7cf723ae
+
+Possible Fileless Cobalt Strike cf1051ba-5360-4226-8ffb-
+955fe849db53
+
+PsExec
+
+Workbench Alert ID
+
+Possible Credential Access via PSEXESVC 0b870a13-e371-4bad-9221-
+Command Execution be7ad98f16d7
+
+Possible Powershell Process Injection via PSEXEC 7fe83eb8-f40f-43be-8edd-
+f6cbc1399ac0
+
+Possible Remote Ransomware Execution via 47fbd8f3-9fb5-4595-9582-
+PsExec eb82566ead7a
+
+PSEXEC Execution By Process e011b6b9-bdef-47b7-b823-
+c29492cab414
+
+12/13
+
+
+
+Remote Execution of Windows Command Shell via b21f4b3e-c692-4eaf-bee0-
+PsExec ece272b69ed0
+
+Suspicious Execution of PowerShell Parameters and 26371284-526b-4028-810d-
+PSEXEC 9ac71aad2536
+
+Suspicious Mimikatz Credential Dumping via PsExec 8004d0ac-ea48-40dd-aabf-
+f96c24906acf
+
+SILENTKILL
+
+Workbench Alert ID
+
+Possible Disabling of Antivirus Software 64a633e4-e1e3-443a-8a56-7574c022d23f
+
+Suspicious Deletion of Volume Shadow Copy 5707562c-e4bf-4714-90b8-becd19bce8e5
+
+Rhysida
+
+Workbench Alert ID
+
+Ransom Note Detection (Real-time Scan) 16423703-6226-4564-91f2-
+3c03f2409843
+
+Ransomware Behavior Detection 6afc8c15-a075-4412-98c1-
+bb2b25d6e05e
+
+Ransomware Detection (Real-time Scan) 2c5e7584-b88e-4bed-b80c-
+dfb7ede8626d
+
+Scheduled Task Creation via Command Line 05989746-dc16-4589-8261-
+6b604cd2e186
+
+System-Defined Event Logs Clearing via 639bd61d-8aee-4538-bc37-
+Wevtutil c630dd63d80f
+
+Trend Micro Vision One hunting query
+Trend Vision One customers can use the following hunting query to search for Rhysida within
+their system:
+
+processCmd:"powershell.exe*\\*$\?.ps1" OR (objectFilePath:"?:*\\??\\psexec.exe" AND
+processCmd:"*cmd.exe*\\??\\??.bat")

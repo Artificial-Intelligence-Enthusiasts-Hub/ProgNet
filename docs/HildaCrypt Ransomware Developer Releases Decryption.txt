@@ -1,0 +1,126 @@
+HildaCrypt Ransomware Developer Releases Decryption
+Keys
+
+bleepingcomputer.com/news/security/hildacrypt-ransomware-developer-releases-decryption-keys/
+
+Lawrence Abrams
+
+By
+Lawrence Abrams
+
+October 5, 2019
+04:47 PM
+4
+
+The developer behind the HildaCrypt Ransomware has decided to release the
+ransomware's private decryption keys. With these keys a decryptor can be made that would
+allow any potential victims to recover their files for free.
+
+When a new ransomware or a variant is discovered, it is very common for researchers to
+post about them on Twitter.  This week, researcher GrujaRS discovered a new ransomware
+variant and identified it as a STOP variant.
+
+1/5
+
+
+
+Last night, the developer contacted the researcher to tell him that it was an incorrect
+identification and that it was actually a variant of the HildaCrypt Ransomware.
+
+As part of this communication, the developer decided to also release the master private
+decryption keys for the ransomware.
+
+With these keys a decryptor can be made that allows a victim to get their files back for free.
+
+2/5
+
+
+
+HildaCrypt Ransomware Decryption Keys
+After giving the keys to Michael Gillespie, he confirmed they were legitimate released a
+decryptor using them.
+
+For those who wish to view the keys or create a decryptor based on them, they can be
+accessed here.
+
+HildaCrypt was created for fun
+BleepingComputer had a conversation with the ransomware developer last night and was
+told that HildaCrypt was only made for fun and "it was mainly an educational thing really".
+
+They further told us "hildacrypt never was used on anyone" and that they released the keys
+in case "some kid gets a hold of these binaries I hope the keys would be of some use".
+
+After further discussion, the developer intimated that they were probably going to stop
+development of the ransomware and instead focus on getting involved in more legitimate
+efforts of the cybersecurity community.
+
+Related Articles:
+HelloKitty ransomware source code leaked on hacking forum
+
+TransForm says ransomware data breach affects 267,000 patients
+
+Critical Atlassian Confluence bug exploited in Cerber ransomware attacks
+
+3/5
+
+
+
+US sanctions Russian who laundered money for Ryuk ransomware affiliate
+
+TellYouThePass ransomware joins Apache ActiveMQ RCE attacks
+
+Decryptor
+HildaCrypt
+Ransomware
+
+Lawrence Abrams
+Lawrence Abrams is the owner and Editor in Chief of BleepingComputer.com. Lawrence's
+area of expertise includes Windows, malware removal, and computer forensics. Lawrence
+Abrams is a co-author of the Winternals Defragmentation, Recovery, and Administration
+Field Guide and the technical editor for Rootkits for Dummies.
+
+Previous Article
+Next Article
+
+Comments
+nkdev Photo
+GT500 Photo
+cybercynic Photo
+
+4/5
+
+
+
+matutn Photo
+matutn - 4 years ago
+
+Hi, do you have any information about ".coot". 
+I tried with many decryptors like rannohdecrypt or, trend micro (cause I read it could be
+"CryptXXX V...", then I read that could be "hildacrypt" and used emsisoft decryptor, but
+nothing is working. 
+The note says:  
+ATTENTION!  
+
+Don't worry, you can return all your files!
+All your files like photos, databases, doc uments and other important are encrypted
+with strongest encryption and unique key.
+The only method of recovering files is to p urchase decrypt tool and unique key for
+you.
+This  software will decrypt all your encrypted files.
+What guarantees you have?  
+You can send one of your en crypted file from your PC and we decrypt it for free.
+But we can decrypt only 1 file for free. File must not contain valuable information .
+You can get and look video overview decrypt tool:  
+https://we.tl/t-IbdGyCKhdr  
+Price of private key and de crypt software is $980.
+Discount 50% available if you contact us first 72 h ours, that's price for you is $490.
+Please note that you'll never restore your data without payment.  
+Check your e-mail "Spam" or "Junk" folder if you don't get answe r more than 6 hours.
+
+thx
+
+Post a Comment Community Rules
+You need to login in order to post a comment
+Not a member yet? Register Now
+
+You may also like:

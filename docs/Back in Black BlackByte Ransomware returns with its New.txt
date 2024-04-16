@@ -1,0 +1,209 @@
+Back in Black: BlackByte Ransomware returns with its New
+Technology (NT) version
+
+blog.cluster25.duskrise.com/2023/05/22/back-in-black-blackbyte-nt
+
+Cluster25 Threat Intel Team
+
+By Cluster25 Threat Intel Team
+May 22, 2023  
+
+BlackByte is a Ransomware-as-a-Service (RaaS) group that is known for the use of the homonymous
+malware that is constantly updated and spread in different variants. The first implementation of the
+malware was written in the C# programming language, which was followed by a Golang implementation
+that also integrated a privilege escalation technique that exploited the Bring Your Own Vulnerable
+Driver (BYOVD) vulnerability.
+
+The last implementation, known as BlackByte NT, is written in C++ and integrates different techniques
+to hinder both the static and dynamic analysis of the malware, hiding the behavior of the malware when
+the execution is monitored. The new version also adds new drivers for the exploit of the BYOVD
+vulnerability in order to disable security products and tools that may interfere with its execution.
+
+INSIGHTS
+The analyzed sample is a 64-bit PE with the compilation timestamp of February 19th 2023. The
+malware uses different anti-analysis mechanisms to hinder both the static and the dynamic analysis.
+One of these consists in the dynamic import of the APIs needed for the malware execution: the
+malware uses a function to find the DLL and a function to import the needed procedure with the use of
+the hash of their names. In both cases the hash is computed starting from a byte with the value 0x99,
+which is multiplied by three and added to each byte of the string of the module name. The following is an
+re-implementation of the algorithm in Python:
+
+1/6
+
+
+
+POWERSHELL
+
+def get_hash(module_name):
+    module_name_b = bytearray()
+    module_name_b.extend(map(ord, module_name))
+    current_hash = 0x99
+    for i in range(len(module_name_b)):
+        current_hash = module_name_b[i] + current_hash*3
+     return hex(current_hash)
+
+The team used the above function in a IDAPython script that allowed to retrieve all invocations to the
+functions responsible for the dynamic loading of the APIs in order to continue with the static analysis of
+the malware.
+
+The mentioned functions receive the hash of the module or function to load as one of their arguments,
+then the Process Environment Block (PEB) structure of the binary is parsed to access to the list of the
+DLLs loaded in the process memory and their export function names.
+
+The PEB structure is also accessed to perform an anti-debug check, verifying the content of the flag
+BeingDebugged.
+
+After loading the needed APIs, the malware checks the arguments passed during the execution, which
+may have the following flags: -a, -s, -w, -q.
+
+In case no one of the mentioned arguments is specified, the malware terminates its execution.
+
+2/6
+
+
+
+Moreover, if the string “svc” is provided as an argument, the malware launches a new thread to register
+a new service using a random name of 7 characters which may be used to establish persistence. This,
+like other operations executed by the malware, is performed using syscalls instead of standard
+Windows API libraries. In this way, the malware tries to bypass detection techniques that monitor user-
+mode hooks by using syscalls instead of standard Windows API libraries.The same method may be
+used also to hinder the actions of debugger hiding tools (e.g. ScyllaHide).
+
+The main thread, instead, continues its execution decoding the string dHJ0dW9pYQc= from the Base64
+encoding, the resulting string is then decrypted with a XOR loop using the key BAGMVPR1p6PfdcfiV,
+that is itself encrypted in the binary. The obtained value (i.e. 63389936), is compared against the value
+passed with one of the execution flags when the binary is launched and, if the values don’t match, the
+malware terminates its execution. This is done possibly with the intent of hiding the behavior of the
+malware from sandbox tools when the sample is not launched in the proper way.
+
+The malware then creates the file at the path C:\SystemData\MsExchangeLog1.log using a syscall to
+the function NtCreateFile. The file contains a sequence of elements q<number> and w<number> that
+seem to be used to keep track of the status of the process.
+
+To proceed with its execution, the malware continues the dynamic resolution of functions from the
+following DLLs:
+
+kernel32.dll
+
+3/6
+
+
+
+ntdll.dll
+advapi32.dll
+user32.dll
+shell32.dll
+rstrtmgr.dll
+netapi32.dll
+shlwapi.dll
+mpr.dll
+psapi.dll
+ole32.dll
+OleAut32.dll
+version.dll
+Winhttp.dll
+IPHLPAPI.dll
+Ws2_32.dll
+Dbghelp.dll
+
+ 
+Some of these are retrieved from the hash of their names, that are hardcoded in the binary, others using
+the string of their names, which are decrypted and passed to the LoadLibraryW function.
+
+When all the APIs are retrieved, the malware performs an anti-debug check using two syscalls to the
+Native API NtQueryInformationProcess, using the ProcessDebugPort and
+ProcessBasicInformation arguments to detect if a debugger is attached to the process. If this is the
+case, the malware exists after deleting its executable file by launching a Windows command through the
+CreateProcessInternalW API:
+
+WINDOWS COMMAND
+
+C:\\Windows\\System32\\cmd.exe /c ping 1.1.1.1 -n 10 > Nul & fsutil file setZeroData offset=0
+length=663424 \"<file-path>" & Del \"<file-path>" /F /Q
+
+Other checks are performed using the NtSystemDebugControl and NtGetContextThread functions, to
+check debug registers and also detect hardware breakpoints.
+
+If all the checks are successful, the malware scans the list of running processes and injects itself in
+svchost.exe, where the file encryption takes place. The encryption is performed in a dedicated thread
+for each file, using Curve25519 Elliptic Curve Cryptography (ECC) for asymmetric encryption and
+ChaCha20 for symmetric file encryption. The files are also renamed with a Base64-encoded string and
+the .blackbytent extension (e.g. IjUSLV4COhRVDA0EbyABJg==.blackbytent).
+
+4/6
+
+
+
+The following figure shows an excerpt of the Random note:
+
+Finally, the new variant, like its previous version, continues to exploit vulnerable drivers to perform
+enhanced evasion techniques. In fact, the malware drops the following files in the directory
+C:\SystemData:
+
+A3V86HEL: which is the file RTCore64.sys, a kernel mode driver used by Micro-Star MSI AfterBurner,
+a graphics card utility;
+
+ 
+A3V86HEL_1: which is DBUtil_2_3.Sys, a driver related to Dell Client firmware update utility.
+
+Both the drivers can be exploited to escalate the privileges in the target system and disable security
+protection products. While the use of the RTCore64.sysdriver was already reported for previous analysis
+of the second version of BlackByte, the use of the Dell driver seems a peculiarity of the new version.
+
+MITRE ATT&CK MATRIX
+
+5/6
+
+
+
+TACTIC TECHNIQUE DESCRIPTION
+
+Initial Access T1566.001 Phishing: Spearphishing Attachment
+
+Initial Access T1566.002 Phishing: Spearphishing Link
+
+Execution T1059.003 Command and Scripting Interpreter: Windows Command Shell
+
+Execution T1106 Native API
+
+Execution T1204.002 User Execution: Malicious File
+
+Execution T1569 System Services
+
+Privilege Escalation T1068 Exploitation for Privilege Escalation
+
+Defense Evasion T1140 Deobfuscate/Decode Files or Information
+
+Defense Evasion T1622 Debugger Evasion
+
+  Defense Evasion   T1211   Exploitation for Defense Evasion
+
+  Defense Evasion   T1562   Impair Defenses
+
+  Defense Evasion   T1070   Indicator Removal
+
+  Defense Evasion   T1055   Process Injection
+
+  Discovery   T1082   System Information Discovery
+
+  Discovery   T1083   File and Directory Discovery
+
+  Discovery   T1057   Process Discovery
+ 
+
+  Discovery   T1518   Software Discovery
+ 
+
+  Impact   T1486   Data Encrypted for Impact
+
+INDICATORS OF COMPROMISE
+
+CATEGORY TYPE VALUE
+
+  PAYLOAD SHA256 02a0a39dbe0dcb5600f4179aeab457bb86965699e45d1d154082b02139dc701d
+
+  PAYLOAD SHA1 c0950ebfa3a63c705ca813cfd28364aa1d90bb09
+
+  PAYLOAD MD5 bf1f2f3759448a05d3dd92a4f7f042f6
+
+Malware, Intelligence, Ransomware

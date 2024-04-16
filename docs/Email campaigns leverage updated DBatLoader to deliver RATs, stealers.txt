@@ -1,0 +1,658 @@
+Email campaigns leverage updated DBatLoader to deliver RATs, stealers
+securityintelligence.com/posts/email-campaigns-leverage-updated-dbatloader-deliver-rats-stealers/
+
+Threat Intelligence September 12, 2023
+By Ole Villadsen Golo Mühr Kat Metrick 11 min read
+IBM X-Force has identified new capabilities in DBatLoader malware samples delivered in recent email campaigns, signaling a
+heightened risk of infection from commodity malware families associated with DBatLoader activity. X-Force has observed nearly two
+dozen email campaigns since late June leveraging the updated DBatLoader loader to deliver payloads such as Remcos, Warzone,
+Formbook, and AgentTesla. DBatLoader malware has been used since 2020 by cybercriminals to install commodity malware remote
+access Trojans (RATs) and infostealers, primarily via malicious spam (malspam).
+
+DBatLoader
+DBatLoader (aka ModiLoader) is a malware strain that has been observed since 2020 used to download and execute the final
+payload of commodity malware campaigns, namely a remote access tool/trojan (RAT) or infostealer such as Remcos, Warzone,
+Formbook, and AgentTesla. DBatLoader campaigns are frequently undertaken using malicious emails and are known to abuse cloud
+services to stage and retrieve additional payloads. Earlier this year, DBatLoader campaigns reportedly targeted entities in Eastern
+Europe to distribute Remcos and businesses in Europe to distribute Remcos and Formbook. Remcos was the most common payload
+that X-Force observed in these recent campaigns.
+
+Remcos — short for Remote Control and Surveillance — is a remote access tool offered for sale by a company named Breaking
+Security but is widely used for malicious purposes. Like most such remote tools, Remcos can be used to provide backdoor access to
+Windows operating systems. Warzone (aka AveMaria), in use since 2018, is a remote access trojan that is also publicly available for
+purchase at the website warzone[.]ws. Formbook and AgentTesla are popular information stealers that are available on underground
+markets.
+
+The recent campaigns observed by X-Force that deliver the updated DBatLoader follow and also improve on previously observed
+tactics. For example, in several observed campaigns the threat actors leveraged sufficient control over the email infrastructure to
+enable malicious emails to pass SPF, DKIM, and DMARC email authentication methods. A majority of campaigns leveraged
+OneDrive to stage and retrieve additional payloads, with a small fraction otherwise utilizing transfer[.]sh or new/compromised
+domains. Most email content appeared targeted toward English speakers, although X-Force also observed emails in Spanish and
+Turkish.
+
+1/21
+
+
+
+DBatLoader is still under active development and continues to improve its capabilities. The recently observed samples offer UAC-
+bypass, persistence, various process injection techniques, and support the injection of shellcode payloads. Furthermore, the signed
+Windows executable vulnerable to DLL-hijacking (easinvoker.exe), as well as a modified version of netutils.dll, may now be supplied
+as part of the downloaded payload and config, in order to decrease the size of the DBatLoader stager.
+
+DBatLoader’s most recent iteration also attempts an unexpected technique of DLL hooking. DLL hooking is commonly used to
+bypass AMSI, however, most of DBatLoader’s current hooking implementations are flawed, rendering it ineffective. The experimental
+coding style and frequent implementation changes suggest that some of the loader’s functionality is still a work in progress.
+
+Analysis
+
+DBatLoader email campaigns
+The email campaigns that X-Force observed used either ISO images or one of several different archive file formats — such as 7-Zip,
+tar, zip, or rar — to deliver the DBatLoader executable. Most of the campaigns relied on a variety of common email lures to persuade
+targets to open the file attachments, such as shipping orders or billing/invoice/purchase requests or inquiries. The graphics below
+provide a screenshot of emails delivering DBatLoader.
+
+Figure 1: Malicious email delivering DBatLoader to install Formbook
+
+2/21
+
+
+
+Figure 2: Malicious email delivering DBatLoader to install Remcos
+
+Figure 3: DBatLoader infection chain
+
+DBatLoader: First stage
+
+3/21
+
+
+
+Broken AMSI-bypass
+
+The first stage of DBatLoader is a Delphi-compiled executable. After initialization, execution transfers to the loader’s main function.
+DBatLoader makes heavy use of junk code and specifically displays an interesting behavior of faking DLL patching. It is not
+uncommon to see malware attempt to manipulate the behavior of specific DLLs in memory such as AMSI.dll in order to prevent
+antivirus detection. This is known as AMSI-bypass and is usually achieved by hooking or otherwise patching the AMSI.dll in memory.
+In the case of DBatLoader, the malware combines splitted strings to generate those commonly targeted API names, such
+as AmsiInitialize(), AmsiUacScan() or AmsiOpenSession().
+
+Figure 4: AMSI function names splitted strings
+
+The loader uses the strings in a function, which at first appears to locate those functions in memory and then call another function to
+patch them in order to break the malware detection capability. However, instead of passing the address of the targeted export, the
+code passes the address of the pointer to the export.
+
+4/21
+
+
+
+Figure 5: Faulty patching function
+
+The function responsible for patching the memory does work as expected, so it overwrites the pointer it received with a jump
+instruction to an unrelated API call (GetBkMode). It also uses VirtualProtect, which would have been necessary, if the targeted
+address was in fact within AMSI.dll’s .text segment.
+
+Figure 6: Patching memory
+
+Multiple implementations of this were observed in different samples and both the first and second stages. The second stage for
+instance uses native API calls NtProtectVirtualMemory and NtWriteVirtualMemory to patch memory, with a jump instruction to
+the GetCPInfo export.
+
+5/21
+
+
+
+Figure 7: Faulty patching in Stage 2
+
+All implementations display the same unexpected behavior of patching only the pointer, but not the actual DLL. Whether or not this
+behavior is intended, it renders the functionality completely ineffective as an AMSI bypass.
+
+Payload decryption and execution
+
+The encrypted second-stage PE is stored within the binary. Due to the simple ADD-based encryption, it is visible in the hexdump:
+
+6/21
+
+
+
+Figure 8: ADD-encrypted second stage
+
+The payload is decrypted byte-by-byte using the ADD-based algorithm below:
+
+7/21
+
+
+
+Figure 9: Payload decryption
+
+Once the payload is decrypted, the resulting PE is parsed and each section is manually mapped into memory. The loader also
+resolves all imports and applies the appropriate memory protection. Next, the faulty patching functions discussed above are used on
+several other APIs, associated with malware detection and antivirus behavior. Some of them are:
+
+ReportEventW (used for event logging)
+SaferiIsExecutableFileType (used to detect executable files that could potentially be malicious)
+VerifySignature and SspiZeroAuthIdentity (used by Windows to verify security and identity)
+
+Lastly, the loader transfers execution to the entry point of the second stage.
+
+DBatLoader: Second stage
+Downloading and decrypting the config
+
+DBatLoader’s second stage is a Delphi-compiled DLL. It begins by initiating a timer event using timeSetEvent() and passes its main
+function as a callback, which is executed after 10 seconds. Just like the first stage, almost all functions contain large amounts of the
+faulty DLL patching functionality. First, the code attempts to locate and parse the encrypted download URL from its parent binary. The
+encrypted bytes and a key can be parsed using the delimiter “^^Nc”.
+
+8/21
+
+
+
+Figure 10: Encrypted URL in green, separator in red, key in blue
+
+Next, the bytes are decrypted using a simple modulo-based algorithm and the hardcoded key highlighted above.
+
+Figure 11: URL decryption
+
+Decryption with the key “255” results in the following download URL:
+
+https://onedrive[.]live[.]com/download?resid=E0CF7F9E6AAF27EF%211759&authkey=!APOw7kS6PG9JFg8
+
+Scroll to view full table
+
+In order to retrieve the payload, DBatLoader first resolves the CLSID for the object “WinHttp.WinHttpRequest.5.1” using
+the CLSIDFromProgID() API. The CLSID is then passed to CoCreateInstance() to initialize the HTTP object. The response to the
+GET request is a Base64 encoded blob of encrypted data containing various configuration parameters and payloads.
+
+Figure 12: Base64 encoded response
+
+After decoding, the response is decrypted using the same key and algorithm as the URL (see Figure 8). The next stage of decryption
+uses the custom algorithm shown below:
+
+9/21
+
+
+
+Figure 13: Custom decryption algorithm
+
+The resulting binary blob contains a list of different config values, which are each parsed out by another separator:
+
+Figure 14: Payload with separator (highlighted blue)
+
+After splitting the blob into a list, the following config values are revealed:
+
+1. XOR key to decrypt payload
+2. Filename to be used for persistence
+3. Encrypted payload
+4. Option to enable UAC bypass
+5. Option to enable persistence
+
+10/21
+
+
+
+6. Option to inject shellcode
+7. Option to inject into remote process
+8. Numeric decryption key (often same as used before)
+9. Unused
+
+10. easinvoker.exe payload
+11. netutils.dll payload
+12. Option to inject via process hollowing
+
+Figure 15: DBatLoader parsing payload
+
+Persistence
+
+If the persistence option is enabled, DBatLoader writes its parent binary to “C:\Users\Public\Libraries\<config_filename>.PIF“. By
+using the .PIF extension, it will automatically be executed if opened.
+
+It then writes a .URL file at the path “C:\Users\Public\<config_filename>.url“. The file is effectively a shortcut to the .PIF file:
+
+Figure 16: Example shortcut file for persistence
+
+Finally, DBatLoader writes the path of the shortcut file to the registry key:
+
+HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\<config_filename>
+
+Scroll to view full table
+
+This will ensure the execution of the DBatLoader binary every time the user logs on.
+
+UAC bypass
+
+When the UAC bypass option is enabled, DBatLoader will start to drop several files. The first file, dropped to
+C:\Users\Public\Libraries\Null, is used as a mutex and contains a random integer. Execution will only continue if the file doesn’t
+exist already.
+
+Next, both downloaded files from the config, easinvoker.exe and netutils.dll are dropped to C:\Users\Public\Libraries\.
+
+11/21
+
+
+
+Figure 17: Building easinvoker.exe path to drop
+
+DBatLoader also drops two .BAT files KDECO.bat and <config_filename>O.bat to the same directory and executes the latter:
+
+Figure 18: UAC bypass .BAT file
+
+The malicious .BAT file above creates a new directory “C:\Windows \System32” and copies both binaries and KDECO.bat into it.
+This technique is known as mocking trusted directories. The extra space in the “Windows “ directory name mocks the trusted
+directory “C:\Windows\System32” and ultimately leads to Windows automatically elevating the privilege of processes of specific
+system executables started from that location — without a UAC confirmation pop-up. The executable easinvoker.exe, which is run
+by the batch script, is a legitimate and signed Windows component that is vulnerable to DLL hijacking, meaning it will search for and
+load any DLL in its directory called “netutils.dll” and execute a specific export.
+
+In this case, it will find the netutils.dll previously copied to the mock directory. The DLL’s export NetpwNameValidate() was modified
+to execute a .BAT file in the same directory.
+
+Figure 19: Modified netutils.dll export
+
+Finally, KDECO.bat contains the following command, which is executed with elevated privileges:
+
+12/21
+
+
+
+start /min powershell -WindowStyle Hidden -inputformat none -outputformat none -NonInteractive -Command \”Add-MpPreference
+-ExclusionPath ‘C:\\Users’\” & exit
+
+Scroll to view full table
+
+This effectively disables antivirus protection for all files below the C:\\Users\ directory.
+
+After this has been completed, all previously dropped files and directories are deleted by the first BAT file and DBatLoader’s second
+stage.
+
+Process injection
+
+The next task is to decrypt and execute the final payload that was downloaded. It can be decrypted using the XOR key from the
+config using another custom algorithm, which XORs the key as well as both lengths of the key and ciphertext.
+
+Figure 20: XOR decryption algorithm
+
+Afterward, it goes through another stage of modulo-based decryption with the integer key from the config (see Figure 12) and finally
+the already mentioned custom decryption algorithm (Figure 14).
+
+The resulting payload is then injected into a legitimate process from the C:\Windows\System32\ directory. Each DBatLoader sample
+contains a list of targeted process names, from which it chooses the first executable present on the system. The following processes
+have been observed recently:
+
+sndvol.exe
+iexpress.exe
+colorcpl.exe
+wusa.exe
+
+DBatLoader’s downloaded config also specifies how the payload is to be injected, either via regular process injection, shellcode
+injection (for shellcode payloads only), or process hollowing.
+
+In the case of regular process injection, DBatLoader uses WinExec() to start the targeted process. It then
+uses CreateToolhelp32Snapshot(), Process32First() and Process32Next() to search for the process and retrieve the corresponding
+process handle to open the process. DBatLoader allocates memory in the remote process space, maps the payload, resolves
+imports, and writes the payload into the allocated memory buffer using the following API calls:
+
+NtAllocateVirtualMemory()
+LoadLibraryExA()
+NtProtectVirtualMemory()
+NtWriteVirtualMemory()
+
+The payload is then executed in a new thread via RtlCreateUserThread().
+
+13/21
+
+
+
+Lastly, DBatLoader hooks two APIs NtSetSecurityObject() and NtOpenProcess() in the memory space of the newly created process,
+by writing a return instruction (0xC3) at the start of the functions. This is the only implementation of hooking that is not broken and
+works as expected.
+
+Figure 21: Hooking ntdll 
+
+Shellcode injection
+
+DBatLoader also supports the injection of shellcode payloads. If the config has the respective option enabled, the loader starts the
+targeted process in a suspended state and opens it:
+
+Figure 22: Create suspended process
+
+The decrypted payload is written to the process memory in a buffer using NtAllocateVirtualMemory() and NtWriteVirtualMemory(). To
+execute the shellcode, an APC thread is created via the NtQueueApcThread() API and run via ResumeThread(). Lastly, DBatLoader
+hooks NtSetSecurityObject() in the new processes context.
+
+Process hollowing
+
+PE payloads may also be injected using a technique known as process hollowing. First, the target process is again created in a
+suspended state. Instead of injecting the payload into a new buffer within the process memory, this technique uses a series of API
+calls in order to overwrite the legitimate executable with the mapped malicious PE within the created process. The following API calls
+are made:
+
+GetThreadContext()
+NtReadVirtualMemory()
+NtUnmapViewOfSection()
+NtAllocateVirtualMemory()
+NtWriteVirtualMemory()
+NtFlushInstructionCache()
+SetThreadContext()
+
+14/21
+
+
+
+After the process has been injected with the malicious PE, DBatLoader resumes the suspended thread using NtResumeThread(),
+which causes execution to continue at the malicious PE’s entry point. Once again, NtSetSecurityObject() is hooked in the new
+process.
+
+Finally, before the DBatLoader’s process is terminated, it calls FlushInstructionCache() and hooks NtOpenProcess().
+
+Improved DBatLoader heralds increased risk of associated infections
+Due to the sophistication of DBatLoader phishing techniques and improvements to the malware itself, it is likely that infections with
+DBatLoader and follow-on payloads will rise. IBM X-Force reported on a surge in Remcos RAT activity in Q1 2023, and expects to
+see a future upward trend in infections from this malware, as well as other RATs and infostealers associated with DBatLoader. A rise
+in these infections signals a heightened risk of highly impactful post-compromise activity facilitated by malicious programs that collect
+credentials and enable remote control of systems.
+
+To combat this, security teams are encouraged to renew vigilance around TTPs associated with DBatLoader campaigns, such as
+abuse of public cloud infrastructure, and characteristics of the new variants of the malware observed by X-Force. Policy and
+procedure changes in the form of multi-factor authentication implementation, monitoring for leaked enterprise credentials, and review
+of policies for ISO auto-mounting can also help mitigate the risk of this and other malicious activity.
+
+To learn how IBM Security X-Force can help with anything regarding cybersecurity including incident response, threat intelligence or
+offensive security services, schedule a meeting here: IBM Security X-Force Scheduler.
+
+If you are experiencing cybersecurity issues or an incident, contact IBM Security X-Force for help: US hotline 1-888-241-9812 |
+Global hotline (+001) 312-212-8034.
+
+Indicators of Compromise
+
+Indicator Indicator Context 
+Type
+
+hxxp://doctorproff[.]ru/194_Hmoczcsvbok URL Payload
+Staging
+URL
+
+hxxps://travelinspiration.sa[.]com/.xleet2/255_Oyvdqiogydx URL Payload
+Staging
+URL
+
+hxxps://onedrive.live[.]com/download?resid=168DC93239B65DF6%21216&authkey=!AFhcwjWlnon5LwE URL Payload
+Staging
+URL
+
+hxxps://onedrive.live[.]com/download?resid=B044AF3D48F7B886%21365&authkey=!AIpyTdc7_NVF6I8 URL Payload
+Staging
+URL
+
+hxxps://onedrive.live[.]com/download?resid=F253EE082321791B%21110&authkey=!AMAFiW2uLt6IzGM URL Payload
+Staging
+URL
+
+hxxps://transfer[.]sh/get/6eSIqx4VYA/255_Xwgdedwtiyw URL Payload
+Staging
+URL
+
+hxxps://onedrive.live[.]com/download?resid=2F714EB1E9F0F34B%21131&authkey=!AB-Xgr3iPCVl3gc URL Payload
+Staging
+URL
+
+hxxps://onedrive.live[.]com/download?resid=D94EF82AD5BE7BDF%21120&authkey=!AI3c0hhcpsQ92lg URL Payload
+Staging
+URL
+
+hxxps://onedrive.live[.]com/download?resid=8AC261C876D2C5D0!230&authkey=!AJjFtmZbzh4E0lA URL Payload
+Staging
+URL
+
+15/21
+
+
+
+Indicator Indicator Context 
+Type
+
+hxxps://biototec[.]co/youtubedrivedocumentsuploadgifterssocialiseapartmentsroomsdoors/211_Wbroctgfmht URL Payload
+Staging
+URL
+
+hxxps://onedrive.live[.]com/download?resid=DDFE20447411E22A!138&authkey=!ANsuuB_STyMMWaM URL Payload
+Staging
+URL
+
+hxxps://onedrive.live[.]com/download?resid=F21FE0453B44A092%21131&authkey=!AHYgqFp_4Em3JLI URL Payload
+Staging
+URL
+
+hxxps://onedrive.live[.]com/download?resid=445E8B425B247567%21164&authkey=!AMMd_FSLiwAEKhQ URL Payload
+Staging
+URL
+
+hxxps://onedrive.live[.]com/download?resid=445E8B425B247567%21152&authkey=!APbQBxaFQ4ZpNjQ URL Payload
+Staging
+URL
+
+hxxps://onedrive.live[.]com/download?resid=26943FEBC022618F%21339&authkey=!AMGXtmXOj3JDCls URL Payload
+Staging
+URL
+
+hxxps://onedrive.live[.]com/download?resid=4949CD367CC71D79!665&authkey=!AHrzsEuO8nQG9Ck URL Payload
+Staging
+URL
+
+hxxps://onedrive.live[.]com/download?resid=B044AF3D48F7B886%21307&authkey=!AND2XupI-UzvwZc URL Payload
+Staging
+URL
+
+hxxps://ariso[.]eu/vorpruefung/255_Pbtrfmfsxud URL Payload
+Staging
+URL
+
+hxxps://onedrive.live[.]com/download?resid=E0CF7F9E6AAF27EF%211585&authkey=!APMIaCFn0CdoKkc URL Payload
+Staging
+URL
+
+hxxp://balkancelikdovme[.]com/hjghgynyvbtvyugjhbugvdveksk/Xezdxpgykmk URL Payload
+Staging
+URL
+
+hxxps://balkancelikdovme[.]com/work/Elpuxpkilck URL Payload
+Staging
+URL
+
+hxxps://onedrive.live[.]com/download?resid=B044AF3D48F7B886%21367&authkey=!AF8bdRvVB0L2ejQ URL Payload
+Staging
+URL
+
+hxxps://onedrive.live[.]com/download?resid=B044AF3D48F7B886!369&authkey=!AA6HUemo3mWPD8E URL Payload
+Staging
+URL
+
+40.74.95[.]186 IP Remcos C2
+Address
+
+www.rainbow-industrie[.]com Domain Remcos C2
+
+www.binccoco[.]com Domain Remcos C2
+
+www.aconaus[.]org Domain Remcos C2
+
+hxxp://chibb.ydns[.]eu/chibbori/inc/8fcde15698ce9a.php URL AgentTesla
+C2
+
+20.231.24[.]237 IP Remcos C2
+Address
+
+16/21
+
+
+
+Indicator Indicator Context 
+Type
+
+hxxp://jimbo.ydns[.]eu/jimboori/inc/def4f4924bdf6e.php URL AgentTesla
+C2
+
+www.monarkpapes[.]com Domain Remcos C2
+
+donelpacino.ddns[.]net Domain Warzone
+C2
+
+nightmare4666.ddns[.]net Domain Warzone
+C2
+
+www.zysnuy[.]com Domain Remcos C2
+
+www.twyfordtille[.]com Domain Remcos C2
+
+remcos1.ydns[.]eu Domain Remcos C2
+
+greatzillart.ydns[.]eu Domain Remcos C2
+
+www.playdoapp[.]online Domain Formbook
+C2
+
+www.oldironmetalworksllc[.]com Domain Formbook
+C2
+
+www.mattewigs[.]com Domain Formbook
+C2
+
+www.dunia138[.]info Domain Formbook
+C2
+
+www.transportlogistcs[.]com Domain Formbook
+C2
+
+www.rva[.]info Domain Formbook
+C2
+
+www.totomata[.]com Domain Formbook
+C2
+
+www.janus[.]news Domain Formbook
+C2
+
+www.bvgroupcos[.]com Domain Formbook
+C2
+
+www.transportlogistcs[.]com Domain Formbook
+C2
+
+www.purelyunorthodox[.]com Domain Formbook
+C2
+
+www.660danm[.]top Domain Formbook
+C2
+
+www.mytraderstore[.]com Domain Formbook
+C2
+
+www.undoables[.]com Domain Formbook
+C2
+
+www.azurefd-paitohk[.]xyz Domain Formbook
+C2
+
+www.altralogos[.]com Domain Formbook
+C2
+
+www.sinpercar[.]com Domain Formbook
+C2
+
+17/21
+
+
+
+Indicator Indicator Context 
+Type
+
+55c34ff5126f2b46d623f802d1e0e1d886e671fb8fb7f75294bbf7726f13340d SHA256 DBatLoader
+Hash
+
+352aac36d6ee5ce68679227aa27b082cbeae8990853a47b3d48ee7bc4cd7c613 SHA256 DBatLoader
+Hash
+
+fef09480410315363b71b047f1a07100080cb970bae50ee0280586ab778089e8 SHA256 DBatLoader
+Hash
+
+98a4d17d6dee54f9242c704af627da853d978d6d37738f875d08ea0e7eaca373 SHA256 DBatLoader
+Hash
+
+43ff884128b4cee041776015abb9692e42db2cbf8b5a4364859d346c809ec5cd SHA256 DBatLoader
+Hash
+
+cf39a14a2dc1fe5aa487b6faf19c63bc97103db670fa24c62832895e3002eca2 SHA256 DBatLoader
+Hash
+
+d168a3b56994a97374be1c208e6e3aa01e1c512829ee4cceafceeeee1b5ddcc1 SHA256 DBatLoader
+Hash
+
+1ba931f3d786284d056bd83659afabe498c61c999fd5d64837da8c2b737e3746 SHA256 DBatLoader
+Hash
+
+147ccc27801c86734963bf547721517bddbc76c4b80225d557c373cd5e16da3d SHA256 DBatLoader
+Hash
+
+0d2f7e49186d74f6e8a320d41283d88fcd785f4b1e06abd18553ebc14b8c9f17 SHA256 DBatLoader
+Hash
+
+b9e4e58572b93ecd81ebcb6ef411b6fa447c7c9177a1ea2fdf26558d76e0ca3a SHA256 DBatLoader
+Hash
+
+ad5e18d32f403ca4871f3d4b222c84821a6b6ba74ec858cc99eb00c66bb6bddb SHA256 DBatLoader
+Hash
+
+0cc5de13ddde8a5dbbe9ce4f14a595e8f8bed743a0f4a7bbdba4d8de44d88b30 SHA256 DBatLoader
+Hash
+
+a08cd110a928227dd4b3b42b1801bc1c907dd042bea8494ac701142c5eb345da SHA256 DBatLoader
+Hash
+
+d9b2b28698fd4b81fc602305bd73e060dc35acb6b72264e75ba9bee47a3501e2 SHA256 DBatLoader
+Hash
+
+203146e788d7a0afa679721e1581f5cdcf8e2c4d4367a7ce53c433184d988fcc SHA256 DBatLoader
+Hash
+
+9474ca0fa771bd4dd2202e312ada0090f6890635b9039b5be855cc7cb8eab6ee SHA256 DBatLoader
+Hash
+
+921a295f8a722340f6cf979c9e3fb0f9a762fe45c94407d1e1a32a4dc35e2854 SHA256 DBatLoader
+Hash
+
+31eed753e4fc1e7fb831c38bddd30577a41a727fabb73360fa90a6d93fc61d02 SHA256 DBatLoader
+Hash
+
+7db150c239b11e729433ce9ea99939f08bf35aac1dda071917c4a7e694a7258d SHA256 DBatLoader
+Hash
+
+e9352253e3211314faee670cf457e3f6732d7d93eb52f46aebf4f79cb22cbf7e SHA256 DBatLoader
+Hash
+
+1ba55bb7d2d33d7892669c2e96c351fe59ce60144429508d6251d5dcbfc5ff86 SHA256 DBatLoader
+Hash
+
+Scroll to view full table
+
+18/21
+
+
+
+More from Threat Intelligence
+
+19/21
+
+
+
+#$mobile_readTime??'' ?>
+
+#$mobile_readTime??'' ?>
+
+20/21
+
+
+
+#$mobile_readTime??'' ?>
+
+#$mobile_readTime??'' ?>
+Analysis and insights from hundreds of the brightest minds in the cybersecurity industry to help you prove compliance, grow business
+and stop threats.

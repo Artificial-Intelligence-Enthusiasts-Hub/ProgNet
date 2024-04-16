@@ -1,0 +1,400 @@
+Fake Update Utilizes New IDAT Loader To Execute StealC and Lumma Infostealers
+rapid7.com/blog/post/2023/08/31/fake-update-utilizes-new-idat-loader-to-execute-stealc-and-lumma-infostealers/
+
+Natalie Zargarov August 31, 2023
+
+Last updated at Tue, 07 Nov 2023 16:33:39 GMT
+
+Technical Analysis by: Thomas Elkins, Natalie Zargarov
+Contributions: Evan McCann, Tyler McGraw
+
+Recently, Rapid7 observed the Fake Browser Update lure tricking users into executing malicious binaries. While analyzing the dropped
+binaries, Rapid7 determined a new loader is utilized in order to execute infostealers on compromised systems including StealC and Lumma.
+
+The IDAT loader is a new, sophisticated loader that Rapid7 first spotted in July 2023. In earlier versions of the loader, it was disguised as a 7-
+zip installer that delivered the SecTop RAT. Rapid7 has now observed the loader used to deliver infostealers like Stealc, Lumma, and Amadey.
+It implements several evasion techniques including Process Doppelgänging, DLL Search Order Hijacking, and Heaven's Gate. IDAT loader got
+its name as the threat actor stores the malicious payload in the IDAT chunk of PNG file format.
+
+Prior to this technique, Rapid7 observed threat actors behind the lure utilizing malicious JavaScript files to either reach out to Command and
+Control (C2) servers or drop the Net Support Remote Access Trojan (RAT).
+
+The following analysis covers the entire attack flow, which starts from a new ClearFake malware, spotted just several days ago, and ends with
+the stolen information in threat actors’ hands.
+
+Technical Analysis
+Threat Actors (TAs) are often staging their attacks in the way security tools will not detect them and security researchers will have a hard time
+investigating them.
+
+1/11
+
+
+
+Figure 1: Attack Flow
+
+Stage 1 - ClearFake
+ClearFake is a new malware first recognized just a few days ago. Its campaign started on July 19,2023 which aligns with the time Rapid7
+spotted a new IDAT loader distribution. We first attributed that initial attack flow to the SocGolish malware, however the ClearFake seems to be
+less sophisticated.
+
+In this campaign, ClearFake malware uses base64 to obfuscate malicious Javascript, which can be easily deobfuscated by using CyberChef.
+As spotted by Randy McEoin, the “One noticeable difference from SocGholish is that there appears to be no tracking of visits by IP or cookies.
+As an analyst you can you go back to the compromised site over and over coming from the same IP and not clearing your browser cache. This
+also means the site owner is more likely to see the infection as well.”
+
+Figure 2 - Obfuscated JavaScript Embedded in the Compromised Domain
+This prompt falsely presents itself as a browser update, with the added layer of credibility coming from the fact that it appears to originate from
+the intended domain.
+
+2/11
+
+
+
+Figure 3 - Pop-up Prompting the User to Update their Browser
+Once the user interacts with the “Update Chrome” button, the browser is redirected to another URL where a binary automatically downloads to
+the user's default download folder. After the user double clicks the fake update binary, it will proceed to download the next stage payload. In
+this investigation, Rapid7 identified a binary called ChromeSetup.exe, the file name widely used in previous SocGholish attacks and now
+adopted by ClearFake.
+
+Stage 2 - MSI Downloader
+ChromeSetup.exe downloads and executes the Microsoft Software Installer (MSI) package from:
+hxxps://ocmtancmi2c5t[.]xyz/82z2fn2afo/b3/update[.]msi.
+
+In similar investigations, Rapid7 observed that the initial dropper executable appearance and file name may vary depending on the user’s
+browser when visiting the compromised web page. In all instances, the executables contained invalid signatures and attempted to download
+and install an MSI package.
+
+Rapid7 determined that the MSI package executed with several switches intended to avoid detection:
+
+/qn to avoid an installation UI
+/quiet to prevent user interaction
+/norestart to prevent the system from restarting during the infection process
+
+When executed, the MSI dropper will write a legitimate VMwareHostOpen.exe executable, multiple legitimate dependencies, and the
+malicious Dynamic-Link Library (DLL) file vmtools.dll. It will also drop an encrypted vmo.log file which has a PNG file structure and is later
+decrypted by the malicious DLL. 
+Rapid7 spotted an additional vers ion of the attack where the MSI dropped a legitimate pythonw.exe, legitimate dependencies, and the
+malicious DLL file python311.dll.In that case, the encrypted file was named pz.log,though the execution flow remains the same.
+
+3/11
+
+
+
+Figure 4 - Content of vmo.log
+
+Stage 3 - Decryptor
+When executed, the legitimate VMWareHostOpen.exe loads the malicious vmtools.dllfrom the same directory as from which the
+VMWareHostOpen.exeis executed. This technique is known as DLL Search Order Hijacking.
+
+During the execution of vmtools.dll, Rapid7 observed that the DLL loads API libraries from kernel32.dll and ntdll.dll using API hashing and
+maps them to memory. After the API functions are mapped to memory, the DLL reads the hex string 83 59 EB ED 50 60 E8 and decrypts it
+using a bitwise XOR operation with the key F5 34 84 C3 3C 0F 8F, revealing the string vmo.log. The file is similar to the Vmo\log directory,
+where Vmware logs are stored.
+
+The DLL then reads the contents from vmo.log into memory and searches for the string …IDAT. The DLL takes 4 bytes following …IDAT and
+compares them to the hex values of C6 A5 79 EA. If the 4 bytes following …IDAT are equal to the hex values C6 A5 79 EA, the DLL proceeds
+to copy all the contents following …IDAT into memory.
+
+4/11
+
+
+
+Figure 5 - Function Searching for Hex Values C6 A5 79 EA
+Once all the data is copied into memory, the DLL attempts to decrypt the copied data using the bitwise XOR operation with key F4 B4 07 9A.
+Upon additional analysis of other samples, Rapid7 determined that the XOR keys were always stored as 4 bytes following the hex string C6 A5
+79 EA.
+
+Figure 6 - XOR Keys found within PNG Files pz.log and vmo.log
+Once the DLL decrypts the data in memory, it is decompressed using the RTLDecompressBuffer function. The parameters passed to the
+function include:
+
+Compression format
+Size of compressed data
+Size of compressed buffer
+Size of uncompressed data
+Size of uncompressed buffer
+
+5/11
+
+
+
+Figure 7 - Parameters passed to RTLDecompressBuffer function
+The vmtools.dll DLL utilizes the compression algorithm LZNT1 in order to decompress the decrypted data from the vmo.log file.
+
+After the data is decompressed, the DLL loads mshtml.dll into memory and overwrites its .text section with the decompressed code. After the
+overwrite, vmtools.dll calls the decompressed code.
+
+Stage 4 - IDAT Injector
+Similarly to vmtools.dll,IDAT loader uses dynamic imports. The IDAT injector then expands the %APPDATA% environment variable by using
+the ExpandEnvironmentStringsW API call. It creates a new folder under %APPDATA%, naming it based on the
+QueryPerformanceCounter API call output and randomizing its value.
+
+ 
+All the dropped files by MSI are copied to the newly created folder. IDAT then creates a new instance of VMWareHostOpen.exefrom the
+%APPDATA% by using CreateProcessW and exits.
+
+ 
+The second instance of VMWareHostOpen.exebehaves the same up until the stage where the IDAT injector code is called from
+mshtml.dllmemory space. IDAT immediately started the implementation of the Heaven’s Gate evasion technique, which it uses for most API
+calls until the load of the infostealer is completed. 
+
+ 
+Heaven's Gate is widely used by threat actors to evade security tools. It refers to a method for executing a 64-bit process within a 32-bit
+process or vice versa, allowing a 32-bit process to run in a 64-bit process. This is accomplished by initiating a call or jump instruction through
+the use of a reserved selector. The key points in analyzing this technique in our case is to change the process mode from 32-bit to 64-bit, the
+specification of the selector “0x0033” required and followed by the execution of a far call or far jump, as shown in Figure 8.
+
+Figure 8 - Heaven’s Gate technique implementation
+
+ 
+The IDAT injector then expands the %TEMP% environment variable by using the ExpandEnvironmentStringsW API call. It creates a string
+based on the QueryPerformanceCounter API call output and randomizes its value.
+
+ 
+Next, the IDAT loader gets the computer name by calling GetComputerNameW API call, and the output is randomized by using rand and
+srand API calls. It uses that randomized value to set a new environment variable by using SetEnvironmentVariableW.This variable is set to a
+combination of %TEMP% path with the randomized string created previously.
+
+6/11
+
+
+
+Figure 9 - New Environment variable - TCBEDOPKVDTUFUSOCPTRQFD set to %TEMP%\89680228
+Now, the new cmd.exe process is executed by the loader. The loader then creates and writes to the %TEMP%\89680228 file.
+
+Next, the IDAT injects code into cmd.exe process by using NtCreateSection + NtMapViewOfSection Code Injectiontechnique. Using this
+technique the malware:
+
+Creates a new memory section inside the remote process by using the NtCreateSection API call
+Maps a view of the newly created section to the local malicious process with RW protection by using NtMapViewOfSection API call
+Maps a view of the previously created section to a remote target process with RX protection by using NtMapViewOfSection API call
+Fills the view mapped in the local process with shellcode by using NtWriteVirtualMemory API call
+In our case, IDAT loader suspends the main thread on the cmd.exe process by using NtSuspendThread API call and then resumes the
+thread by using NtResumeThread API call
+After completing the injection, the second in stance of VMWareHostOpen.exeexits.
+
+Stage 5 - IDAT Loader:
+The injected loader code implements the Heaven’s Gate evasion technique in exactly the same way as the IDAT injector did. It retrieves the
+TCBEDOPKVDTUFUSOCPTRQFD environment variable, and reads the %TEMP%\89680228 file data into the memory. The data is then
+recursively XORed with the 3D ED C0 D3 key.  
+
+The decrypted data seems to contain configuration data, including which process the infostealer should be loaded, which API calls should be
+dynamically retrieved, additional code,and more. The loader then deletes the initial malicious DLL (vmtools.dll) by using DeleteFileW.The
+loader finally injects the infostealer code into the explorer.exe process by using the Process Doppelgänging injection technique.
+
+TheProcess Doppelgängingmethod utilizes the Transactional NTFS feature within the Windows operating system. This feature is designed to
+ensure data integrity in the event of unexpected errors. For instance, when an application needs to write or modify a file, there's a risk of data
+corruption if an error occurs during the write process. To prevent such issues, an application can open the file in a transactional mode to
+perform the modification and then commit the modification, thereby preventing any potential corruption. The modification either succeeds
+entirely or does not commence.
+
+Process Doppelgänging exploits this feature to replace a legitimate file with a malicious one, leading to a process injection. The malicious file is
+created within a transaction, then committed to the legitimate file, and subsequently executed. The Process Doppelgängingin our sample was
+performed by:
+
+Initiating a transaction by using NtCreateTransaction API call
+Creating a new file by using NtCreateFile API call
+Writing to the new file by using NtWriteFileAPI call
+Writing malicious code into a section of the local process using NtCreateSectionAPI call
+Discarding the transaction by using NtRollbackTransactionAPI call
+Running a new instance of explorer.exe process by using NtCreateProcessEx API call
+Running the malicious code inside explorer.exe process by using NtCreateThreadExAPI call
+
+ 
+If the file created within a transaction is rolled back (instead of committed), but the file section was already mapped into the process memory,
+the process injection will still be performed.
+
+The final payload injected into the explorer.exe process was identified by Rapid7 as Lumma Stealer.
+
+7/11
+
+
+
+Figure 10 - Process Tree
+
+Throughout the whole attack flow, the malware delays execution by using NtDelayExecution, a technique that is usually used to escape
+sandboxes.
+
+As previously mentioned, Rapid7 has investigated several IDAT loader samples. The main differences were:
+
+1. The legitimate software that loads the malicious DLL.
+2. The name of the staging directory created within %APPDATA%.
+3. The process the IDAT injector injects the Loader code to.
+4. The process into which the infostealer/RAT loaded into.
+5. Rapid7 observed the IDAT loader has been used to load the following infostealers and RAT: Stealc, Lumma and Amadey infostealers and
+
+SecTop RAT.
+
+Figure 11 - Part of an HTTP POST request to a StealC C2 domain
+
+Figure 12 - An HTTP POST request to a Lumma Stealer C2 domain
+
+Conclusion
+IDAT Loader is a new sophisticated loader that utilizes multiple evasion techniques in order to execute various commodity malware including
+InfoStealers and RAT’s. The Threat Actors behind the Fake Update campaign have been packaging the IDAT Loader into DLLs that are loaded
+by legitimate programs such as VMWarehost, Python and Windows Defender.
+
+Rapid7 Customers
+For Rapid7 MDR and InsightIDR customers, the following Attacker Behavior Analytics (ABA) rules are currently deployed and alerting on the
+activity described in this blog:
+
+Attacker Technique - MSIExec loading object via HTTP
+Suspicious Process - FSUtil Zeroing Out a File
+Suspicious Process - Users Script Spawns Cmd And Redirects Output To Temp File
+Suspicious Process - Possible Dropper Script Executed From Users Downloads Directory
+Suspicious Process - WScript Runs JavaScript File from Temp Or Download Directory
+
+MITRE ATT&CK Techniques:
+
+8/11
+
+
+
+Initial Drive-by Compromise
+Access (T1189) The ClearFake Uses Drive-by Compromise technique to target user’s web browser
+Defense System Binary Proxy The ChromeSetup.exe downloader
+Evasion Execution: Msiexec (C9094685AE4851FD5A5B886B73C7B07EFD9B47EA0BDAE3F823D035CF1B3B9E48)
+
+(T1218.007) downloads and executes .msi file
+
+Execution User Execution: Malicious Update.msi
+File (T1204.002) (53C3982F452E570DB6599E004D196A8A3B8399C9D484F78CDB481C2703138D47) drops
+
+and executes VMWareHostOpen.exe
+
+Defense Hijack Execution Flow: DLL VMWareHostOpen.exe loads a malicious vmtools.dll
+Evasion Search Order Hijacking (931D78C733C6287CEC991659ED16513862BFC6F5E42B74A8A82E4FA6C8A3FE06)
+
+(T1574.001)
+
+Defense Deobfuscate/Decode Files vmtools.dll
+Evasion or Information (T1140) (931D78C733C6287CEC991659ED16513862BFC6F5E42B74A8A82E4FA6C8A3FE06) decrypts
+
+vmo.log(51CEE2DE0EBE01E75AFDEFFE29D48CB4D413D471766420C8B8F9AB08C59977D7)
+file
+
+Defense Masquerading (T1036) vmo.log(51CEE2DE0EBE01E75AFDEFFE29D48CB4D413D471766420C8B8F9AB08C59977D7)
+Evasion file masqueraded to .png file
+
+Execution Native API (T1106) The IDAT injector and IDAT loader are using Heaven’s Gate technique to evade detection
+
+Defense Process Injection (T1055) IDAT injector implements NtCreateSection + NtMapViewOfSection Code Injection technique to
+Evasion inject into cmd.exe process
+
+Defense Process Injection: Process IDAT loader implements Process Doppelgänging technique to load the InfoStealer
+Evasion Doppelgänging
+
+(T1055.013)
+
+Defense Virtualization/Sandbox Execution delays are performed by several stages throughout the attack flow
+Evasion Evasion: Time Based
+
+Evasion (T1497.003)
+
+IOCs
+
+IOC SHA-256 Notes
+InstaIIer.exe A0319E612DE3B7E6FBB4B71AA7398266791E50DA0AE373C5870C3DCAA51ABCCF MSI downloade
+
+ChromeSetup.exe C9094685AE4851FD5A5B886B73C7B07EFD9B47EA0BDAE3F823D035CF1B3B9E48 MSI downloade
+
+MlcrоsоftЕdgеSеtuр.exe 3BF4B365D61C1E9807D20E71375627450B8FEA1635CB6DDB85F2956E8F6B3EC3 MSI downloade
+
+update.msi 53C3982F452E570DB6599E004D196A8A3B8399C9D484F78CDB481C2703138D47 MSI dropper, d
+pythonw.exe,
+python311.dll a
+files
+
+update.msi D19C166D0846DDAF1A6D5DBD62C93ACB91956627E47E4E3CBD79F3DFB3E0F002 MSI dropper, d
+VMWareHostO
+vmtools.dll and
+files
+
+DirectX12AdvancedSupport.msi B287C0BC239B434B90EEF01BCBD00FF48192B7CBEB540E568B8CDCDC26F90959 MSI dropper, d
+MpCopyAccele
+MpClient.dll, an
+virginium.flac fi
+
+python311.dll BE8EB5359185BAA8E456A554A091EC54C8828BB2499FE332E9ECD65639C9A75B Malicious dll loa
+pythonw.exe
+
+vmtools.dll 931D78C733C6287CEC991659ED16513862BFC6F5E42B74A8A82E4FA6C8A3FE06 Malicious dll loa
+VMWareHostO
+
+MpClient.dll 5F57537D18ADCC1142294D7C469F565F359D5FF148E93A15CCBCEB5CA3390DBD Malicious dll loa
+MpCopyAccele
+
+vmo.log 51CEE2DE0EBE01E75AFDEFFE29D48CB4D413D471766420C8B8F9AB08C59977D7 Encrypted payl
+decrypted by vm
+
+pz.log 8CE0901A5CF2D3014AAA89D5B5B68666DA0D42D2294A2F2B7E3A275025B35B79 Encrypted payl
+decrypted by
+python311.dll
+
+9/11
+
+
+
+IOC SHA-256 Notes
+
+virginium.flac B3D8BC93A96C992099D768BEB42202B48A7FE4C9A1E3B391EFBEEB1549EF5039 Encrypted payl
+decrypted by
+MpClient.dll
+
+ocmtancmi2c5t[.]xyz Host of the MS
+package
+
+lazagrc3cnk[.]xyz Host of the MS
+package
+
+omdowqind[.]site Domain that fac
+download of the
+downloader
+
+weomfewnfnu[.]site Domain that fac
+download of the
+downloader
+
+winextrabonus[.]life Domain that fac
+download of the
+downloader
+
+bgobgogimrihehmxerreg[.]site Domain that fac
+download of the
+downloader
+
+pshkjg[.]db[.]files[.]1drv[.]com Domain that fac
+download of the
+downloader
+
+ooinonqnbdqnjdnqwqkdn[.]space Domain that fac
+download of the
+downloader
+
+hello-world-broken-dust- Domain that fac
+1f1c[.]brewasigfi1978[.]workers[.]dev download of the
+
+downloader
+
+doorblu[.]xyz C&C server
+
+costexcise[.]xyz C&C server
+
+buyerbrand[.]xyz C&C server
+
+94.228.169[.]55 C&C server
+
+gapi-node[.]io C&C server
+
+gstatic-node[.]io C&C server
+
+References:
+
+https://zeltser.com/media/docs/malware-analysis-lab.pdf
+
+10/11
+
+
+
+Never miss a blog
+Get the latest stories, expertise, and news about security today.

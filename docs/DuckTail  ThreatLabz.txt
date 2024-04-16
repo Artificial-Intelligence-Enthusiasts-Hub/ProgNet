@@ -1,0 +1,612 @@
+DuckTail | ThreatLabz
+zscaler.com/blogs/security-research/look-ducktail
+
+Sudeep Singh, Naveen Selvan
+
+Zscaler Blog
+Get the latest Zscaler blog updates in your inbox
+
+Subscribe
+
+Introduction
+In our persistent quest to decode DuckTail’s maneuvers, Zscaler ThreatLabz began an
+intelligence collection operation in May 2023. Through an intensive three-month period of
+monitoring, we obtained critical details about DuckTail’s operational framework. This
+expedition granted us unprecedented visibility into DuckTail’s end-to-end operations,
+spanning the entire kill chain from reconnaissance to post-compromise.
+
+1/23
+
+
+
+Our team yielded valuable insights into DuckTail’s intrusion techniques, compromise tactics,
+post-compromise procedures, and the underground economy. These insights, some of which
+have never been publicly documented, provide a panoramic view of their targets and an
+understanding of their strategic motives. 
+
+This report dives into the operational mechanics of DuckTail, dissecting the anatomy of their
+tactics, techniques and procedures (TTPs), and tracing the trajectory of stolen data.
+
+Key Takeaways
+Ideal Social Engineering Target: DuckTail threat actors primarily target users working
+in the digital marketing and advertising space. Unfortunately, the tech layoffs occurring
+in 2022 and 2023 introduced more eager candidates into the digital market - meaning
+more prime targets for DuckTail.
+Raiding Business and Ad Accounts: DuckTail targets Facebook and TikTok business
+accounts, and Google ad accounts. Stolen social media business accounts feed an
+underground economy where these accounts are traded among other users in
+Vietnamese Telegram groups.
+Social Engineering as the Distribution Method: DuckTail’s primary distribution
+vector continues to be social engineering through LinkedIn messaging. Threat actors
+set up fake LinkedIn recruiter profiles and fake job postings impersonating popular
+companies to lure unsuspecting victims looking for employment.
+Expanding and Always Evolving: DuckTail continues to expand the list of cloud
+services abused for hosting and distributing payloads.
+Exploiting Themes of Innovative AI Online Tools: DuckTail threat actors have
+successfully weaponized the recent popularity of generative AI platforms, such as
+ChatGPT and Google Bard AI, to lure victims to install malicious software.
+Stealthy and Strategic Maneuvers: DuckTail threat actors use private residential
+proxy services to log in to compromised social media business accounts to prevent
+raising any security alarms. In addition, they abuse the "Encrypted notifications"
+Facebook feature to prevent the victim from performing an account recovery.
+
+Brief Overview
+DuckTail is an operation that involves multiple Vietnam-based threat actors who share the
+same tactics, techniques, and procedures (TTPs). They also share the same motivation: gain
+access to social media business accounts, specifically ones belonging to digital marketers.
+
+DuckTail malware steals saved session cookies from browsers, with code specifically tailored
+to take over Facebook business accounts.The malware is typically spread on LinkedIn,
+where threat actors post fake job descriptions to “recruit” potential victims.
+
+2/23
+
+
+
+The “products” of the operation (i.e. hacked social media accounts) feed an underground
+economy of stolen social media accounts, where numerous vendors offer accounts priced
+according to their perceived usefulness for malicious activity. The image below shows a high-
+level overview of how DuckTail threat actors abuse different cloud services and social media
+platforms in their whole operation:
+
+Fopigeurraet io1n: .Visual overview illustrating how DuckTail abuses social media and cloud platforms in different stages of their
+
+Unveiling DuckTail’s TTPs
+Overview of the architecture
+
+The threat research community is already abundant with great articles that address the
+technical details of DuckTail’s malware payload. 
+
+Distribution methods and techniques
+
+3/23
+
+
+
+The following sections break down:
+
+the infection vectors employed by Ducktail
+what those infection campaigns look like
+
+Fake Job Posts on LinkedIn
+
+DuckTail primarily reaches victims by posting fake marketing-related job listings on LinkedIn.
+The threat actors presume that the marketing professionals who apply likely have access to
+ad accounts. The image below is an example of a fake job post on LinkedIn used by Ducktail
+to lure an unsuspecting candidate.
+
+Fthigaut rthee 2 p: oTshti sis i sp rwohmaot ttehde. threat actor sees moments after setting up a fake marketing job post on LinkedIn. It’s worth noting
+
+In addition to creating fake job posts on LinkedIn, threat actors also set up profiles on
+LinkedIn impersonating recruiters. To facilitate social engineering tactics, in some cases,
+threat actors add the “Hiring” banner to their LinkedIn profile picture. This catches the
+attention of users actively seeking a new job.
+
+Once a potential victim responds to a bait post, the “recruiter” will send a message on
+LinkedIn.
+
+4/23
+
+
+
+How it works
+
+The threat actors will ask the interested applicant to review the job application package by:
+
+1. Downloading an archive
+2. Opening it on a Windows machine
+3. Double-clicking the executable (camouflaged as another type of file) inside it
+
+To maximize their chance of infection, some threat actors create instructional videos showing
+victims how to “properly” infect their own devices. The image below shows this tactic in
+action:
+
+Figure 3: “Ashley Swarts” (a fake threat actor account) instructing a victim on how to open the fake job application package.
+
+The nuances of language
+
+The threat actor’s English proficiency closely matches the English language skills of an
+average Vietnamese cybercriminal, not an American HR professional. 
+
+Our team observed threat actors using Google Translate to communicate with potential
+victims. The image below shows a threat actor translating messages from English to
+Vietnamese in real-time as they communicate with a victim. The predominant use of the
+Vietnamese language also supports our attributing DuckTail to Vietnamese threat actors.
+
+5/23
+
+
+
+Fcoignuvreer s4a: tAio nthsr eoant  Laicntkoer duIsni.ng Google Translate to communicate in English while handling multiple fraudulent job application
+
+Impersonating real companies
+
+DuckTail threat actors send job offers impersonating popular organizations and brands to
+entice job seekers.  
+
+In the image below, a threat actor leveraged a compromised LinkedIn account to message a
+victim with job opportunity details. While impersonating a real company called Mondelez
+International, this threat actor sent the following in their message:
+
+a link to the company's real Wikipedia and Facebook page
+an iCloud URL hosting an archive file containing the malware
+
+6/23
+
+
+
+Figure 5: A threat actor messaging a victim on LinkedIn and impersonating a real company.
+
+Spear phishing emails
+
+Our team also observed cases where threat actors sent infected archive links through email,
+after making initial contact on LinkedIn. The image below shows a spear phishing email
+example.
+
+Ffilieg.ure 6: A spear phishing email sent to a victim containing the URL shortener link, which downloads the malicious archive
+
+.NET executables as a common thread in DuckTail binaries
+
+7/23
+
+
+
+Most commonly, DuckTail’s malware payload is a .NET executable, but this is not always the
+case. Some Ducktail payloads come in an Excel add-in or browser extension.
+
+The .NET executables family associated with the Ducktail variants share the following
+attributes:
+
+Large file sizes, in most cases - around 70 MB or more
+Includes a fake Office or PDF document icon
+Contains a decoy document with details about the fake job offer/marketing
+advertisement, which opens right after execution
+Signed with valid code-signing certificates belonging to Vietnamese publishers
+(sometimes)
+Makes use of Telegram for C2 communications
+
+The executable is usually delivered in an archive, together with image and video files. The
+images below depict two common archive variations.
+
+Type 1 Archive
+
+Figure 7: Type 1 Archive - .exe files with fake icons (first row), together with job-related images
+
+Type 2 Archive
+
+8/23
+
+
+
+F(.ipgdufr.eln k8,:  .Tdyopcex .2s cAr)r,c thoivgee t-h .elnr kw fiitlhe sjo wbi-trhe lPaotewde irmSahgeell spayloads, plus .scr executables, both obscured by double extensions
+
+Cloud hosting and URL shortening services
+
+Our research team noticed the following patterns when investigating DuckTail’s
+infrastructure:
+
+Malicious archives are often hosted on public cloud hosting services like iCloud,
+Google Drive, Dropbox, Transfer.sh, and OneDrive. 
+In some cases, threat actors use Trello, a project management platform, as a cloud
+hosting service by uploading archives as attachments to Trello cards and providing
+victims with a direct download link to the card.
+Another widely abused platform is Rebrandly (rebrand.ly) - a URL shortener service.
+Threat actors spread download links generated by Rebrandly to give the download a
+more legitimate look. You can see the difference that Rebrandly makes in the image
+below.
+
+Figure 9: A redirection chain set up by the threat actor transforms a long, unfriendly Dropbox link into a short rebrand.ly link.
+
+9/23
+
+
+
+Newly registered domains used to host payloads
+
+In addition to disguising links with Rebrandly, threat actors also registered many custom
+domains through Rebrandly, spreading shortened links with their own fake company name
+domains.
+
+Most of these custom domains registered by the threat actor use TLDs like:
+
+.social 
+
+.software 
+
+.sale 
+
+.click 
+
+.news 
+
+.agency 
+
+.company
+
+For a complete list of newly registered domains used by DuckTail, visit the Indicators of
+Compromise (IOCs) section at the bottom of this blog.
+
+Marketing guides and AI tools
+
+Another method of infection is the creation of web pages pretending to offer marketing
+guides and marketing software, but actually serving DuckTail malware.
+
+We observed the following legitimate marketing and AI tools spoofed:
+
+Adplexity
+ClickMinded 
+ChatGPT
+Google BardAI
+
+Generative AI softwares, like ChatGPT, are prime targets because they are being
+increasingly utilized by professionals working in digital marketing, content creation, and
+advertising.
+
+The image below shows a web page created by a threat actor leveraging ChatGPT for
+Facebook advertising.
+
+10/23
+
+
+
+Figure 10: A screenshot of newguide[.]tech, a website set up by Ducktail to leverage ChatGPT.
+
+Below, there is another example of a website set up by a threat actor impersonating
+Adplexity.
+
+11/23
+
+
+
+ 
+
+Fleiagdusre t o1 1a:  DAu scckrteaeiln isnhfeoct toefd a adrpclheixviety. desk[.]tech, a website set up by Ducktail impersonating  Adplexity. The download button
+
+Insights Gained
+In the following sections, we share insights about the threat actors operating DuckTail and
+the strategies they employ. 
+
+Primary targets and industries
+
+While Ducktail is mostly known for targeting Facebook users, we observed threat actors
+stealing and abusing access to victim accounts on other advertising platforms, namely TikTok
+Business and Google Ads. This ability to pilfer multiple platforms is due to Ducktail’s general-
+purpose cookie stealing capabilities.
+
+Communication channels and techniques
+
+The threat actors use the following platforms to communicate and trade stolen information:
+
+Telegram
+Facebook
+Zalo (a Vietnamese messaging app)
+
+12/23
+
+
+
+The threat actors set up Telegram bots to automatically handle data arriving from new
+victims. This allows them to pinpoint the most important information, like: 
+
+the victim’s Facebook account information
+the number of detected ad accounts
+business manager accounts
+
+Fthigreuere b 1u2si:n Ae sbso mt ianntraogdeurc easc cao nuenwts .victim’s Facebook profile. An American with control over four personal ad accounts and
+
+Infiltration strategies
+Adding threat actor email addresses to compromised accounts
+
+One of the primary methods threat actors use to takeover a victim’s compromised account is
+by adding their own email address to that account.
+
+In the image below, Facebook emailed a security notification to a victim informing them that a
+threat actor has added an email address to their account.
+
+13/23
+
+
+
+Figure 13: This screenshot shows a security notification warning a victim about a new email address added to their account
+- indicating that a Ducktail threat actor has begun a takeover of their Facebook account. 
+
+Updating password and email for compromised accounts
+
+DuckTail threat actors change the password and email address of a Facebook account
+during takeover.
+
+Abusing Facebook Encrypted Notifications feature
+
+We observed an instance where, after taking over a victim’s Facebook account, the threat
+actor enabled the Encrypted Notifications setting. This way every Facebook email
+communication with the victim is encrypted - effectively preventing the victim from recovering
+their account.
+
+Using compromised LinkedIn accounts for communication
+
+While investigating communication between threat actors and victims on LinkedIn, we came
+across instances where threat actors contacted victims using compromised LinkedIn
+accounts.
+
+These compromised LinkedIn accounts belonged to users working in the digital marketing
+space. Some of the compromised LinkedIn accounts had more than 500 connections and
+1000 followers. The high amount of connections/followers helped lend authenticity to the
+compromised accounts and facilitated the social engineering process for threat actors.
+
+14/23
+
+
+
+How are the threat actors compromising LinkedIn accounts?
+
+We believe, with a medium-confidence level, that some of these compromised LinkedIn
+accounts were purchased in underground markets by DuckTail threat actors. We
+discovered an internal budgeting spreadsheet used by the DuckTail team which details
+their revenue and expenditures. One of the entries in the spreadsheet corresponded to
+the purchase of LinkedIn accounts.
+We believe, with a high-confidence level, that threat actors are compromising the
+LinkedIn accounts of users who fell victim to DuckTail’s initial attack where victims were
+enticed with fraudulent job posts and fake recruiters. We reached this conclusion after
+observing a conversation between members of the DuckTail group. One member
+directed another member to access a victim's Gmail account (using the stolen browser
+cookies), delete email entries related to LinkedIn (to clear traces), and change the
+account recovery email address to an attacker-controlled email.
+
+Compromising TikTok business accounts
+
+The image below shows the activity log page of a victim’s compromised TikTok Business
+account. The log depicts the threat actor inviting themselves to control the account and then
+performing actions. After three days, the targeted business notices and revokes their access.
+
+Fthigreuaret  a1c4to: rT.his is a TikTok business center activity log for a compromised account, showing the actions executed by the
+
+Leveraging residential proxy services to access compromised accounts
+
+Our team observed DuckTail threat actors using “Residential Proxy” services to circumvent
+Facebook account compromise detections. 
+
+15/23
+
+
+
+In the image below, the attacker’s machine uses the “S5 Proxy” residential proxy service
+from the vendor - 922proxy.com. Interestingly, the UI also shows the threat actor’s own
+original IP address. We confirmed with an IP geolocation lookup that the threat actor’s
+original IP address maps to a city in Vietnam, further strengthening our theory that DuckTail
+is operated by Vietnam-based threat actors.
+
+Fcoigmuprero 1m5i:s Tehdi sF asccerebeonoskh aoct csohuonwts o af  ath vriecatitm a.ctor connecting to a residential proxy in Konya, Turkey, before logging into the
+
+Stolen Credentials Enter Underground Market
+Social media ad accounts are constantly targeted for hacking. Threat actors, like those
+behind the Ducktail operation, collect massive amounts of hacked accounts. But where do
+they end up?
+
+Hacked social media and ad accounts end up for sale in a busy Vietnamese-language
+underground market. Here is what we know about this market:
+
+Mainly Facebook accounts are sold
+It includes numerous publicly accessible Telegram groups
+DuckTail threat actors are active sellers
+
+Despite the illicit nature of these groups, they are public and easily accessible. Although it
+may be difficult for a novice to interpret the jargon and abbreviations that are heavily used in
+the community. 
+
+16/23
+
+
+
+Awareness of OPSEC among those involved appears to be be lacking or non-existent.
+
+Figure 16: In this screenshot, vendors offer access to hacked Facebook accounts on a Vietnamese Telegram group.
+
+Threat actors target ad accounts so they can access ad budgets. High ad budgets and long-
+term accessibility to accounts are attractive characteristics to threat actors.
+
+17/23
+
+
+
+Facebook combats threat actors like Ducktail, who hack and abuse ad accounts on their
+platform, by automatically flagging suspicious accounts. Because of this, threat actors try to
+prolong the life of a compromised ad account. For this reason, hacked Facebook accounts
+are not interchangeable commodities. Depending on an account’s properties, it may range
+from very valuable to almost useless to buyers.
+
+Here are common properties that vendors and buyers check for in this underground market:
+
+The type of account  (a personal ad account or a business manager account)
+The daily ad budget and payment threshold of an account
+The number of ad accounts a business manager account controls
+A successful business verification by Facebook
+If the account controls a page or profile with a verified badge
+The age of the account. Older accounts are more valuable than younger.
+The existence and validity of saved payment methods
+The account’s successful payment history. More successful payments indicate a more
+valuable account.
+
+We observed the following Vietnamese browser extension used for displaying account
+properties:
+
+18/23
+
+
+
+Fmigeudriae  b1u7s: iAne sscsr eaecncsohuontt  odfe tthaeil sV. ietnamese-designed browser extension used by threat actors to quickly assess social
+
+Payments and Transactions
+We observed that an account deemed “low-grade” sells for around 350,000 Vietnamese
+dong (~$15 USD), while accounts considered valuable sell for around 8,000,000 Vietnamese
+dong (~$340 USD).
+
+When a transaction is complete, the seller hands over control of the hacked account by:
+
+Adding/inviting the buyer to control the account through Facebook (business manager)
+Providing the victim’s login and password to the compromised account
+Providing the victim’s exported browser cookies, thus replicating their logged-in session
+
+19/23
+
+
+
+If the level of compromise is thorough, access to the victim’s email may be given on top of
+the above to maintain access even longer, and also be able to bypass MFA security
+measures.
+
+Conclusion
+In this blog, ThreatLabz provides a wealth of new insight for the research community.
+Understanding the operational methods and end-to-end journey of a threat actor like
+DuckTail is a form of protection. Because of our research team, we can confidently state:
+
+DuckTail is primarily run by Vietnamese-speaking cyber criminals who use Google
+Translate to communicate with potential victims over LinkedIn.
+DuckTail threat actors are abusing themes of popular AI tools, like ChatGPT, to infect
+devices.
+DuckTail threat actors take extra measures to prevent raising security alarms by using
+private residential proxy services to log in to compromised accounts.
+DuckTail threat actors use strategic account takeover methods which they routinely use
+in their post-compromise procedures to prevent any form of account recovery by
+victims
+Hacked and/or compromised social media business ad accounts enter a primarily
+Vietnamese-based underground market where they are sold based on their perceived
+value.
+You can take steps to minimize the impact of a hacker by managing your saved
+payment methods in business ad accounts and making use of safeguards like daily
+spending limits, payment thresholds, etc.
+
+In addition to staying on top of these threats, Zscaler's ThreatLabz team continuously
+monitors for new threats and shares its findings with the wider community.
+
+MITRE ATT&CK TTP Mapping
+
+ID TACTIC TECHNIQUE
+T1204.001 User Execution: Malicious Link User executes the shortcut .lnk file
+
+T1204.002 User Execution: Malicious File User executes the attached
+compressed/executable file
+
+T1027.001 Obfuscated Files or Information: Binary inflated in order to avoid
+Binary Padding sandboxing 
+
+T1036.005 Masquerading: Match Legitimate Drops malicious binaries into
+Name or Location legitimate paths
+
+20/23
+
+
+
+ID TACTIC TECHNIQUE
+
+T1057 Process Discovery Checks for well known security
+software analysis tools 
+
+T1567.002 Exfiltration Over Web Service: Telegram API used to exfiltrate user
+Exfiltration to Cloud Storage data
+
+T1070.006 Indicator Removal: Timestomp PE’s Timestamp header value are
+tampered
+
+Indicators of Compromise (IOCs)
+Fake sites set up by DuckTail threat actor
+
+marketingagency[.]social
+a1outreach[.]software
+mangogroup[.]sale
+la-roche-posay[.]click
+li-ning[.]agency
+li-ning[.]news
+hrm[.]social
+hrms[.]social
+mccann[.]fyi
+avalonorganics[.]work
+li-ningagency[.]news
+li-ningjod[.]news
+ogilvy[.]social
+narscosmetics[.]social
+yodo1game[.]software
+louisvuitton-social[.]news
+luoisviitton[.]news
+eucerin[.]work
+guessinc[.]work
+samsungagency[.]link
+brandresource[.]social
+recruiterofbrand[.]social
+brandrecruitment[.]social
+hrmmarketing[.]link
+marketingmanager[.]social
+recruitmentagency[.]social
+marketing-project[.]social
+nike-agency[.]link
+recuiter[.]company
+
+21/23
+
+
+
+louisvuitton-agency[.]link
+louisvuitton-agencyjod[.]live
+mccann[.]expert
+ogilvysocial[.]company
+louisvuitton-hr[.]news
+louisvuitton-jod[.]chat
+hyundaimotorjob[.]social
+hyundaimotor[.]social
+hyundaimotorgroup[.]social
+adplexity[.]site
+adplexitydesk[.]tech
+fbadsguide[.]tech
+affiliateguide[.]tech
+newguide[.]tech
+businessmanagerads[.]tech
+businessmanager-update[.]info
+marketing-tool[.]info
+connectads[.]agency
+disruptiveadvertising[.]agency
+impressionagency[.]co
+themars[.]social
+ommmarketing[.]agency
+growmemarketing[.]agency
+ommmarketing[.]digital
+impressiondigitals[.]agency
+impressiondigital[.]info
+passions[.]agency
+brandstyle[.]agency
+brandstyle[.]digital
+
+Appendix
+Attacker-controlled Trello account
+
+22/23
+
+
+
+Figure 19: An attacker-controlled Trello account used to host the malicious files. Screenshot shows the activity log.
+
+Thank you for reading
+
+Was this post useful?
+
+Get the latest Zscaler blog updates in your inbox
+
+By submitting the form, you are agreeing to our privacy policy.

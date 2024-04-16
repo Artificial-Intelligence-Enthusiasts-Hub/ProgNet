@@ -1,0 +1,120 @@
+Akira’s Play with Linux
+labs.k7computing.com/index.php/akiras-play-with-linux/
+
+By Vigneshwaran P July 25, 2023
+
+The proliferation of Ransomware-as-a-Service (Raas) and the widespread availability of
+leaked source code from prominent ransomware strains have elevated ransomware
+attacks to a significant concern for individuals and organizations alike. As more threat
+actors adopt this modus operandi, it becomes imperative to acquire a comprehensive
+understanding of the Tactics, Techniques, and Procedures (TTPs) employed by these
+ransomware affiliates.
+
+Recently we noticed that threat actors have been working on cross-platform malware for a
+wider attack surface. One such malware was a new ransomware variant named Akira that
+has emerged, making waves in the cybersecurity landscape from late March 2023.
+Notably, the ransomware group operates a Tor website imbued with a retro-themed
+aesthetic, where they publicly disclose pilfered data as a consequence of non-compliance
+with their ransom demands. Moreover, their website offers a chat feature, facilitating
+communication between victims and the perpetrators, utilizing the unique ID provided
+within the ransom note. Through this blog post, we will delve into the recent Akira
+ransomware Linux variant, unraveling its interconnectedness with the Windows variant of
+Akira ransomware and the Conti ransomware strain.
+
+The Tor site of Akira ransomware is as shown below.
+
+1/8
+
+
+
+Figure 1: Tor site of Akira ransomware
+
+Binary analysis
+Let’s start with the header of the file. This file is 64 bit. 
+
+Figure 2: Binary Header
+On analyzing the binary, we can see that this ransomware has the following command line
+arguments.
+
+2/8
+
+
+
+Figure 3: Command line arguments
+
+Arguments Description
+
+-p Encryption Path used to only encrypt files in the given path
+
+-s Path to file containing list of shares to include in the encryption 
+
+-n Encryption percentage on how much content of the files needs to be
+encrypted
+
+-fork To create new process or child process
+
+The ransomware integrates functionalities related to several symmetric key algorithms,
+such as AES, CAMELLIA, IDEA, and DES. Upon encountering a file possessing an
+extension from the aforementioned list, the ransomware proceeds with the encryption
+process of said file.
+
+3/8
+
+
+
+Figure 4: Algorithms referred in the binary
+We found this ransomware is also using the CHACHA 20 encryption algorithm.
+
+Figure 5: CHACHA_20
+If the directory and file shown in Figure 6 are present in the system, it excludes those from
+the encryption.
+
+4/8
+
+
+
+Figure 6: Exclusion list
+
+It then encrypts and adds the extension .akira for all the files.
+
+During our analysis, we observed that the examined samples exhibited distinctive
+characteristics, specifically, a distinct Public RSA key and a Unique ID embedded in their
+Load section. These components were deliberately incorporated by the attacker to enable
+communication between the victim and the ransomware group. 
+
+Figure 7: Comparison of public key
+It appears that the ransomware operator dynamically constructs the ransomware with a
+fresh public RSA key for each target, along with a corresponding Unique ID appended in
+the ransomware note. The purpose of this Unique ID is to facilitate the attacker in
+determining the specific ransomware build that infected the victim, thereby identifying the
+corresponding private key required for decrypting the compromised files.
+
+Figure 8: Unique ID for communication
+Figure 9 lists around 190  file extensions that this binary encrypts.
+
+5/8
+
+
+
+Figure 9: Files extension to be encrypted
+
+6/8
+
+
+
+Figure 10: Ransom note
+We at K7 Labs provide detection for Akira ransomware and all the latest threats. Users are
+advised to use a reliable security product such as “K7 Total Security” and keep it up-to-
+date to safeguard their devices.
+
+Indicators of Compromise (IOCs)
+
+Hash Detection Name
+
+7/8
+
+
+
+177ACD248FC715A8B5E443BE38D3B204 Trojan ( 035562be1 )
+
+302f76897e4e5c8c98a52a38c4c98443 Trojan ( 035562be1 )

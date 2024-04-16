@@ -1,0 +1,336 @@
+BlackSuit Ransomware Strikes Windows and Linux Users
+blog.cyble.com/2023/05/12/blacksuit-ransomware-strikes-windows-and-linux-users/
+
+May 12, 2023
+
+New Ransomware Targets VMware ESXi servers
+Cyble Research and Intelligence Labs (CRIL) observed an increase in the number of ransomware
+groups launching Linux variants, such as Cylance and Royal ransomware. This can be attributed to the
+fact that Linux is extensively utilized as an operating system across various sectors, including enterprise
+environments and cloud computing platforms. The widespread use of Linux makes it an appealing
+target for ransomware groups, as a single attack can potentially compromise numerous systems.
+
+CRIL came across a new ransomware group named BlackSuit posted by Unit 42, Palo Alto Networks.
+BlackSuit ransomware is being used by Threat Actors (TA) to target both Windows and Linux operating
+systems users.
+
+The code of the Linux variant of BlackSuit has been found to share similarities with the Royal
+ransomware, according to observations made by researchers. BlackSuit ransomware communicates
+with its victims through an onion site and has not yet publicized any of its victims’ information.
+
+The image below displays the onion site used by BlackSuit ransomware.
+
+Figure 1 – BlackSuit Ransomware Site
+
+Technical Analysis
+The BlackSuit ransomware (SHA256:
+90ae0c693f6ffd6dc5bb2d5a5ef078629c3d77f874b2d2ebd9e109d8ca049f2c) is a 32-bit executable,
+coded in C/C++.
+
+The figure below shows the file details.
+
+1/14
+
+
+
+Figure 2 – File
+
+Details
+Upon execution, the BlackSuit ransomware utilizes the GetCommandLineW function to acquire the
+command-line arguments. Subsequently, it compares these arguments with a predefined list of strings,
+such as -name, -percentage, -noprotect, -disablesafeboot, -local, -network, -delete, -list, and -p.
+Whenever a match is identified, it sets the associated flag variable to one. These strings define the
+operations conducted by the ransomware executable during runtime and can be provided as command-
+line parameters.
+
+In order to execute the ransomware binary, it is mandatory to include the “-name” parameter, which is a
+distinct 32-character identifier assigned to each victim.
+
+Figure 3 – Command Line Arguments
+
+2/14
+
+
+
+During execution, if the “-noprotect” parameter is utilized, the ransomware can launch multiple
+instances. However, if this parameter is not used, ransomware employs the CreateMutexW() function to
+generate a mutex. The Mutex name is determined by the value of the “-name” parameter.
+
+The figure below shows the mutex creation by the ransomware binary.
+
+Figure 4 – CreateMutex
+Following the creation of the mutex, the ransomware verifies whether a mutex with a similar name
+exists by checking the error value, which is retrieved through the GetLastError() function. If the error
+value is 183, indicating that a mutex with the same name already exists, the ransomware will terminate
+itself.
+
+The figure below shows the mutex check created by the ransomware.
+
+Figure 5 – Running Single Instance
+
+Subsequently, the ransomware verifies whether the flag variable for the “-local” parameter has a value
+of zero, indicating that the parameter was not passed. If this is the case, the ransomware will create a
+thread through the CreateThread() function, which will be employed for enumerating network devices.
+
+The figure below shows the call to CreateThread() made by ransomware.
+
+Figure 6 – Creating Thread
+
+After creating a new thread, the ransomware employs the NetShareEnum() API to obtain information
+about the available network shares on the local system. Once it obtains the list of network shares, the
+ransomware establishes connections to the administrative (ADMIN$) and interprocess communication
+(IPC$) shares, enabling its lateral movement to infect other systems connected to the same network.
+
+The figure below shows the network enumeration part present in the ransomware binary.
+
+3/14
+
+
+
+Figure 7 –
+
+Enumerating Network Shares
+Now the ransomware checks for the “-network” parameter. If this parameter is not passed, it will jump to
+the function responsible for fetching the drive details. This function starts by calling
+GetLogicalDriveStringsW to retrieve a list of logical drives and then iterates over the list. For each drive
+it encounters, it calls FindFirstFileW() API to search files in the drive. If FindFirstFileW returns a valid
+handle, it calls the GetDriveTypeW API to determine whether the drive type is removable or fixed.
+
+Figure 8 – Getting Drive Details
+After this, the ransomware binary attempts to inhibit the system recovery by deleting the shadow
+copies. The figure below shows the vssadmin command executed by ransomware using
+ShellExecuteW. This command is executed with two options, “/All” and “/Quiet”. The “/All” option deletes
+all shadow copies, and the “/Quiet” option suppresses any confirmation prompts that might appear
+during the deletion process.
+
+Figure 9 – Deleting Shadow Copies
+The ransomware now uses FindFirstFileW() and FindNextFileW() API functions to enumerate the files
+and directories and initiates the encryption process.
+
+4/14
+
+
+
+The figure below shows the FindFirstFileW() and FindNextFileW used by the ransomware.
+
+Figure 10 – Enumerating Directories
+The ransomware drops the ransom note named “README.BlackSuit.txt” in every directory it traverses.
+After encrypting the files, it renames them by appending the “.BlackSuit” extension.
+
+The figure below shows the ransom note and encrypted files.
+
+Figure 11 – Dropping Ransom Note
+Afterward, it checks for the presence of the parameter “-disablesafeboot”. If this variable is passed, the
+program disables safe boot mode by invoking the “bcdedit.exe” utility with the argument /deletevalue
+{current} safeboot.
+
+The code also checks if the current process is running on a 64-bit Operating System and invokes the
+64-bit version of “bcdedit.exe” (located in the “Sysnative” folder) if necessary. Finally, it initiates a
+system shutdown with the “shutdown.exe” utility and the arguments “/r /t 0”, which will restart the
+system immediately.
+
+The figure below shows the part of the code for disabling safe boot.
+
+5/14
+
+
+
+Figure 12 – Disable Safeboot
+Finally, the ransomware verifies whether the “delete” parameter is provided during execution. If this
+parameter is passed, it causes the ransomware to delete itself after completing the encryption process.
+This method enables the malware to eliminate traces, making it more challenging for investigators to
+examine its code and behavior.
+
+To accomplish this task, the ransomware utilizes the following batch script, which creates an infinite
+loop. This loop checks for the existence of the specified file “f” and deletes it if it exists. The command
+will continue running until the file is deleted or until the script is terminated:
+
+start cmd /v/c \”set f= “&for /l %l in () do if exist !f! (del /f/a \”!f!\”) else (exit)\
+
+Figure 13 – Ransomware Deleting Itself
+
+Linux Variant of BlackSuit Ransomware
+The Linux variant of the BlackSuit ransomware is a 64-bit ELF executable compiled with GCC with
+sha256 as 1c849adcccad4643303297fb66bfe81c5536be39a87601d67664af1d14e02b9e.
+
+The figure below shows additional details of the Linux-based executable.
+
+6/14
+
+
+
+Figure 14 – File Details of BlackSuit Ransomware Linux Variant
+The BlackSuit ransomware offers several command line parameters that serve different purposes and
+enable specific operations. These parameters provide additional functionality and control to the
+ransomware. The following are the command line parameters utilized by the BlackSuit ransomware.
+
+-name
+-percent
+-p
+-thrcount
+-skip
+-killvm
+-allfies
+-noprotect
+-vmsyslog
+-demonoff
+
+The figure below shows the command line arguments that could be used by the ransomware.
+
+7/14
+
+
+
+Figure 15 –
+
+BlackSuit Code to Parse the Arguments
+When the parameter “-vmsyslog” is passed, the ransomware is designed to terminate the “vmsyslog”
+service in the targeted machine. This particular service is responsible for generating logs in the system
+where VMware virtual machines are running, which aids in detecting anomalies in the functioning of the
+virtual machines. Disrupting the vmsyslog service through this parameter can potentially limit the
+monitoring capabilities and impede the ability to detect any irregularities in the operation of the virtual
+machines.
+
+The figure below shows the code used by the ransomware to kill vmsyslog.
+
+8/14
+
+
+
+Figure 16 –
+
+BlackSuit Code to Kill vmsyslog
+The -killvm parameter, when used with the ransomware, scans for active VMware virtual machines
+(VMs) and terminates their processes. This step ensures that the files associated with the VMs become
+accessible for encryption.
+
+The code snippet below illustrates how the ransomware lists virtual machines.
+
+9/14
+
+
+
+Figure 17 –
+
+BlackSuit Code to Kill Virtual Machines
+After killing the processes, the ransomware proceeds to prepare the files that will be encrypted.
+However, it also implements a mechanism to exclude specific files from the encryption process. These
+exclusions typically encompass vital system files, files that have already been encrypted, and the
+ransom notes that the ransomware itself drops after infecting a system. By excluding these files, the
+ransomware ensures they remain intact and accessible to facilitate its operations.
+
+Figure 18 – BlackSuit Files
+
+Excluded from Encryption
+In addition to excluding certain files from encryption, the ransomware also offers the option of using the
+“-vmonly” parameter. When this parameter is used, the malware restricts its encryption activities solely
+to files associated with VMware virtual machines.
+
+The figure below illustrates the virtual machine-related files that would be targeted by the ransomware
+when the “-vmonly” parameter is used.
+
+10/14
+
+
+
+Figure 19 – BlackSuit Ransomware Targeting 
+
+Virtual Machine-Related Files
+Following the preparation of files, the ransomware proceeds to generate keys required for the
+encryption process.
+
+The code snippet below demonstrates the implementation responsible for staging the encryption keys,
+as depicted in the figure.
+
+Figure 20 – BlackSuit Code for
+
+Preparing Keys for Encryption
+
+11/14
+
+
+
+Once the keys have been prepared, the ransomware initiates the encryption process by applying the
+AES algorithm to encrypt files.
+
+The code snippet depicted in the figure below demonstrates the implementation responsible for
+encrypting the files.
+
+Figure 21 – BlackSuit Code for File Encryption
+The ransomware also leaves behind a ransom note within the compromised system during the file
+encryption process. This note serves as a communication from the threat actor, providing instructions
+on making the ransom payment and a Tor link to establish a connection with the attacker.
+
+The figure below illustrates the presence of the ransom note, which is embedded into the executable of
+the ransomware.
+
+12/14
+
+
+
+Figure 22 – Ransom Note Embedded in the BlackSuit Ransomware
+
+Conclusion
+Ransomware attacks are getting more prevalent, with a recent surge in the number of emerging new
+groups. BlackSuit is among the latest ransomware strains to the surface, and while there are similarities
+in its code with Royal ransomware, their connection is not yet confirmed.
+
+BlackSuit has not yet publicly revealed any information about its victims, but it is possible that they may
+do so in the future. The group has already increased its attack surface by targeting different operating
+systems.
+
+Our Recommendations   
+With Threat Actors and their TTPs increasing in sophistication and rapid adoption of new Ransomware
+techniques alongside the increasing use of Artificial Intelligence, the industry continues its search for
+the proverbial silver bullet to counter this cyber threat.
+
+However, there are a few cybersecurity measures that we strongly recommend to organizations to
+reduce the likelihood of a successful attack: 
+
+Define and implement a backup process and secure those backup copies by keeping them offline
+or on a separate network 
+Monitor darkweb activities for early indicators and threat mitigation 
+
+13/14
+
+
+
+Enforce password change policies for the network and critical business applications or consider
+implementing multi-factor authentication for all remote network access points 
+Reduce the attack surface by ensuring that sensitive ports are not exposed to the Internet 
+Conduct cybersecurity awareness programs for employees, third parties, and vendors 
+Implement a risk-based vulnerability management process for IT infrastructure to ensure that
+critical vulnerabilities and security misconfigurations are identified and prioritized for remediation 
+Instruct users to refrain from opening untrusted links and email attachments without verifying their
+authenticity 
+Deploy reputed anti-virus and internet security software packages on your company-managed
+devices, including PCs, laptops, and mobile devices 
+Turn on the automatic software update features on computers, mobiles, and other connected
+devices
+
+MITRE ATT&CK® Techniques
+
+Tactic Technique ID Technique Name
+
+Execution T1204 User Execution
+T1059  Command and  Scripting Interpreter
+
+Discovery   T1057 Process Discovery
+T1082 System Information  Discovery
+T1083 File and Directory Discovery  
+
+Impact  T1486  Data Encrypted for Impact 
+T1490  Inhibit System Recovery  
+
+Indicators of Compromise (IOCs)
+
+Indicators Indicator Description
+Type
+
+748de52961d2f182d47e88d736f6c835 MD5 BlackSuit
+30cc7724be4a09d5bcd9254197af05e9 fab76455 SHA1 Windows
+90ae0c693f6ffd6dc5bb2d5a5ef078629c3d77f874 b2d2ebd9e109d8ca049f2c SHA2 56 Executable
+
+9656cd12e3a85b869ad90a0528ca026e MD5 BlackSuit
+861793c4e0d4a92844994b640cc6bc3e2 0944a73 SHA1 Linux
+1c849adcccad4643303297fb66bfe81c5536be39a87601d67664af1d14e02b9e SHA2 56 Executable

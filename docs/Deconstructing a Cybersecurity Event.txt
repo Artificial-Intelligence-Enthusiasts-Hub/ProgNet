@@ -1,0 +1,155 @@
+Deconstructing a Cybersecurity Event
+dragos.com/blog/deconstructing-a-cybersecurity-event/
+
+May 10, 2023
+
+Blog Post
+
+By Dragos, Inc.
+
+05.10.23
+
+1/9
+
+
+
+On May 8, 2023, a known cybercriminal group attempted and failed at an extortion scheme
+against Dragos.  No Dragos systems were breached, including anything related to the
+Dragos Platform.    
+
+Dragos has a culture of transparency and a commitment to providing educational material
+to the community. This is why it’s important to us to share what happened during a recent
+failed extortion scheme against Dragos in which a cybercriminal group attempted to
+compromise our information resources. We want to share this experience with the
+community, describe how we prevented it from being much worse, and, hopefully, help de-
+stigmatize security events.
+
+The criminal group gained access by compromising the personal email address of a new
+sales employee prior to their start date, and subsequently used their personal information to
+impersonate the Dragos employee and accomplish initial steps in the employee onboarding
+process. The group accessed resources a new sales employee typically uses in SharePoint
+and the Dragos contract management system. In one instance, a report with IP (internet
+protocol) addresses associated with a customer was accessed, and we’ve reached out to
+the customer.
+
+We investigated alerts in our corporate Security Information & Event Management (SIEM)
+and blocked the compromised account. We promptly activated our incident response
+retainer with Crowdstrike and engaged our third-party Monitoring, Detection & Response
+(MDR) provider to manage incident response efforts. We are confident that our layered
+security controls prevented the threat actor from accomplishing what we believe to be their
+primary objective of launching ransomware.  They were also prevented from accomplishing
+lateral movement, escalating privileges, establishing persistent access, or making any
+changes to the infrastructure. 
+
+Timeline
+
+2/9
+
+
+
+A known TTP of this criminal group is to deploy ransomware. After they failed to gain
+control of a Dragos system and deploy ransomware, they pivoted to attempting to extort
+Dragos to avoid public disclosure. Below are samples of various messages sent to Dragos
+executives.
+
+3/9
+
+
+
+The next activity was to expand tactics to include references to family members and
+contacts.
+
+4/9
+
+
+
+The cybercriminal continued to escalate their messages, Dragos did not engage.
+
+5/9
+
+
+
+The cybercriminal continued reaching out to multiple publicly known Dragos contacts to
+elicit a response.
+
+6/9
+
+
+
+The cybercriminal’s texts demonstrated research into family details as they knew names of
+family members of Dragos executives, which is a known TTP. However, they referenced
+fictitious email addresses for these family members.  In addition, during this time, the
+cybercriminal contacted senior Dragos employees via personal email.
+
+Our decision was that the best response was to not engage with the criminals.
+
+7/9
+
+
+
+While the external incident response firm and Dragos analysts feel the event is contained,
+this is an ongoing investigation. The data that was lost and likely to be made public because
+we chose not to pay the extortion is regrettable. However, it is our hope that highlighting the
+methods of the adversary will help others consider additional defenses against these
+approaches so that they do not become a victim to similar efforts.
+
+MITRE ATT&CK Mapping
+
+Tactic Technique Procedure
+
+TA0001 T1078 Leverage Valid Accounts
+
+TA0006 T1621 Multi-Factor Authentication Request Generation
+
+TA0007 T1526 Cloud Service Discovery
+
+TA0009 T1530 Collect Data from Cloud Storage
+
+TA00010 T1567 Exfiltration Over Web Service
+
+TA0042 T1586.002 Compromise Email Accounts
+
+TA0043 T1593 Search Open Websites/Domains
+
+T1591.004 Gather Victim Org Information: Identify Roles
+
+Indicators of Compromise
+IP Addresses
+144[.]202[.]42[.]216
+
+162[.]33[.]179[.]126
+
+Email Address
+dragos.negotiations[@]proton.me
+
+Lessons Learned
+In response to this event, we added an additional verification step to further harden our
+onboarding process and ensure that this technique cannot be repeated.
+
+Every thwarted access attempt was due to multi-step access approval.  We are evaluating
+expanding the use of this additional control based on system criticality.
+
+Positive outcomes further reinforce our resolve to not engage or negotiate with
+cybercriminals.
+
+8/9
+
+
+
+Verbose system activity logs enabled the rapid triage and containment of this security
+event.
+
+Recommendations
+Harden Identity & Access Management infrastructure and processes
+Implement separation of duties across the enterprise
+Apply the principle of least privilege to all systems and services
+Implement multi-factor authentication everywhere feasible
+Apply explicit blocks for known bad IP addresses (like those shown above)
+Scrutinize incoming emails for typical phishing triggers, including the email address,
+URL, and spelling
+Ensure continuous security monitoring is in place, with tested incident response
+playbooks
+
+Again, our investigation is ongoing, and we will reach out directly if we learn of additional
+effects on our customers. In the meantime, if you have questions, please send them to
+Dragos’s Office of the CISO at ciso-office@dragos.com.

@@ -1,0 +1,917 @@
+GuLoader: Navigating a Maze of Intricacy
+malwarebookreports.com/guloader-navigating-a-maze-of-intricacy/
+
+muzi June 29, 2023
+
+GuLoader TL;DR
+GuLoader is a polymorphic shellcode loader packed full of anti-analysis and anti-vm
+techniques to evade detection. The malware began as a Visual Basic (VB) 5/6 downloader,
+first identified in 2019. VB served as a wrapper for the core component implemented in
+shellcode until late last year. GuLoader began experimenting with a variety of delivery
+methods including VBS and macro-enabled documents before introducing NSIS (Nullsoft
+Scriptable Install System) in 2022. GuLoader and its delivery mechanisms are frequently
+updated by the authors to inhibit analysis and make detection more difficult. GuLoader
+typically delivers Remote Access Tools such as Remcos, but has been observed delivering
+numerous different malware families. Let’s attempt to navigate this mess of anti-analysis
+techniques together.
+
+SHA256: ee548086db277e0febd2797b582a734ac451a9cd050540d2a1fd08afa6232721
+
+NSIS Installer
+
+NSIS Primer
+A NSIS script is a regular text file with a special syntax. A script file contains Installer
+Attributes, Pages and Sections and Functions. Each line is treated as a command. The
+following section provides essential knowledge required to analyze a NSIS script. For
+additional details, see the following link.
+
+Installer Attributes
+Installer attributes determine the behavior, look and feel of the installer. These attributes can
+change text shown during installation, the number of installation types, etc. An example of an
+Installer Attribute is:
+
+AddBrandingImage left 100
+
+Pages
+A non-silent installer has a set of wizard pages that let the user configure the installer. The
+Page command is used to set pages to be displayed. A typical set of pages looks like this:
+
+1/37
+
+
+
+Page license 
+Page components 
+Page directory 
+Page instfiles 
+UninstPage uninstConfirm 
+UninstPage instfiles
+
+Sections
+Installers commonly have multiple options available to the user during installation. For
+example, an installer may allow the user to install additional tools, plug-ins, examples and
+more. Each of these components has corresponding code. If the user selects to install this
+component, then the installer will execute the respective code for that component. In a script,
+that code is defined in sections.
+
+Instructions used in sections are different from instructions for installer attributes. They are
+executed at runtime on the user’s computer and can extract files, read from and write to the
+registry, INI files or normal files, create directories, create shortcuts and more. See
+Instructions for more information. An example of a section looks like this:
+
+Section "My Program" 
+ SetOutPath $INSTDIR 
+ File "My Program.exe" 
+ File "Readme.txt" 
+SectionEnd
+
+Functions
+Functions, like Sections, contain script code. The difference between sections and functions
+is the way in which they are called. There are two types of functions: user functions and
+callback functions.
+
+User functions are called from Sections by the user or other functions using the Call
+instruction. User functions will not execute unless you call them. After the code in the
+function has executed, the installer will continue executing the instructions that came after
+the Call instruction, unless installation has been aborted inside the function. User functions
+are useful if an installer contains a set of instructions that need to be executed in several
+locations of the installer. Example user function:
+
+Function Hello 
+ DetailPrint "Hello world" 
+FunctionEnd
+
+Callback functions are called by the installer upon certain defined events, such as when the
+installer starts. Callbacks are optional. Example callback function:
+
+2/37
+
+
+
+Function .onInit 
+ MessageBox MB_YESNO "This will install My Program. Do you wish to continue?" IDYES 
+gogogo 
+   Abort 
+ gogogo: 
+FunctionEnd
+
+GuLoader NSIS Script
+NSIS Script
+The NSIS install script is located in the .nsi file, which is bundled in the executable.
+
+Figure 1: Files extracted from NSIS using 7z
+The script is relatively small, containing 6 user functions, 1 callback function and 1 unused
+section. Though the script is small, the control flow of the script is intentionally convoluted,
+with junk commands sprinkled throughout. The callback function .onMouseOverSection
+serves as the entry point. The key commands from the entry point function are:
+
+1. Store file path
+$INSTDIR\Skrivefelt172\Beskyttelsesprogram\Udledningstilladelses169\Gtter
+iernes.The in var $_45_
+
+2. Store the value 41000 in var $R1
+3. Store the value 1 in var $R7
+4. Store the value 2893 in var $1
+5. Store the file path $INSTDIR\Arbejderklassernes.Ato in var $4
+
+3/37
+
+
+
+Figure 2: Entry point callback function .onMouseOverSection
+The callback function ends by calling func_36. func_36 contains a loop that extracts
+individual characters from Arbejderklassernes.Ato to build command strings to load and
+execute GuLoader shellcode. Control flow jumps between functions and labels, making
+analysis difficult to follow. The following commands are the key components for the loop.
+
+1. Open
+$INSTDIR\Skrivefelt172\Beskyttelsesprogram\Udledningstilladelses169\Gtter
+iernes and store file handle in var $_46_.
+
+2. Push $_46_ onto the stack and Pop $R2 (store file handle in $R2)
+3. Call func_0 to call FileSeek and move the file pointer to var $R1
+4. Read 1 byte from
+
+$INSTDIR\Skrivefelt172\Beskyttelsesprogram\Udledningstilladelses169\Gtter
+iernes at file pointer location and store in var $_42_
+
+5. Push $_42_ onto the stack and Pop $1 (store the byte read from the file in var $1
+
+4/37
+
+
+
+6. Iterate index variable $R1 by 205 (file pointer + 205)
+7. Copy Z into var $R9
+8. Copy $1 (byte read from file) into var $0
+9. Loop condition: If $0 is a not a Z, write the it to the registry key HKCU Software\Allos
+
+Setup and loop again starting at label 37. If $0 is a Z, call func_23 to write the
+remaining value to the registry key HKCU Software\Allos Setup and read the string
+stored in that key into var $R8, then call func_62 to allocate memory using
+System::Alloc followed by System:Call to call the deobfuscated command that uses
+the Windows API to execute the GuLoader shellcode.
+
+Figure 3: Main execution loop that extracts commands from file to the registry and executes
+shellcode
+The resulting deobfuscated commands use the Windows API to:
+
+1. Load the file $INSTDIR\Arbejderklassernes.Ato
+2. Set the file pointer to offset 63101
+3. Allocate RWX memory of size 19456000
+4. Read shellcode starting from offset 63101 size 19456000 into the allocated RWX
+
+memory
+5. Execute GuLoader shellcode using EnumWindows callback function
+
+kernel32::CreateFileA(m r4 , i 0x80000000, i 0, p 0, i 4, i 0x80, i 0)i.r5 
+kernel32::SetFilePointer(i r5, i 63101 , i 0,i 0)i.r3 
+kernel32::VirtualAlloc(i 0,i 19456000, i 0x3000, i 0x40)p.r2 
+kernel32::ReadFile(i r5, i r2, i 19456000,*i 0, i 0)i.r3 
+user32::EnumWindows(i r2 ,i 0)
+
+5/37
+
+
+
+Figure 4: EnumWindows callback function executes shellcode
+
+GuLoader Shellcode
+
+PEB Parsing and API Hashing
+Shellcode Decrypt and Execute
+The first section of shellcode is responsible for decrypting the stage one shellcode.
+GuLoader calculates an XOR key by performing arithmetic operations against a constant
+value, XOR decrypts the encrypted shellcode byte-by-byte, and transfers execution to the
+decrypted shellcode. The screenshots below show the XOR decrypt and the call eax
+instruction that executes the decrypted stage one shellcode.
+
+Figure 5: XOR decrypt shellcode using key 0x3AD1577C
+
+Figure 6: Call decrypted GuLoader shellcode
+Walking the PEB and Resolving Windows APIs
+GuLoader does not have an Import Address Table (IAT) and therefore must manually resolve
+addresses of the functions it needs to execute. GuLoader walks the Process Environment
+Block (PEB) to locate base addresses of loaded modules and enumerates their export tables
+to find the desired Windows APIs . The PEB is always located at offset 0x30 (Win32) within
+the Thread Information Block (TIB).
+
+6/37
+
+
+
+typedef struct _PEB { 
+ BYTE                          Reserved1[2]; 
+ BYTE                          BeingDebugged; 
+ BYTE                          Reserved2[1]; 
+ PVOID                         Reserved3[2]; 
+ PPEB_LDR_DATA                 Ldr; 
+ PRTL_USER_PROCESS_PARAMETERS  ProcessParameters; 
+ PVOID                         Reserved4[3]; 
+ PVOID                         AtlThunkSListPtr; 
+ PVOID                         Reserved5; 
+ ULONG                         Reserved6; 
+ PVOID                         Reserved7; 
+ ULONG                         Reserved8; 
+ ULONG                         AtlThunkSListPtr32; 
+ PVOID                         Reserved9[45]; 
+ BYTE                          Reserved10[96]; 
+ PPS_POST_PROCESS_INIT_ROUTINE PostProcessInitRoutine; 
+ BYTE                          Reserved11[128]; 
+ PVOID                         Reserved12[1]; 
+ ULONG                         SessionId; 
+} PEB, *PPEB;
+
+Once a pointer to the PEB is acquired, the shellcode gets a pointer to the PEB_LDR_DATA
+structure, which is located at offset 0xC. Ldr contains an entry, InMemoryOrderModuleList,
+which is a doubly-linked list that contains the loaded modules for the process.
+
+Figure 7: Walking the PEB
+Each item in the list is a pointer to an LDR_DATA_TABLE_ENTRY structure, including the
+DllBase address and the DllName.
+
+7/37
+
+
+
+typedef struct _LDR_DATA_TABLE_ENTRY { 
+   PVOID Reserved1[2]; 
+   LIST_ENTRY InMemoryOrderLinks; 
+   PVOID Reserved2[2]; 
+   PVOID DllBase; 
+   PVOID EntryPoint; 
+   PVOID Reserved3; 
+   UNICODE_STRING FullDllName; 
+   BYTE Reserved4[8]; 
+   PVOID Reserved5[3]; 
+   union { 
+       ULONG CheckSum; 
+       PVOID Reserved6; 
+   }; 
+   ULONG TimeDateStamp; 
+} LDR_DATA_TABLE_ENTRY, *PLDR_DATA_TABLE_ENTRY;
+
+Figure 8: Walking the PEB (continued)
+Once the DLL has been identified, GuLoader iterates the exports of the DLL in search of the
+desired API. GuLoader uses DJB2 to hash the name of the API and compare it against the
+pre-computed hash value. This method reduces the number of strings visible in memory,
+increasing the difficulty of detection.
+
+8/37
+
+
+
+Figure 9: Iterate DLL exports and calculate DJB2
+GuLoader leverages the DJB2 algorithm throughout the codebase to hash strings. The
+constant 5381 (0x1505) and instruction shl 5 are a clear indication of the use of the
+algorithm. Below is a representation of the algorithm,
+
+   unsigned long 
+   hash(unsigned char *str) 
+   { 
+       unsigned long hash = 5381; 
+       int c; 
+
+       while (c = *str++) 
+           hash = ((hash << 5) + hash) + c; /* hash * 33 + c */ 
+
+       return hash; 
+   }
+
+GuLoader employs an additional XOR as part of its DJB2 algorithm for additional
+obfuscation. This ensures that the DJB2 hashes of specific APIs cannot be used for
+detection mechanisms such as Yara rules.
+
+Figure 10: Loop to calculate DJB2 hash
+
+Vectored Exception Handler
+
+9/37
+
+
+
+GuLoader registers a custom vectored exception handler (VEH), using
+RtlAddVectoredException, as a control flow obfuscation technique to hinder analysis in
+debuggers and disassemblers. A VEH is an extension to structured exception handling that
+are not frame-based, therefore the VEH will be called for unhandled exceptions regardless of
+the location in a call frame. VEHs are called in the order they are added and can be
+designated to run first when registered via AddVectoredExceptionHandler.
+
+PVOID AddVectoredExceptionHandler( 
+ ULONG                       First, 
+ PVECTORED_EXCEPTION_HANDLER Handler 
+);
+
+GuLoader calls RtlAddVectoredExceptionHandler with the First argument set to 1, which
+indicates the handler should be the first handler to be called. The VEH is used to control
+execution by dynamically calculating the address of EIP based on instructions following the
+address in which the exception occurred. GuLoader incorporates code throughout the
+shellcode that intentionally triggers the following three exceptions, causing the VEH code to
+execute.
+
+1. 0xC0000005 EXCEPTION_ACCESS_VIOLATION
+2. 0x80000004 EXCEPTION_SINGLE_STEP
+3. 0x80000003 EXCEPTION_BREAKPOINT
+
+EXCEPTION_ACCESS_VIOLATION
+GuLoader triggers access violation exceptions by performing mathematical operations on a
+constant stored in a register, then uses this value to attempt to write data the the [invalid]
+memory address referenced by this constant. This causes an access violation exception
+0xC0000005, triggering the VEH.
+
+Figure 11: Code to trigger access violation exception
+EXCEPTION_SINGLE_STEP
+Setting the Trap Flag is a well-known way to detect if a debugger is currently attached to a
+process. When the Trap Flag is set, a Single Step exception is raised. If a debugger is
+attached, it will handle the raised exception and continue execution. If a debugger is not
+attached, the exception will be handled by the exception handler, in this case, the GuLoader
+VEH.
+
+The code below is an example of the code blocks located throughout the GuLoader
+shellcode that cause a Single Step exception 0x80000004. Constant obfuscation is used to
+conceal the value of 0x100, which is eventually stored in edx. pushfd is used to push the
+EFLAGS register to the top of the stack. Next, the value of the EFLAGS is calculated via or
+
+10/37
+
+
+
+dword ptr ds:[edi] (0x206), edx (0x100), resulting in the value 0x306. 0x306 is
+1100000110 in binary, meaning the bit in position 8 (Trap Flag) is set. Finally, pushfd pops
+the dword on top of the stack into the EFLAGS register, setting the Trap Flag and triggering a
+Single Step exception (when the debugger is not attached).
+
+Figure 12: Code to trigger single step exception
+EXCEPTION_BREAKPOINT
+The INT3 (0xCC) instruction is a single-byte instruction defined for use by debuggers to
+temporarily replace an instruction in a running program in order to set a breakpoint. When an
+INT3 instruction is executed, a breakpoint exception 0x80000003 is triggered and the VEH is
+executed. If a debugger is attached, the exception is handled by the debugger, the VEH is
+not called, and program execution is paused. Instructions following the INT3 instructions are
+often invalid, causing exceptions and breaking execution in the debugger.
+
+Figure 13: int3 instruction to trigger breakpoint exception
+GuLoader VEH
+When an exception is thrown, the VEH receives an EXCEPTION_POINTER structure, which
+contains a pointer to the ExceptionRecord and ContextRecord.
+
+typedef struct _EXCEPTION_POINTERS { 
+ PEXCEPTION_RECORD ExceptionRecord; 
+ PCONTEXT          ContextRecord; 
+} EXCEPTION_POINTERS, *PEXCEPTION_POINTERS;
+
+The ExceptionRecord contains a machine-independent description of the exception. The
+most important member for the GuLoader VEH is the ExceptionCode, which is used to
+determine the code branch to execute in order to calculate EIP and continue execution.
+
+typedef struct _EXCEPTION_RECORD { 
+ DWORD                    ExceptionCode; 
+ DWORD                    ExceptionFlags; 
+ struct _EXCEPTION_RECORD *ExceptionRecord; 
+ PVOID                    ExceptionAddress; 
+ DWORD                    NumberParameters; 
+ ULONG_PTR                ExceptionInformation[EXCEPTION_MAXIMUM_PARAMETERS]; 
+} EXCEPTION_RECORD;
+
+11/37
+
+
+
+Once the ExceptionCode is identified, the VEH accesses the ContextRecord to retrieve EIP,
+then calculates a new EIP and continues execution using the following formula:
+
+1. Exception_Access_Violaton and Exception_Single_Step: eip = ((eip + 2) ^
+0xDB) + eip
+
+2. Exception_Breakpoint: eip = ((eip + 1) ^ 0xDB) + eip
+
+Note: The XOR value changes in each sample of GuLoader.
+
+12/37
+
+
+
+typedef struct _CONTEXT { 
+ DWORD64 P1Home; 
+ DWORD64 P2Home; 
+ DWORD64 P3Home; 
+ DWORD64 P4Home; 
+ DWORD64 P5Home; 
+ DWORD64 P6Home; 
+ DWORD   ContextFlags; 
+ DWORD   MxCsr; 
+ WORD    SegCs; 
+ WORD    SegDs; 
+ WORD    SegEs; 
+ WORD    SegFs; 
+ WORD    SegGs; 
+ WORD    SegSs; 
+ DWORD   EFlags; 
+ DWORD64 Dr0; 
+ DWORD64 Dr1; 
+ DWORD64 Dr2; 
+ DWORD64 Dr3; 
+ DWORD64 Dr6; 
+ DWORD64 Dr7; 
+ DWORD64 Rax; 
+ DWORD64 Rcx; 
+ DWORD64 Rdx; 
+ DWORD64 Rbx; 
+ DWORD64 Rsp; 
+ DWORD64 Rbp; 
+ DWORD64 Rsi; 
+ DWORD64 Rdi; 
+ DWORD64 R8; 
+ DWORD64 R9; 
+ DWORD64 R10; 
+ DWORD64 R11; 
+ DWORD64 R12; 
+ DWORD64 R13; 
+ DWORD64 R14; 
+ DWORD64 R15; 
+ DWORD64 Rip; 
+ union { 
+   XMM_SAVE_AREA32 FltSave; 
+   NEON128         Q[16]; 
+   ULONGLONG       D[32]; 
+   struct { 
+     M128A Header[2]; 
+     M128A Legacy[8]; 
+     M128A Xmm0; 
+     M128A Xmm1; 
+     M128A Xmm2; 
+     M128A Xmm3; 
+     M128A Xmm4; 
+     M128A Xmm5; 
+
+13/37
+
+
+
+     M128A Xmm6; 
+     M128A Xmm7; 
+     M128A Xmm8; 
+     M128A Xmm9; 
+     M128A Xmm10; 
+     M128A Xmm11; 
+     M128A Xmm12; 
+     M128A Xmm13; 
+     M128A Xmm14; 
+     M128A Xmm15; 
+   } DUMMYSTRUCTNAME; 
+   DWORD           S[32]; 
+ } DUMMYUNIONNAME; 
+ M128A   VectorRegister[26]; 
+ DWORD64 VectorControl; 
+ DWORD64 DebugControl; 
+ DWORD64 LastBranchToRip; 
+ DWORD64 LastBranchFromRip; 
+ DWORD64 LastExceptionToRip; 
+ DWORD64 LastExceptionFromRip; 
+} CONTEXT, *PCONTEXT;
+
+Figure 14: VEH Calculating EIP for Access Violation/Single Step Violation
+
+Anti-Analysis and Anti-Debug
+
+Figure 15: Your new favorite MessageBox indicating your debugger/VM has been detected
+and GuLoader is terminating
+Software Breakpoint Check
+
+14/37
+
+
+
+GuLoader performs anti-analysis/debug checks prior to calling Windows APIs by checking
+for breakpoints at the start of the function. When setting a software breakpoint on a function
+in a debugger, the debugger patches the first byte with a 0xCC, 0x3CD or 0xB0F, depending on
+the type of breakpoint selected, to trigger a software interrupt. GuLoader checks the first byte
+of the function for these values in order to detect software breakpoints. If detected, GuLoader
+jumps to code that crashes the process.
+
+15/37
+
+
+
+Figure 16: Check for software breakpoints
+Scan Memory for Pre-Computed DJB2 Hashes of Strings
+
+16/37
+
+
+
+GuLoader scans the entire memory area using ZwQueryVirtualMemory from 0x00010000 to
+0x7FFFF000 for strings indicating the malware is running in a virtualized environment or for
+various security tools.
+
+Figure 17: ZwQueryVirtualMemory to scan entire memory area
+ZwQueryVirtualmemory returns the MEMORY_BASIC_INFORMATION struct, which contains
+information including the BaseAddress as well as Protect, which describes current page
+protection.
+
+typedef struct _MEMORY_BASIC_INFORMATION { 
+ PVOID  BaseAddress; 
+ PVOID  AllocationBase; 
+ ULONG  AllocationProtect; 
+ USHORT PartitionId; 
+ SIZE_T RegionSize; 
+ ULONG  State; 
+ ULONG  Protect; 
+ ULONG  Type; 
+} MEMORY_BASIC_INFORMATION, *PMEMORY_BASIC_INFORMATION;
+
+GuLoader access the State member, looking for memory pages with protection
+PAGE_EXECUTE, PAGE_EXECUTE_READ, PAGE_EXECUTE_READWRITE, PAGE_WRITE, and
+PAGE_READWRITE (not pictured). GuLoader then scans the identified memory pages for
+strings, hashes the string using DJB2 and compares the hash against pre-computed hashes.
+
+Figure 18: Check memory page protection
+
+17/37
+
+
+
+Figure 19: Check memory string hash against pre-computed DJB2 hashes
+QEMU Agent Detection
+GuLoader uses CreateFileA to check for of C:\Program Files\Qemu-ga\qemu-ga.exe and
+C:\Program Files\qga\qga.exe to identify the QEMU emulator.
+
+Figure 20: Check for existence of Qemu
+
+18/37
+
+
+
+Figure 21: Check for existence of Qemu continued
+DbgBreakPoint and DbgRemoteBreakin
+GuLoader gets the address of DbgBreakPoint and patches the first byte 0xCC (int3) with
+0x90 (nop), meaning breakpoints will no longer pause execution in the debugger.
+
+Note: Setting a breakpoint on this function inserts a CC at the beginning of the function,
+negating this anti-debug technique.
+
+Figure 22: DbgBreakPoint patched with 0x90
+DbgUiRemoteBreakin
+The DbgUiRemoteBreakin API is used by the debugger to break in to a process. GuLoader
+patches this API to ensure that the process cannot be attached to for debugging by replacing
+the beginning of the API with a call to ExitProcess.
+
+Figure 23: Patched DbgUiRemoteBreakin API to call ExitProcess
+Patch ldrLoadDll
+GuLoader patches the initial bytes of LdrLoadDll, presumably to prevent hooks.
+
+Figure 24: Code to patch initial bytes of LdrLoadDll
+Unhooking API Calls
+
+19/37
+
+
+
+AV and EDR products insert hooks into commonly used NTDLL API functions, allowing the
+security tool to monitor API calls and arguments to monitor for malicious behavior. User
+mode hooks are generally inserted in the form of an unconditional jump, replacing the initial
+0xB8 mov instruction with a jump 0xE9 to the handler. GuLoader identifies and removes these
+hooks by searching for byte patterns (\xB8\x00.{3}\xB9) common of those in NTDLL
+functions.
+
+Figure 25: Check for byte pattern indicating NTDLL call to syscall
+If a hook is identified, GuLoader replaces the first 5 bytes to remove any hooks.
+
+Figure 26: Replace initial 5 bytes to original NTDLL
+GuLoader uses 0x33C9, 0xC2, and 0xE8 as anchor bytes in order to retrieve relative byte
+positions in order to patch.
+
+20/37
+
+
+
+Figure 27: Example of using byte anchor to retrieve relative byte positions
+GuLoader calls ZwProtectVirtualmemory to change the page permissions back to
+PAGE_EXECUTE_READ (0x20) once it has finished replacing any hooks.
+
+Figure 28: Call ZwProtectVirtualMemory to set page permissions to PAGE_EXECUTE_READ
+0x20
+EnumWindows
+GuLoader uses the Windows API EnumWindows to enumerate all top-level windows on the
+user’s screen to attempt to identify an analysis/sandbox environment. If the number of
+windows is less than 12, it calls TerminateProcess to terminate itself.
+
+21/37
+
+
+
+Figure 29: Bypassing EnumWindows check by setting number of top-level windows to 15
+NtSetInformationThread
+The Windows API NtSetInformationThread is used to modify thread specific data for a
+provided thread.
+
+__kernel_entry NTSYSCALLAPI NTSTATUS NtSetInformationThread( 
+ [in] HANDLE          ThreadHandle, 
+ [in] THREADINFOCLASS ThreadInformationClass, 
+ [in] PVOID           ThreadInformation, 
+ [in] ULONG           ThreadInformationLength 
+);
+
+GuLoade calls NtSetInformationThread and passes 0x11 as the argument for
+ThreadInformationClass. 0x11 corresponds to ThreadHideFromDebugger. This is a known
+anti-debug technique that causes the debugger to crash when a breakpoint is hit in the
+specified thread or when the debugger steps through instructions.
+
+22/37
+
+
+
+Figure 30: GuLoader calls NtSetInformationThread passing ThreadHideFromDebugger
+Enumerate Device Drivers
+GuLoader uses EnumDeviceDriver and GetDeviceDriverBaseNameA from psapi.dll to
+enumerate system driver names, searching for VM-related drivers. Similar to the
+methodology used to search for strings, GuLoader uses DJB2 to hash each driver name and
+compares it to a list of pre-computed hashes.
+
+Figure 31: EnumDeviceDrivers to enumerate drivers
+
+Figure 32: GetDriverBaseNameA returns vmmouse.sys
+Enumerate Installed Products
+
+23/37
+
+
+
+GuLoader uses MsiGetProductInfoA and MsiEnumProductsA to enumerate installed
+software, hashes the name of the software, and compares them to a list of pre-computed
+hashes.
+
+Figure 33: GuLoader calling MsiEnumProductsA to enumerate installed software
+Enumerate System Services
+GuLoader enumerates system services using OpenSCManagerA and EnumServiceStatusA,
+hashes the service names, and compares them to a list of pre-computed hashes.
+
+Figure 34: GuLoader calling OpenSCManagerA to enumerate system services
+NtQueryInformationProcess
+NtQueryInformationProcess is a Windows API that retrieves information about the specified
+process.
+
+__kernel_entry NTSTATUS NtQueryInformationProcess( 
+ [in]            HANDLE           ProcessHandle, 
+ [in]            PROCESSINFOCLASS ProcessInformationClass, 
+ [out]           PVOID            ProcessInformation, 
+ [in]            ULONG            ProcessInformationLength, 
+ [out, optional] PULONG           ReturnLength 
+);
+
+Among the process information available, the ProcessInformationClass provides the
+ProcessDebugPort (0x7), which provides the port number of the debugger for the process.
+A nonzero value indicates that the process is being run under the control of a ring 3
+debugger. If a debugger is detected, the malware exits.
+
+24/37
+
+
+
+Figure 35: Call to NtQueryInformationProcess querying ProcessDebugPort to identify a ring
+3 debugger
+CPUID & RDTSC Sandwich
+GuLoader calls CPUID leaf 1 (eax == 1)and checks whether a hypervisor is present by
+checking bit 31 of register ECX, indicating the malware is running in a virtual environment.
+This CPUID call is wrapped in rdtsc instructions, which GuLoader uses to calculate the
+amount of time needed to execute the CPUID call. This is another measure to detect a virtual
+environment, as a hypercall is required to execute the CPUID instruction within a virtual
+environment, therefore taking a longer amount of time to execute than on a virtualized
+system.
+
+Figure 36: CPUID and RDTSC Sandwich
+
+String Decryption
+GuLoader decrypts all strings at runtime, making static analysis difficult.
+NtAllocateVirtualMemory is called to allocate a buffer to store the encrypted and decrypted
+data. Once the buffer is allocated, the length of the encrypted string is written to the first
+word. Next, the encrypted data is written to the buffer, overwriting the length. GuLoader
+iterates through the ciphertext, XORing each byte by the key. The decrypted byte is then
+written back to the buffer in place.
+
+25/37
+
+
+
+Figure 37: String Decryption
+
+Code Injection
+GuLoader uses process hollowing in order to inject code into a suspended process, then
+resume execution inside the new process. GuLoader has been observed using process
+hollowing injection into a number of different executables, as well as spawning a child
+process of itself to inject into. In the case of this sample, GuLoader injected into a copy of
+itself using the following APIs.
+
+CreateProcessInternalW
+
+GuLoader first calls CreateProcessInternalW, passing its own path as an argument, as well
+as the creation flag of 0x4 (Suspended). GuLoader uses a direct syscall rather than calling
+the API directly to avoid EDR/AV detection.
+
+26/37
+
+
+
+Figure 38: CreateProcessInternalW Suspended
+
+Figure 39: Suspended process created
+NtUnmapViewOfSection
+
+GuLoader uses NtUnmapViewOfSection to unmap the image at 0x400000 in the suspended
+process.
+
+Figure 40: NtUnmapViewOfSection unmapping the original image in the suspended process
+NtOpenFile
+
+GuLoader decrypts the path to C:\Windows\System32\mshtml.dll and opens a file handle
+to it using NtOpenFile.
+
+27/37
+
+
+
+Figure 41: NtOpenFile acquiring a file handle to C:\Windows\System32\mshtml.dll
+NtCreateSection
+
+After opening a handle to mshtml.dll, GuLoader calls NtCreateSection using the file
+handle received from NtOpenFile in order to create a section object. A section object
+represents a section of memory that can be shared with other processes. A section object
+that is not backed by a file is suspicious, so GuLoader hardcodes a file to create the section
+object to avoid potential detection.
+
+Figure 42: NtCreateSection creating a section object
+NtMapViewOfSection
+
+28/37
+
+
+
+Next, GuLoader calls NtMapViewOfSection to map the mshtml.dll section that was just
+created using NtCreateSection into the virtual address space of the suspended process.
+
+Figure 43: Mapping the section object created from mshtml.dll to memory
+
+Figure 44: Section successfully mapped to memory
+ZwWriteVirtualMemory
+
+After the image is mapped in the suspended process, GuLoader writes its shellcode into the
+memory of the suspended process. Note: The shellcode is not written into the mapped
+section. The payload will be mapped over it later on.
+
+29/37
+
+
+
+Figure 45: GuLoader writing itself to the suspended process
+NtGetContextThread
+
+Next, GuLoader calls NtGetContextThread to retrieve a pointer to the Context structure of
+the thread in the suspended process. This is the same context structure as discussed in the
+VEH section and contains processor-specific register data.
+
+Figure 46: GuLoader retrieving Context structure from suspended process
+ZwSetContextThread
+
+30/37
+
+
+
+GuLoader calculates an entry point for the suspended process and updates the EAX register
+(RtlUserThreadStart is EIP and will jump to the address in EAX). in the context structure
+retrieved with NtGetContextThread. If abnormal execution is detected, GuLoader will set a
+decoy entry point, breaking execution in the new process.
+
+Figure 47: Accessing EIP in Context structure to update EIP
+Once the entry point is calculated, GuLoader calls ZwSetContextThread to set the thread
+context in the suspended process.
+
+Figure 48: Setting Context structure in suspended process with updated registers/EIP
+NtResumeThread
+
+Finally, GuLoader calls NtResumeThread to resume execution of the suspended process,
+executing the injected GuLoader shellcode.
+
+31/37
+
+
+
+Figure 49: Executing GuLoader shellcode in injected process
+
+Payload Download and Execution
+Decrypt C2
+GuLoader resumes execution in the new process, repeating all anti-analysis and anti-vm
+checks covered above. Once completed, GuLoader decrypts the C2 in memory using the
+same decryption methodology mentioned above.
+
+Figure 50: Decrypted C2 String
+If the fifth byte of the C2 is an ‘s’, GuLoader replaces the prefix to https://. Otherwise, it
+replaces the prefix with http://.
+
+Figure 51: https:// prepended to C2
+Download Payload
+GuLoader resolves the addresses of the following APIs InternetOpenA,
+InternetSetOptionA, InternetOpenUrlA, InternetReadFile, InternetCloseHandle in
+order to perform a GET request and download the payload. GuLoader payloads are
+frequently hosted on Google Drive and other cloud storage and file-sharing solutions.
+Payloads are generally long-lived as the payloads are XOR encrypted, making it difficult for
+providers to detect and remove them.
+
+32/37
+
+
+
+Figure 52: Call to InternetOpenUrlA in process of downloading payload
+Decrypt Payload
+GuLoader’s decryption routine consists of three steps:
+
+1. Calculate XOR key
+2. Decrypt payload key
+3. Decrypt payload
+
+Calculate XOR Key
+
+When calculating the XOR key, GuLoader retrieves the first two bytes from the payload,
+which start at byte offset 40. The two bytes are then XORed against the first two bytes of the
+encrypted key as well as a counter value. This process is repeated until the first two bytes of
+the payload are decrypted to 0x4D5A (MZ). When the first two bytes of the payload are
+0x4D5A, the value in the counter register is used as the decryption key for the payload key.
+For this sample, the XOR key is 0x8BF7.
+
+Figure 53: First part of routine to calculate XOR key
+
+Figure 54: XOR key loop condition checking for 4D5A, completing calculation of XOR key
+Decrypt Payload Key
+
+33/37
+
+
+
+With the XOR key now calculated, GuLoader moves to a routine to decrypt the payload key.
+The decryption routine iterates through the downloaded payload 2 bytes at a time, XORing
+against the two byte XOR key. The length of the payload key in this sample is 468 bytes.
+
+Figure 55: Using XOR key to decrypt 468 byte payload key
+
+Figure 56: Decrypted 468 byte payload key
+Decrypt Payload
+
+After the payload key is fully decrypted, GuLoader finally XOR decrypts the downloaded
+payload in place, byte-by-byte using the 468 byte payload key.
+
+34/37
+
+
+
+Figure 57: Payload decryption routine
+
+Figure 58: Decrypted Remcos Payload
+Execute Payload
+Zero Base Address 0x400000
+
+Once the payload has been decrypted, GuLoader sets memory permissions at 0x400000 to
+RW and zeroes out the image that is in place.
+
+35/37
+
+
+
+Figure 59: Zeroed out image base
+Copy Payload to Base Address
+
+Next, GuLoader copies the new payload to 0x400000.
+
+Figure 60: Remcos payload written to 0x400000
+NtCreateSection
+
+GuLoader then calls NtCreateSection to create a section object so that it can map the image
+to memory.
+
+NtMapViewOfSection
+
+After the section is created, GuLoader maps the section into memory, then calls
+ZwProtectVirtualMemory to set memory protection appropriately.
+
+Figure 61: Payload mapped to memory with permissions set
+NtCreateThreadEx
+
+Finally, GuLoader calls NtCreateThreadEx to execute the image that is now mapped at
+0x400000, executing the payload.
+
+Bonus: Remcos Configuration Extraction
+
+36/37
+
+
+
+The payload downloaded by this sample of GuLoader is Remcos. Remcos is a commercial
+Remote Access Tool advertised as legitimate software for surveillance and penetration
+testing, though it is frequently used in malware campaigns.
+
+I previously wrote a Remcos configuration extractor for another project and it looks like the
+configuration has not changed. The configuration extractor can be found on my GitHub.
+
+❯ python3 extract_config.py remcos_payload.bin 
+Remcos Config Extractor - CRITICAL Extracting config from: remcos_payload.bin 
+Malware Family: Remcos 
+Botnet: RemoteHost 
+C2s: ['194.59.218[.]165:2408']

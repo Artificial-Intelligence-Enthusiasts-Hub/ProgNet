@@ -1,0 +1,876 @@
+From ERMAC to Hook: Investigating the technical
+differences between two Android malware variants
+
+research.nccgroup.com/2023/09/11/from-ermac-to-hook-investigating-the-technical-differences-between-two-android-
+malware-variants/
+
+September 11, 2023
+
+Authored by Joshua Kamp (main author) and Alberto Segura.
+
+Summary
+Hook and ERMAC are Android based malware families that are both advertised by the actor
+named “DukeEugene”. Hook is the latest variant to be released by this actor and was first
+announced at the start of 2023. In this announcement, the actor claims that Hook was written
+from scratch [1]. In our research, we have analysed two samples of Hook and two samples
+of ERMAC to further examine the technical differences between these malware families.
+
+1/32
+
+
+
+After our investigation, we concluded that the ERMAC source code was used as a base for
+Hook. All commands (30 in total) that the malware operator can send to a device infected
+with ERMAC malware, also exist in Hook. The code implementation for these commands is
+nearly identical. The main features in ERMAC are related to sending SMS messages,
+displaying a phishing window on top of a legitimate app, extracting a list of installed
+applications, SMS messages and accounts, and automated stealing of recovery seed
+phrases for multiple cryptocurrency wallets.
+
+Hook has introduced a lot of new features, with a total of 38 additional commands when
+comparing the latest version of Hook to ERMAC. The most interesting new features in Hook
+are: streaming the victim’s screen and interacting with the interface to gain complete control
+over an infected device, the ability to take a photo of the victim using their front facing
+camera, stealing of cookies related to Google login sessions, and the added support for
+stealing recovery seeds from additional cryptocurrency wallets.
+
+Hook had a relatively short run. It was first announced on the 12th of January 2023, and the
+closing of the project was announced on April 19th, 2023, due to “leaving for special military
+operation”. On May 11th, 2023, the actors claimed that the source code of Hook was sold at
+a price of $70.000. If these announcements are true, it could mean that we will see
+interesting new versions of Hook in the future.
+
+The launch of Hook
+On the 12th of January 2023, DukeEugene started advertising a new Android botnet to be
+available for rent: Hook.
+
+2/32
+
+
+
+Forum post where DukeEugene first advertised Hook.
+Hook malware is designed to steal personal information from its infected users. It contains
+features such as keylogging, injections/overlay attacks to display phishing windows over
+(banking) apps (more on this in the “Overlay attacks” section of this blog), and automated
+stealing of cryptocurrency recovery seeds.
+
+Financial gain seems to be the main motivator for operators that rent Hook, but the malware
+can be used to spy on its victims as well. Hook is rented out at a cost of $7.000 per month.
+
+Forum post showing the rental price of Hook, along with the claim that it was written from
+scratch.
+The malware was advertised with a wide range of functionality in both the control panel and
+build itself, and a snippet of this can be seen in the screenshot below.
+
+3/32
+
+
+
+Some of Hook’s features that were advertised by DukeEugene.
+
+Command comparison
+Analyst’s note: The package names and file hashes that were analysed for this research
+can be found in the “Analysed samples” section at the end of this blog post.
+
+While checking out the differences in these malware families, we compared the C2
+commands (instructions that are sent by the malware operator to the infected device) in each
+sample. This analysis did lead us to find several new commands and features on Hook, as
+can be seen just looking at the number of commands implemented in each variant.
+
+4/32
+
+
+
+Sample Number of commands
+
+Hook sample #1 58
+
+Hook sample #2 68
+
+Ermac sample #1 #2 30
+
+All 30 commands that exist in ERMAC also exist in Hook. Most of these commands are
+related to sending SMS messages, updating and starting injections, extracting a list of
+installed applications, SMS messages and accounts, and starting another app on the victim’s
+device (where cryptocurrency wallet apps are the main target). While simply launching
+another app may not seem that malicious at first, you will think differently after learning about
+the automated features in these malware families.
+
+Automated features in the Hook C2 panel.
+Both Hook and ERMAC contain automated functionality for stealing recovery seeds from
+cryptocurrency wallets. These can be used to gain access to the victim’s cryptocurrency. We
+will dive deeper into this feature later in the blog.
+
+When comparing Hook to ERMAC, 29 new commands have been added to the first sample
+of Hook that we analysed, and the latest version of Hook contains 9 additional commands on
+top of that. Most of the commands that were added in Hook are related to interacting with the
+user interface (UI).
+
+Hook command: start_vnc
+The UI interaction related commands (such as “clickat” to click on a specific UI element and
+“longpress” to dispatch a long press gesture) in Hook go hand in hand with the new
+“start_vnc” command, which starts streaming the victim’s screen.
+
+5/32
+
+
+
+A decompiled method that is called after the “start_vnc” command is received by the bot.
+In the code snippet above we can see that the createScreenCaptureIntent() method is
+called on the MediaProjectionManager, which is necessary to start screen capture on the
+device. Along with the many commands to interact with the UI, this allows the malware
+operator to gain complete control over an infected device and perform actions on the victim’s
+behalf.
+
+ 
+
+Controls for the malware operator related to the “start_vnc” command.
+
+Command implementation
+
+6/32
+
+
+
+For the commands that are available in both ERMAC and Hook, the code implementation is
+nearly identical. Take the “logaccounts” command for example:
+
+Decompiled code that is related to the “logaccounts” command in ERMAC and Hook.
+This command is used to obtain a list of available accounts by their name and type on the
+victim’s device. When comparing the code, it’s clear that the logging messages are the main
+difference. This is the case for all commands that are present in both ERMAC and Hook.
+
+Russian commands
+Both ERMAC and the Hook v1 sample that we analysed contain some rather edgy
+commands in Russian, that do not provide any useful functionality.
+
+Decompiled code which contains Russian text in ERMAC and first versions of Hook.
+The command above translates to “Die_he_who_reversed_this“.
+
+7/32
+
+
+
+All the Russian commands create a file named “system.apk” in the “apk” directory and
+immediately deletes it. It appears that the authors have recently adapted their approach to
+managing a reputable business, as these commands were removed in the latest Hook
+sample that we analysed.
+
+New commands in Hook V2
+In the latest versions of Hook, the authors have added 9 additional commands compared to
+the first Hook sample that we analysed. These commands are:
+
+Command Description
+send_sms_many Sends an SMS message to multiple phone numbers
+addwaitview Dtoi sbpela dyiss pala “yweadit / loading” view with a progress bar, custom background colour, text colour, and text
+
+removewaitview R“aedmdwovaeitsv itehwe”  “cwoamitm / alonadding” view that is displayed on the victim’s device because of the
+
+addview Adds a new view with a black background that covers the entire screen
+removeview Removes the view with the black background that was added by the “addview” command
+cookie Steals session cookies (targets victim’s Google account)
+safepal Sasta ortbss tehrev eSda dfeuprainl gW aanlalelyt saipsp olifc tahteio anc (caensds isbtieliatyls s seerveidc ep)hrases as a result of starting this application,
+
+exodus Sasta ortbss tehrev eEdx odduurisn gW aanllaelty saipsp olifc tahteio na c(caensds sibteiliatyls s seerveidc ep)hrases as a result of starting this application,
+
+takephoto Takes a photo of the victim using the front facing camera
+
+One of the already existing commands, “onkeyevent”, also received a new payload option:
+“double_tap”. As the name suggests, this performs a double tap gesture on the victim’s
+screen, providing the malware operator with extra functionality to interact with the victim’s
+device user interface.
+
+More interesting additions are: the support for stealing recovery seed phrases from other
+crypto wallets (Safepal and Exodus), taking a photo of the victim, and stealing session
+cookies. Session cookie stealing appears to be a popular trend in Android malware, as we
+have observed this feature being added to multiple malware families. This is an attractive
+feature, as it allows the actor to gain access to user accounts without needing the actual
+login credentials.
+
+Device Admin abuse
+Besides adding new commands, the authors have added more functionality related to the
+“Device Administration API” in the latest version of Hook. This API was developed to support
+enterprise apps in Android. When an app has device admin privileges, it gains additional
+capabilities meant for managing the device. This includes the ability to enforce password
+policies, locking the screen and even wiping the device remotely. As you may expect: abuse
+of these privileges is often seen in Android malware.
+
+DeviceAdminReceiver and policies
+
+8/32
+
+
+
+To implement custom device admin functionality in a new class, it should extend the
+“DeviceAdminReceiver”. This class can be found by examining the app’s Manifest file and
+searching for the receiver with the “BIND_DEVICE_ADMIN” permission or the
+“DEVICE_ADMIN_ENABLED” action.
+
+Defined device admin receiver in the Manifest file of Hook 2.
+In the screenshot above, you can see an XML file declared as follows:
+android:resource=”@xml/buyanigetili. This file will contain the device admin policies that
+can be used by the app. Here’s a comparison of the device admin policies in ERMAC, Hook
+1, and Hook 2:
+
+Differences between device admin policies in ERMAC and Hook.
+Comparing Hook to ERMAC, the authors have removed the “WIPE_DATA” policy and added
+the “RESET_PASSWORD” policy in the first version of Hook. In the latest version of Hook,
+the “DISABLE_KEYGUARD_FEATURES” and “WATCH_LOGIN” policies were added. Below
+you’ll find a description of each policy that is seen in the screenshot.
+
+Device Admin Policy Description
+USES_POLICY_FORCE_LOCK The app can lock the device
+USES_POLICY_WIPE_DATA The app can factory reset the device
+USES_POLICY_RESET_PASSWORD The app can reset the device’s password/pin code
+USES_POLICY_DISABLE_KEYGUARD_FEATURES Tsuhceh a apsp  tchaen f idnigsearbplrein ut ssec aonf nkeeryguard (lock screen) features,
+
+USES_POLICY_WATCH_LOGIN The app can watch login attempts from the user
+
+The “DeviceAdminReceiver” class in Android contains methods that can be overridden. This
+is done to customise the behaviour of a device admin receiver. For example: the
+“onPasswordFailed” method in the DeviceAdminReceiver is called when an incorrect
+password is entered on the device. This method can be overridden to perform specific
+actions when a failed login attempt occurs. In ERMAC and Hook 1, the class that extends the
+DeviceAdminReceiver only overrides the onReceive() method and the implementation is
+minimal:
+
+9/32
+
+
+
+Full implementation of the class to extend the DeviceAdminReceiver in ERMAC. The first
+version of Hook contains the same implementation.
+The onReceive() method is the entry point for broadcasts that are intercepted by the device
+admin receiver. In ERMAC and Hook 1 this only performs a check to see whether the
+received parameters are null and will throw an exception if they are.
+
+DeviceAdminReceiver additions in latest version of Hook
+In the latest edition of Hook, the class to extend the DeviceAdminReceiver does not just
+override the “onReceive” method. It also overrides the following methods:
+
+Device Admin Method Description
+onDisableRequested() Cpraelsleedn tw ah ewna rtnhien gu smeer sasttaegmep ttos  tthoe d uissaebrle device admin. Gives the developer a chance to
+
+onDisabled() Cpraoltleedct epdri opra trots d oefv tichee  aDdemviicne bPeoinlicgy dMisaanbalgeedr.  AUPpoI n return, the app can no longer use the
+
+onEnabled() C“Daellveidce aPftoelric dyeMvaicnea gaedrm” itno  isse fti rtsht ee ndaebsilreedd.  pAot ltihciies spoint, the app can use
+
+onPasswordFailed() Called when the user has entered an incorrect password for the device
+onPasswordSucceeded() Called after the user has entered a correct password for the device
+
+When the victim attempts to disable device admin, a warning message is displayed that
+contains the text “Your mobile is die”.
+
+Decompiled code that shows the implementation of the “onDisableRequested” method in the
+latest version of Hook.
+The fingerprint scanner will be disabled when an incorrect password was entered on the
+victim’s device. Possibly to make it easier to break into the device later, by forcing the victim
+to enter their PIN and capturing it.
+
+10/32
+
+
+
+Decompiled code that shows the implementation of the “onPasswordFailed” method in the
+latest version of Hook.
+All keyguard (lock screen) features are enabled again when a correct password was entered
+on the victim’s device.
+
+Decompiled code that shows the implementation of the “onPasswordSucceeded” method in
+the latest version of Hook.
+
+Overlay attacks
+Overlay attacks, also known as injections, are a popular tactic to steal credentials on Android
+devices. When an app has permission to draw overlays, it can display content on top of other
+apps that are running on the device. This is interesting for threat actors, because it allows
+them to display a phishing window over a legitimate app. When the victim enters their
+credentials in this window, the malware will capture them.
+
+Both ERMAC and Hook use web injections to display a phishing window as soon as it
+detects a targeted app being launched on the victim’s device.
+
+11/32
+
+
+
+Decompiled code that shows partial implementation of overlay injections in ERMAC and
+Hook.
+In the screenshot above, you can see how ERMAC and Hook set up a WebView component
+and load the HTML code to be displayed over the target app by calling
+webView5.loadDataWithBaseURL(null, s6, “text/html”, “UTF-8”, null) and
+this.setContentView() on the WebView object. The “s6” variable will contain the data to be
+loaded. The main functionality is the same for both variants, with Hook having some
+additional logging messages.
+
+The importance of accessibility services
+Accessibility Service abuse plays an important role when it comes to web injections and
+other automated feature in ERMAC and Hook. Accessibility services are used to assist users
+with disabilities, or users who may temporarily be unable to fully interact with their Android
+device. For example: users that are driving might need additional or alternative interface
+feedback. Accessibility services run in the background and receive callbacks from the
+system when AccessibilityEvent is fired. Apps with accessibility service can have full
+visibility over UI events, both from the system and from 3rd party apps. They can receive
+notifications, they can get the package name, list UI elements, extract text, and more. While
+these services are meant to assist users, they can also be abused by malicious apps for
+activities such as: keylogging, automatically granting itself additional permissions, and
+monitoring foreground apps and overlaying them with phishing windows.
+
+When ERMAC or Hook malware is first launched, it prompts the victim with a window that
+instructs them to enable accessibility services for the malicious app.
+
+12/32
+
+
+
+Instruction window to enable the accessibility service, which is shown upon first execution of
+ERMAC and Hook malware.
+A warning message is displayed before enabling the accessibility service, which shows what
+actions the app will be able to perform when this is enabled.
+
+13/32
+
+
+
+Warning message that is displayed before enabling accessibility services.
+With accessibility services enabled, ERMAC and Hook malware automatically grants itself
+additional permissions such as permission to draw overlays. The onAccessibilityEvent()
+method monitors the package names from received accessibility events, and the web
+injection related code will be executed when a target app is launched.
+
+Targeted applications
+When the infected device is ready to communicate with the C2 server, it sends a list of
+applications that are currently installed on the device. The C2 server then responds with the
+target apps that it has injections for. While dynamically analysing the latest version of Hook,
+we sent a custom HTTP request to the C2 server to make it believe that we have a large
+amount of apps (700+) installed. For this, we used the list of package names that CSIRT
+KNF had shared in an analysis report of Hook [2].
+
+14/32
+
+
+
+Part of our manually crafted HTTP request that includes a list of “installed apps” for our
+infected device.
+The server responded with the list of target apps that the malware can display phishing
+windows for. Most of the targeted apps in both Hook and ERMAC are related to banking.
+
+15/32
+
+
+
+Part of the C2 server response that contains the target apps for overlay injections.
+
+Keylogging
+Keylogging functionality can be found in the onAccessibilityEvent() method of both ERMAC
+and Hook. For every accessibility event type that is triggered on the infected device, a
+method is called that contains keylogger functionality. This method then checks what the
+accessibility event type was to label the log and extracts the text from it. Comparing the code
+implementation of keylogging in ERMAC to Hook, there are some slight differences in the
+accessibility event types that it checks for. But the main functionality of extracting text and
+sending it to the C2 with a certain label is the same.
+
+16/32
+
+
+
+Decompiled code snippet of keylogging in ERMAC and in Hook.
+The ERMAC keylogger contains an extra check for accessibility event
+“TYPE_VIEW_SELECTED” (triggered when a user selects a view, such as tapping on a
+button). Accessibility services can extract information about a selected view, such as the text,
+and that is exactly what is happening here.
+
+Hook specifically checks for two other accessibility events: the
+“TYPE_WINDOW_STATE_CHANGED” event (triggered when the state of an active window
+changes, for example when a new window is opened) or the
+“TYPE_WINDOW_CONTENT_CHANGED” event (triggered when the content within a
+window changes, like when the text within a window is updated).
+
+It checks for these events in combination with the content change type
+
+“CONTENT_CHANGE_TYPE_TEXT” (indicating that the text of an UI element has
+changed). This tells us that the accessibility service is interested in changes of the textual
+content within a window, which is not surprising for a keylogger.
+
+Stealing of crypto wallet seed phrases
+
+17/32
+
+
+
+Automatic stealing of recovery seeds from crypto wallets is one of the main features in
+ERMAC and Hook. This feature is actively developed, with support added for extra crypto
+wallets in the latest version of Hook.
+
+For this feature, the accessibility service first checks if a crypto wallet app has been opened.
+Then, it will find UI elements by their ID (such as
+“com.wallet.crypto.trustapp:id/wallets_preference” and
+“com.wallet.crypto.trustapp:id/item_wallet_info_action”) and automatically clicks on these
+elements until it navigated to the view that contains the recovery seed phrase. For the crypto
+wallet app, it will look like the user is browsing to this phrase by themselves.
+
+Decompiled code that shows ERMAC and Hook searching for and clicking on UI elements in
+the Trust Wallet app.
+Once the window with the recovery seed phrase is reached, it will extract the words from the
+recovery seed phrase and send them to the C2 server.
+
+Decompiled code that shows the actions in ERMAC and Hook after obtaining the seed
+phrase.
+The main implementation is the same in ERMAC and Hook for this feature, with Hook
+containing some extra logging messages and support for stealing seed phrases from
+additional cryptocurrency wallets.
+
+Replacing copied crypto wallet addresses
+Besides being able to automatically steal recovery seeds from opened crypto wallet apps,
+ERMAC and Hook can also detect whether a wallet address has been copied and replaces
+the clipboard with their own wallet address. It does this by monitoring for the
+
+18/32
+
+
+
+“TYPE_VIEW_TEXT_CHANGED” event, and checking whether the text matches a regular
+expression for Bitcoin and Ethereum wallet addresses. If it matches, it will replace the
+clipboard text with the wallet address of the threat actor.
+
+Decompiled code that shows how ERMAC and Hook replace copied crypto wallet addresses.
+The wallet addresses that the actors use in both ERMAC and Hook are
+bc1ql34xd8ynty3myfkwaf8jqeth0p4fxkxg673vlf for Bitcoin and
+0x3Cf7d4A8D30035Af83058371f0C6D4369B5024Ca for Ethereum. It’s worth mentioning
+that these wallet addresses are the same in all samples that we analysed. It appears that this
+feature has not been very successful for the actors, as they have received only two
+transactions at the time of writing.
+
+Transactions received by the Ethereum wallet address of the actors.
+Since the feature has been so unsuccessful, we assume that both received transactions
+were initiated by the actors themselves. The latest transaction was received from a verified
+Binance exchange wallet, and it’s unlikely that this comes from an infected device. The other
+
+19/32
+
+
+
+transaction comes from a wallet that could be owned by the Hook actors.
+
+Stealing of session cookies
+The “cookie” command is exclusive to Hook and was only added in the latest version of this
+malware. This feature allows the malware operator to steal session cookies in order to take
+over the victim’s login session. To do so, a new WebViewClient is set up. When the victim
+has logged onto their account, the onPageFinished() method of the WebView will be called
+and it sends the stolen cookies to the C2 server.
+
+Decompiled
+
+code that shows Google account session cookies will be sent to the C2 server.
+
+20/32
+
+
+
+All cookie stealing code is related to Google accounts. This is in line with DukeEugene’s
+announcement of new features that were posted about on April 1st, 2023. See #12 in the
+screenshot below.
+
+DukeEugene announced new features in Hook, showing the main objective for the “cookie”
+command.
+
+C2 communication protocol
+
+HTTP in ERMAC
+ERMAC is known to use the HTTP protocol for communicating with the C2 server, where
+data is encrypted using AES-256-CBC and then Base64 encoded. The bot sends HTTP
+POST requests to a randomly generated URL that ends with “.php/” (note that the IP of the
+C2 server remains the same).
+
+21/32
+
+
+
+Decompiled code that shows how request URLs are built in ERMAC.
+
+Example HTTP POST request that was made during dynamic analysis of ERMAC.
+
+WebSockets in Hook
+The first editions of Hook introduced WebSocket communication using Socket.IO, and data is
+encrypted using the same mechanism as in ERMAC. The Socket.IO library is built on top of
+the WebSocket protocol and offers low-latency, bidirectional and event-based communication
+between a client and a server. Socket.IO provides additional guarantees such as fallback to
+the HTTP protocol and automatic reconnection [3].
+
+22/32
+
+
+
+Screenshot of WebSocket communication using Socket.IO in Hook.
+The screenshot above shows that the login command was issued to the server, with the user
+ID of the infected device being sent as encrypted data. The “42” at the beginning of the
+message is standard in Socket.IO, where the “4” stands for the Engine.IO “message” packet
+type and the “2” for Socket.IO’s “message” packet type [3].
+
+Mix and match – Protocols in latest versions of Hook
+The latest Hook version that we’ve analysed contains the ERMAC HTTP protocol
+implementation, as well as the WebSocket implementation which already existed in previous
+editions of Hook. The Hook code snippet below shows that it uses the exact same code
+implementation as observed in ERMAC to build the URLs for HTTP requests.
+
+Decompiled code that shows the latest version of Hook implemented the same logic for
+building URLs as ERMAC.
+
+23/32
+
+
+
+Both Hook and ERMAC use the “checkAP” command to check for commands sent by the C2
+server. In the screenshot below, you can see that the malware operator sent the “killme”
+command to the infected device to uninstall Hook. This shows that the ERMAC HTTP
+protocol is actively used in the latest versions of Hook, together with the already existing
+WebSocket implementation.
+
+The infected device is checking for commands sent by the C2 in Hook.
+
+C2 servers
+During our investigation into the technical differences between Hook and ERMAC, we have
+also collected C2 servers related to both families. From these servers, Russia is clearly the
+preferred country for hosting Hook and ERMAC C2s. We have identified a total of 23 Hook
+C2 servers that are hosted in Russia.
+
+Other countries that we have found ERMAC and Hook are hosted in are:
+
+The Netherlands
+United Kingdom
+United States
+Germany
+France
+Korea
+Japan
+
+24/32
+
+
+
+Popular countries for hosting Hook and ERMAC C2 servers.
+
+The end?
+On the 19th of April 2023, DukeEugene announced that they are closing the Hook project
+due to leaving for “special military operation”. The actor mentions that the coder of the Hook
+project, who goes by the nickname “RedDragon”, will continue to support their clients until
+their lease runs out.
+
+DukeEugene mentions that they are closing the Hook project. Note that the first post was
+created on 19 April 2023 initially and edited a day later.
+
+25/32
+
+
+
+Two days prior to this announcement, the coder of Hook created a post stating that the
+source code of Hook is for sale at a price of $70.000. Nearly a month later, on May 11th, the
+coder asked if the thread could be closed as the source code was sold.
+
+Hook’s coder announcing that the source code is for sale.
+
+Observations
+In the “Replacing copied crypto wallet addresses” section of this blog, we mentioned that the
+first received transaction comes from an Ethereum wallet address that could possibly be
+owned by the Hook actors. We noticed that this wallet received a transaction of roughly
+$25.000 the day after Hook was announced sold. This could be a coincidence, but the fact
+that this wallet was also the first to send (a small amount of) money to the Ethereum address
+that is hardcoded in Hook and ERMAC makes us suspect this.
+
+Ethereum transaction that could be related to Hook.
+We can’t verify whether the messages from DukeEugene and RedDragon are true. But if
+they are, we expect to see interesting new forks of Hook in the future.
+
+In this blog we’ve debunked DukeEugene’s statement of Hook being fully developed from
+scratch. Additionally, in DukeEugene’s advertisement of HookBot we see a screenshot of the
+Hook panel that seemed to show similarities with ERMAC’s panel.
+
+26/32
+
+
+
+Conclusion
+While the actors of Hook had announced that the malware was written from scratch, it is
+clear that the ERMAC source code was used as a base. All commands that are present in
+ERMAC also exist in Hook, and the code implementation of these commands is nearly
+identical in both malware families. Both Hook and ERMAC contain typical features to steal
+credentials which are common in Android malware, such as overlay attacks/injections and
+keylogging. Perhaps a more interesting feature that exists in both malware families is the
+automated stealing of recovery seeds from cryptocurrency wallets.
+
+While Hook was not written completely from scratch, the authors have added interesting new
+features compared to ERMAC. With the added capability of being able to stream the victim’s
+screen and interacting with the UI, operators of Hook can gain complete control over infected
+devices and perform actions on the user’s behalf. Other interesting new features include the
+ability to take a photo of the victim using their front facing camera, stealing of cookies related
+to Google login sessions, and the added support for stealing recovery seeds from additional
+cryptocurrency wallets.
+
+Besides these new features, significant changes were made in the protocol for
+communicating with the C2 server. The first versions of Hook introduced WebSocket
+communication using the Socket.IO library. The latest version of Hook added the HTTP
+protocol implementation that was already present in ERMAC and can use this next to
+WebSocket communication.
+
+Hook had a relatively short run. It was first announced on the 12th of January 2023, and the
+closing of the project was announced on April 19th, 2023, with the actor claiming that he is
+leaving for “special military operation”. The coder of Hook has allegedly put the source code
+up for sale at a price of $70,000 and stated that it was sold on May 11th, 2023. If these
+announcements are true, it could mean that we will see interesting new forks of Hook in the
+future.
+
+27/32
+
+
+
+Indicators of Compromise
+Analysed samples
+
+Family Package name File hash (SHA-256)
+Hook com.lojibiwawajinu.guna c5996e7a701f1154b48f962d01d457f9b7e95d9c3dd9bbd6a8e083865d563622
+Hook com.wawocizurovi.gadomi d651219c28eec876f8961dcd0a0e365df110f09b7ae72eccb9de8c84129e23cb
+ERMAC com.cazojowiruje.tutado e0bd84272ea93ea857cc74a745727085cf214eef0b5dcaf3a220d982c89cea84
+ERMAC com.jakedegivuwuwe.yewo 6d8707da5cb71e23982bd29ac6a9f6069d6620f3bc7d1fd50b06e9897bc0ac50
+
+C2 servers
+Family IP address
+Hook 5.42.199[.]22
+Hook 45.81.39[.]149
+Hook 45.93.201[.]92
+Hook 176.100.42[.]11
+Hook 91.215.85[.]223
+Hook 91.215.85[.]37
+Hook 91.215.85[.]23
+Hook 185.186.246[.]69
+ERMAC 5.42.199[.]91
+ERMAC 31.41.244[.]187
+ERMAC 45.93.201[.]92
+ERMAC 92.243.88[.]25
+ERMAC 176.113.115[.]66
+ERMAC 165.232.78[.]246
+ERMAC 51.15.150[.]5
+ERMAC 176.100.42[.]11
+ERMAC 91.215.85[.]22
+ERMAC 35.91.53[.]224
+ERMAC 193.106.191[.]148
+ERMAC 20.249.63[.]72
+ERMAC 62.204.41[.]98
+ERMAC 193.106.191[.]121
+ERMAC 193.106.191[.]116
+ERMAC 176.113.115[.]150
+ERMAC 91.213.50[.]62
+ERMAC 193.106.191[.]118
+ERMAC 5.42.199[.]3
+ERMAC 193.56.146[.]176
+ERMAC 62.204.41[.]94
+ERMAC 176.113.115[.]67
+ERMAC 108.61.166[.]245
+ERMAC 45.159.248[.]25
+
+ERMAC 20 108 0[ ]165
+28/32
+
+
+
+ERMAC 20.108.0[.]165
+ERMAC 20.210.252[.]118
+ERMAC 68.178.206[.]43
+ERMAC 35.90.154[.]240
+
+Network detection
+The following Suricata rules were tested successfully against Hook network traffic:
+
+# Detection for Hook/ERMAC mobile malware
+
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"FOX-SRT – Mobile
+Malware – Possible Hook/ERMAC HTTP POST"; flow:established,to_server;
+http.method; content:"POST"; http.uri; content:"/php/"; depth:5; content:".php/";
+isdataat:!1,relative; fast_pattern; pcre:"/^\/php\/[a-z0-9]{1,21}\.php\/$/U";
+classtype:trojan-activity; priority:1; threshold:type limit,track by_src,count 1,seconds
+3600; metadata:ids suricata; metadata:created_at 2023-06-02; metadata:updated_at
+2023-06-07; sid:21004440; rev:2;)
+
+alert tcp $HOME_NET any -> $EXTERNAL_NET any (msg:"FOX-SRT – Mobile
+Malware – Possible Hook Websocket Packet Observed (login)"; content:"|81|"; depth:1;
+byte_test:1,&,0x80,1; luajit:hook.lua; classtype:trojan-activity; priority:1; threshold:type
+limit,track by_src,count 1,seconds 3600; metadata:ids suricata; metadata:created_at
+2023-06-02; metadata:updated_at 2023-06-07; sid:21004441; rev:2;)
+
+view raw hook.rules hosted with ❤ by GitHub
+The second Suricata rule uses an additional Lua script, which can be found here
+
+List of Commands
+Family Command Description
+EH2RooMkA 1C, sendsms Stoeon ldasrg ae ,s pit ewciilfli esde nSdM thSe m meessssaaggee t oin a m supletipcilfeie pda nrtusmber. If the SMS message is
+
+EH2RooMkA 1C, startussd Executes a given USSD code on the victim’s device
+
+EH2RooMkA 1C, forwardcall Sets up a call forwarder to forward all calls to the specified number in the payload
+
+EH2RooMkA 1C, push Danisdp tlaeyxst  tao  pbues ehd nitoetdif ibcya ttihoen  mona ltwhea rvei cotipme’rsa tdoervice, with a custom app name, title,
+
+EH2RooMkA 1C, getcontacts Gets list of all contacts on the victim’s device
+
+EH2RooMkA 1C, getaccounts Gets a list of the accounts on the victim’s device by their name and account type
+
+EH2RooMkA 1C, logaccounts Gets a list of the accounts on the victim’s device by their name and account type
+
+EH2RooMkA 1C, getinstallapps Gets a list of the installed apps on the victim’s device
+
+EH2RooMkA 1C, getsms Steals all SMS messages from the victim’s device
+
+EH2RooMkA 1C, startinject Performs a phishing overlay attack against the given application
+
+EH2RooMkA 1C, openurl Opens the specified URL
+
+ERMAC t t th ti t 2 St t th G l A th ti t
+29/32
+
+
+
+EH2RooMkA 1C, startauthenticator2 Starts the Google Authenticator app
+
+EH2RooMkA 1C, trust Launches the Trust Wallet app
+
+EH2RooMkA 1C, mycelium Launches the Mycelium Wallet app
+
+EH2RooMkA 1C, piuk Launches the Blockchain Wallet app
+
+EH2RooMkA 1C, samourai Launches the Samourai Wallet app
+
+EH2RooMkA 1C, bitcoincom Launches the Bitcoin Wallet app
+
+EH2RooMkA 1C, toshi Launches the Coinbase Wallet app
+
+EH2RooMkA 1C, metamask Launches the Metamask Wallet app
+
+EH2RooMkA 1C, sendsmsall Smeensdssa gae s ipse tcoiofi eladr gSeM, Sit  wmiell ssseangde t htoe  amll ecsosnatagcet sin o mn uthlteip lveic ptiamrt’ss device. If the SMS
+
+EH2RooMkA 1C, startapp Starts the app specified in the payload
+
+EH2RooMkA 1C, clearcash S“Aeptsp ltihcaet i“oanu tDoeCtlaicilksC” asechttein”g s hfoarr ethde p srpeefecriefiendce a kpepy ( ptoro vbaalubely  1to,  acnleda lra tuhnec chaecsh teh)e
+
+EH2RooMkA 1C, clearcache S“Aeptsp ltihcaet i“oanu tDoeCtlaicilksC” asechttein”g s hfoarr ethde p srpeefecriefiendce a kpepy ( ptoro vbaalubely  1to,  acnleda lra tuhnec chaecsh teh)e
+
+EH2RooMkA 1C, calling Catatellms tphtes  tnou hmidbee ra snpde mcifuieted  tihne t haep p“nlicuamtiboenr” payload, tries to lock the device and
+
+EH2RooMkA 1C, deleteapplication Uninstalls a specified application
+
+EH2RooMkA 1C, startadmin Sasase mtasp  ctlhehese )c“skt abretf_oardem aitnte” mshpatirnegd t op rgeafeinre Dnecevi ckee yA tdom vianl uperi v1il,e wgheisc h(a iss  speroebna ibnl yH uosoekd
+
+EH2RooMkA 1C, killme Sprteofreerse tnhcee  pkaecyk, aing eo rndaemr teo  oufn tihnes tmalal iltic. iTohuiss  aisp pth ien  kthille s “wkiitllcAhp fpolric tahteio mn”a slwhaarreed
+
+EH2RooMkA 1C, updateinjectandlistapps Gtheet sin aje lcistito onf  ttahreg ectu lrirsetsntly installed apps on the victim’s device, and downloads
+
+EH2RooMkA 1C, gmailtitles Sapepts the “gm_list” shared preference key to the value “start” and starts the Gmail
+
+EH2RooMkA 1C, getgmailmessage Ssteatrsts t hthee “ gGmm_amil easp_pcommand” shared preference key to the value “start” and
+
+H2 ook 1 start_vnc Starts capturing the victim’s screen constantly (streaming)
+
+H2 ook 1 stop_vnc Stops capturing the victim’s screen constantly (streaming)
+
+H2 ook 1 takescreenshot Tftooar kt rtehusee   a“tos st acorrnetl_yev ntnasckh”eo c too onmfe mt hsaecn rvediec, tnbimsuht’s oi ttd )deoveicse s (on owtieth tohuatt  tiht es teaxrttsra t h“est rseaammeS accretiveinty”  saest
+
+H2 ook 1 swipe Performs a swipe gesture with the specified 4 coordinates
+
+H2 ook 1 swipeup Perform a swipe up gesture
+
+H2 ook 1 swipedown Performs a swipe down gesture
+
+H2 ook 1 swipeleft Performs a swipe left gesture
+
+H2 ook 1 swiperight Performs a swipe right gesture
+
+H2 ook 1 scrollup Performs a scroll up gesture
+
+H2 ook 1 scrolldown Performs a scroll down gesture
+
+H2 ook 1 onkeyevent PDeIArfLoOrmGs,  aB AceCrKta, inH OacMtiEon,  LdOeCpeKn SdiCngR EonE Nth,e o sr pReEcCifiEedN TkeSy payload (POWER
+
+H2 ook 1 onpointerevent Spterexottvssi  dXwe oadrn.k dT t hoYrg eceeoth ooerpdr,ti inoaanst sein: s:“  daito nfwidrsn pt” e,s r“efcotosrn mtthisne ua sent”a ,ar actitnniogdn  c“ ubopao”sr.d eIitdn l aootonek stsh w elihk peear teyhl oeita ssedh  optepp e uaxlydt
+inrrfeosvrsimo duaosti owsnnta, rtthinegn c iot oserdtsin tahtee sc,o tohrednin iat tpeesr fwohrmerse a i ts strhookueld g dersatuwr ea  ulisnien gto t hfrom tlhoead
+
+is
+
+H2 ook 1 longpress Dispatches a long press gesture at the specified coordinates
+
+H2 ook 1 tap Dispatches a tap gesture at the specified coordinates
+
+H k 1 li k t Cli k t ifi UI l t
+30/32
+
+
+
+H2 ook 1 clickat Clicks at a specific UI element
+
+H2 ook 1 clickattext Clicks on the UI element with a specific text value
+
+H2 ook 1 clickatcontaintext Clicks on the UI element that contains the payload text
+
+H2 ook 1 cuttext Replaces the clipboard on the victim’s device with the payload text
+
+H2 ook 1 settext Sets a specified UI element to the specified text
+
+H2 ook 1 openapp Opens the specified app
+
+H2 ook 1 openwhatsapp Sends a message through Whatsapp to the specified number
+
+H2 ook 1 addcontact Adds a new contact to the victim’s device
+
+H2 ook 1 getcallhistory Gets a log of the calls that the victim made
+
+H2 ook 1 makecall Calls the number specified in the payload
+
+H2 ook 1 forwardsms Stheet sv iucptim a nd eSvMicSe  ftoor wthaer dsepre tcoif ifeodrw naurmd btheer  irne ctheeiv epda yalonadd sent SMS messages from
+
+H2 ook 1 getlocation Gets the geographic coordinates (latitude and longitude) of the victim
+
+H2 ook 1 getimages Gets list of all images on the victim’s device
+
+H2 ook 1 downloadimage Downloads an image from the victim’s device
+
+H2 ook 1 fmmanager Efilieth feror mlis tths eth sep feilceisfi eadt  ap astphe (caidfiedditi opnaathl  p(aadradmitieotnear l “pdal”r)ameter “ls”), or downloads a
+
+Hook 2 send_sms_many Sends an SMS message to multiple phone numbers
+Hook 2 addwaitview Dteixstp claoylosu ar,  “awnadit  t/e lxota tdoi nbge”  dviisepwla wyeitdh a progress bar, custom background colour,
+
+Hook 2 removewaitview Rrvcei
+e
+oelma
+
+mwtmi 
+ovthveaa
+
+e npt
+s
+d o
+ isas  id“tiRiosenplslaa.t yiMveeodLr eoa nys opthueetc”  ivvfiiicceatwilml yg’:s rt ohduiespv ,ci cowemh aimcsha a nd drise prseluamlyt osov fc ethhsi ledth  “veai de“wdwwasi att oi/t vgloieeatwhde”inr gin”
+
+Hook 2 addview Adds a new view with a black background that covers the entire screen
+Hook 2 removeview Rhcoemoves ay “LinearLayoc vuoietlu”w mv iwenw ioth rg  tvrhoeeur tpbic,la awlclyhk i icbnha a ca ksrgrianronguglene rdso  otwht.ha Met rwo vraeies  wsapsde deceiitfdhic ebar“aodmridzmvoianentwad”l l cre oimnm oamv saeinnsd gthlee yll yt:h tehis
+
+Hook 2 cookie Steals session cookies (targets victim’s Google account)
+Hook 2 safepal Ssttaarrttisn gth teh iSs aafpepplaicl aWtioanlle, ta as popblisceartvioend  (daunrdin sgt eaanlasl ysseiesd o pf hthrea saecsc easss aib rielitsyu slte orvf ice)
+Hook 2 exodus Ssttaarrttisn gth teh iEs xaopdpulisc aWtioanlle, ta asp opblisceartvioend  (daunrdin sgt eaanlas lysseiesd o pf hthraes aecsc aess saib rielitsyu slte orfvice)
+Hook 2 takephoto Takes a photo of the victim using the front facing camera
+
+References
+ 
+[1] – https://www.threatfabric.com/blogs/hook-a-new-ermac-fork-with-rat-capabilities
+[2] – https://cebrf.knf.gov.pl/komunikaty/artykuly-csirt-knf/362-ostrzezenia/858-hookb ot-a-
+new-mobile-malware
+[3] – https://socket.io/ docs/v4/
+
+Here are some related articles you may find interesting
+Previous post Next post
+
+Most popular posts
+
+31/32
+
+
+
+Call us before you need us.
+Our experts will help you.
+
+Get in touch

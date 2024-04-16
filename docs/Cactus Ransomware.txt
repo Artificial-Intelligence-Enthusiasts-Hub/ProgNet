@@ -1,0 +1,350 @@
+Cactus Ransomware
+shadowstackre.com/analysis/cactus
+
+January 22, 2024
+
+Jan. 22
+Written By ShadowStackRe SSR
+
+A prickly situation for the victims
+
+Threat Landscape
+On January 20th the Cactus ransomware group attacked a number of victims across varying industries.
+The attacks were disclosed on their leak site with the accompanying victim data. The ransomware group
+has routinely put pressure on victims by releasing personal information about employees of the victim
+
+1/18
+
+
+
+organization; this has included drivers licenses, passports, pictures and other personal identification.
+
+In October of 2023 only 5 disclosures were posted on the leak site, but in November a steady increase of
+10 victims were posted and a drastic increase in December of 30+ victims. This steady increase over a
+three month period has shown that Cactus has been busy deploying their ransomware encryptor.
+
+IPs
+The samples have related IPs that are indexed on VirusTotal and also alienvault OTX. The IPs listed have
+a number of varying hashes from other malware associated to them and the IDS detections on AlienVault
+clearly indicates malicious activity.
+
+2/18
+
+
+
+104.86.182.8 - https://otx.alienvault.com/indicator/ip/104.86.182.8
+
+23.216.147.64 - https://otx.alienvault.com/indicator/ip/23.216.147.64
+
+23.216.147.76 - https://otx.alienvault.com/indicator/ip/23.216.147.76
+
+Keypoints
+Encoded public key to hinder static analysis
+Uses standard C++ constructs; including atomics for synchronisation and lambda's to
+compartmentalise functionality
+
+3/18
+
+
+
+Uses Windows scheduled tasks for persistence
+Perfecting their source code between May 2023 and December 2023
+
+Build information
+
+Hashes
+The sample sizes are typically seen between 8.0MB - 8.9MB and in the PE format.
+
+Hash:
+
+9ec6d3bc07743d96b723174379620dd56c167c58a1e04dbfb7a392319647441a (VirusTotal)
+first seen on 2023-05-05 in VirusTotal.
+
+Hash:
+
+c49b4faa6ac7b5c207410ed1e86d0f21c00f47a78c531a0a736266c436cc1c0a (VirusTotal)
+first seen on 2023-12-18 in VirusTotal.
+
+Compiler
+VirusTotal identified the build tooling (TrID) as Microsoft Visual C++ compiled at 41%, notably the build
+strings in the compiled binary trace to mingw build paths.
+
+The build for 9ec6d3bc07743d96b723174379620dd56c167c58a1e04dbfb7a392319647441a contains
+unique strings for the cactus builder, d:/_locker/cactusbuilder/buildcactuscrypt. This string is reflected in
+the Yara rule below, and can be used to quickly identify other builds with the same code line.
+
+Tactics and Techniques
+
+A forward on the differences
+The samples are very close in source code structure, overall functionality and implementation of tactics
+and techniques. There are some differences in inhibiting system recovery, scheduled task names and
+process / folder black and white listing. However, the source code is so similar there is no doubt that they
+are from the same code line.
+
+Program flow
+The main function facilitates much of the overall structure of the encryptor. All of the major techniques
+branch off from the main function in the form of lambda's, with atomics to control the status and updates of
+the varying techniques.
+
+4/18
+
+
+
+Below is an overall graph of that flow and its general complexity.
+
+5/18
+
+
+
+6/18
+
+
+
+The setup
+The sample starts up with the option of a number of program arguments, but before it processes each
+argument; the sample will first generate a random text file name to use for the readme and attempt to get
+the number of concurrent threads supported for the encryption thread pool. To reduce the chances of the
+process from being discovered, the sample will set the console window property to hide via the
+ShowWindow function and setting the second argument to 0.
+
+A randomized name for the readme file is determined during the setup. With that said, the constructor for
+the readme text still has the original static string containing the original name and can be used for
+identification or potential threat hunting purposes.
+
+Options
+The sample takes a number of arguments to control the encryptor. The common enablement of logging,
+changing the percentage of file to encrypt and specific file path are included; but most notable is the
+control of the system start up persistence and the ability to kill processes and system shadow copies prior
+to encrypting the system.
+
+-s, system start persistence
+-kd, kill processes and shadow copy if admin
+
+Process, files and folder list
+The black and white list contains a fairly standard set of executables, file names, services and extensions.
+Most notable is the extension for cactus cts0-7. The string searching is based on an array of string values
+which are iterated upon during the file searching and preparation for encryption.
+
+7/18
+
+
+
+Victim ID
+The victims ID is stored in the binary statically as a std::string and initialize during the constructor for the
+configuration object. The format of the ID is four groups of four characters separated by dash. This format
+can be used for threat hunting and easily found in standard string analysis from tooling such as FLOSS or
+within IDA Pro.
+
+Inhibit system recovery
+The sample will check for processes and if the user is currently the admin, attempt to close black listed
+processes. Although the sample will later use the Windows restart manager API to ensure file handles are
+not locked; the process takes extra measures to ensure a successful encryption by iterating through each
+running process.
+
+The CreateToolhelp32Snapshot function used to get a handle to a list of all running processes. Once
+obtained a simple while loop is used to iterate through all the processes and get the general PE
+information, this is done via the Process32NextW API. The comparison of the process szExeFile string
+and the blacklist is performed for each blacklisted process. If found, the process is closed.
+
+If the sample has determined that the process is running with admin privileges, it will attempt to delete the
+system shadow copies via the vssadmin.exe, and the WMIC.exe executables. These standard
+executables are available on all versions of Windows. Passing in the command vssadmin delete shadows
+/all /quiet for vssadmin, and WMIC shadowcopy delete for WMIC will immediately hamper the system
+recovery process. Both services will communicate via the VSS Provider API, which is a Windows
+component that maintains the shadow copies. The provider API will access the volumes for the system
+and hardware providers on behalf of the API.
+
+After updating the system shadow copy, the sample will attempt to update the bootstatuspolicy via bcdedit
+by setting the ignoreallfailures. This will ensure no errors such as failed boot, shutdown or failed
+checkpoint will interfere with the next boot cycle.
+
+8/18
+
+
+
+Lastly, the recoveryenabled is turned off, to ensure that the Windows repair tool does not fire, if an error is
+found.
+
+Restoring the public key
+The public key is encoded in the samples, but will be decoded during runtime prior to loading it into
+memory. The sample will pull the encoded string from the static string initialized during the constructor of
+the configuration object.
+
+9/18
+
+
+
+To decode the key, the static string for the public keys salt is also stored in a static string.
+
+Decoding the string is done using a set of AES functions to decrypt the key and load the RSA Key into
+memory once the plain text is decoded. The mechanism is used to hinder static analysis and require
+dynamic execution. This process can be automated provided the encoded string and the salt is located at
+the correct offset address.
+
+Persistence
+The ntuser.dat located in the users c:\ProgramData\ is deleted, and then recreated with junk the threat
+actor added to the sample. This file was found to contain garbage data when testing, but it could be
+expanded upon to added stealth or evasion. Since there is a read/write operation to that specific file, rule
+based detections could pick up the sequence and potentially alert on it.
+
+Note: other samples had a similarly named file ntuser.log
+
+10/18
+
+
+
+Persistence was added through the -s program argument, and will cause the sample to add Windows
+scheduled task with the name Updated Check Task or Google Service Update. The intention is to blend
+into a legitimate system service, but instead execute the sample again upon login.
+
+Windows restart manager
+The restart manager is used to clear any handles to a file used by a running process. The threat actor
+starts off by first getting a new restart manager session via the RmStartSession API. Once obtained the
+session can be used to enumerate resources allocated to a file path via the RmRegisterResources call.
+The session information is then linked to all processes that are listed as a resource, this can be retrieved
+
+11/18
+
+
+
+using the session handle and a call to the RmGetList function. Once obtained, the sample can iterate on
+any process by the handle. Lastly, removing the resource by opening the process via OpenProcess,
+K32GetProcessImageFileNameW and shutting down the application via RmShutdown.
+
+The result will leave the file without any resource locks, allowing the encryptor to modify the file without
+error.
+
+12/18
+
+
+
+Directory and file discovery
+The file discovery starts off in a new thread setup in a lamdba function. The thread is responsible for
+traversing directories, finding files to encrypt and skipping files or extensions which would be problematic
+to the systems uptime.
+
+The file discovery implementation makes use of all the common Windows APIs. The FindFirstFileW and
+the FindNextFileW calls are used to iterate through the file system pointers. Before it can determine if the
+file is legit; it must determine if its a directory. Upon iterating over each file handle, the structures
+dwFileAttributes member has a bit wise & operations performed against it using the constant value
+FILE_ATTRIBUTE_DIRECTORY which resolves to 0x10 in the Windows API. If the file handle is found to
+be a directory, it is checked for the relative paths . and ... The function is recursively called for files that are
+directories.
+
+Note: no tail recursion is done, so this can expand the stack when encountering nested file systems and
+lead to a crash.
+
+Before the file handle is selected and added to a common list of paths, it must first check if the folder
+extension matched any of the white listed data (See: Process, file and folders list above)
+
+13/18
+
+
+
+Before the file can be added to the list, the restart manager is called to ensure the file is opened by
+another service/application. (See: Windows restart manager above)
+
+Lastly, the readme file is prepared to be dropped in the directory.
+
+14/18
+
+
+
+Encryption
+Once the thread pool is created using the maximum number of concurrent threads obtained by the
+system, and file discovery is well underway; the encryption routine is started via lamdba function. This
+function runs in a new thread, and can handle the off loaded work from the file discovery process.
+
+The encryptor uses OpenSSL and will first setup an AES 256 CBC structure as the context across the
+entire encryption process. The extension of .cts* is setup to handle the file naming process, and a
+standard std::ostream object to handle the writing of contents.
+
+15/18
+
+
+
+As the thread prepares the file for encryption, it first must determine if it is going to partially or fully encrypt
+the file. This is done by analyzing the file size and using the configuration object or program argument to
+control the percentage of the file encryption. If the size of greater than 8MB the file is partially encrypted. If
+the file is not, then a full file encryption takes place.
+
+Once the file is processed, a std::atomic used to control the thread busy loop, is updated with a value of 0
+clearing the bit and indicating the work is complete. The Memory order used is the default one, and will
+ensure no other observation or worker thread mis-reads the status.
+
+16/18
+
+
+
+Readme
+Your corporate network was compromised and encrypted by Cactus. Do not interrupt the encryption
+process, don't stop or reboot your machines until the encryption is complete. Otherwise the data may be
+corrupted. In addition to the encrypted infrastructure, we have downloaded a lot of confidential information
+from your systems. The publication of these documents may cause the termination of your commercial
+activities, contracts with your clients and partners, and multiple lawsuits. If you ignore this warning and do
+not contact us, your sensitive data will be posted on our blog:
+https[:]//cactusbloguuodvqjmnzlwetjlpj6aggc6iocwhuupb47laukux7ckid.onion/ In your best interest
+is to avoid contacting law enforcement and data recovery companies. They can't help you with the
+recovery, will cause more problems and expenses, and delay the return to normal work significantly.
+Besides, if you contact the police we will immediately publish your data. We offer the best solution to the
+problem, to receive our decryption software and prevent disclosure of your sensitive information contact us
+directly. A quick recovery is very important to keep your business running at full capacity and minimize
+losses. This is why you need to begin negotiations as soon as possible. By the way, if you don't contact us
+within 5 days, we will start publishing your data. Download TOR Browser
+(https[:]//www[.]torproject.org/download) and follow the link: Your username: Your password: Reply to the
+welcome email and we will get your message. Backup contact is TOX (https[:]//tox.chat):
+dcac7us[@]gmx.com
+http[:]//sonarmsng5vzwqezlvtu2iiwwdn3dxkhotftikhowpfjuzg7p3ca5eid.onion/contact/Cactus_Support
+7367B422CD7498D5F2AAF33F58F67A332F8520CF0279A5FBB4611E0121AE421AE1D49ACEABB2
+http[:]//webmail.cactus47hhktlaclasue3rnkchcy6rgvitxmllv2l6m25gzkgbeyfyad.onion
+cts0100[@]cactus47hhktlaclasue3rnkchcy6rgvitxmllv2l6m25gzkgbeyfyad.onion
+
+17/18
+
+
+
+YARA
+/*
+MIT License 
+Copyright 2023 ShadowStackRe.com 
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
+associated documentation files (the “Software”), to deal in the Software without restriction, 
+including without limitation the rights to use, copy, modify, merge, publish, distribute, 
+sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is 
+furnished to do so, subject to the following conditions: 
+The above copyright notice and this permission notice shall be included in all copies or 
+substantial portions of the Software. 
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT 
+NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT 
+OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+*/
+rule CactusRansomware { 
+meta: 
+   description = "rule to detect Cactus Ransomware" 
+   author = "ShadowStackRe.com" 
+   date = "2024-01-18" 
+   Rule_Version = "v1" 
+   malware_type = "ransomware" 
+   malware_family = "Cactus" 
+   License = "MIT License, https://opensource.org/license/mit/" 
+   Hash = 
+"9ec6d3bc07743d96b723174379620dd56c167c58a1e04dbfb7a392319647441a,c49b4faa6ac7b5c207410ed1e86d0f21
+c00f47a78c531a0a736266c436cc1c0a" 
+strings: 
+   $strReadMe = "cAcTuS.readme.txt" wide 
+   $strLockExt = ".cts" wide 
+   $strTskName = "Updates Check Task" wide 
+   $strTskName2 = "Google Service Update" 
+   $strNTUSer = "ntuser.dat" wide 
+   $strNTUSer2 = "ntuser.log" wide 
+   $strBuilderName = "cactusbuilder" 
+condition: 
+   uint16(0) == 0x5A4D and ($strReadMe and $strLockExt) and 
+   (1 of ($strTskName*)) and (1 of ($strNTUSer*)) or ($strBuilderName) 
+}
+
+ransomwarecactus
+
+ ShadowStackRe SSR

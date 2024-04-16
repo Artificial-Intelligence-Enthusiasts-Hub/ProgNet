@@ -1,0 +1,194 @@
+Godfather Android Banking Trojan Technical Analysis
+brandefense.io/blog/godfather-android-banking-trojan/
+
+August 17, 2023
+
+This is the open version of Godfather Android Banking Trojan Technical Analysis.
+If you want to download it as a PDF click here.
+
+Executive Summary
+Godfather stands out among malicious Android software as a significant threat. This malware
+targets financial and personal information, endangering users’ security. Key characteristics of
+Godfather include:
+
+Objective and Threat: Godfather aims to seize users’ financial account information,
+identity data, and personal details. It can jeopardize users’ security, leading to financial
+losses and identity theft.
+Operational Mechanism: Utilizing keylogging, Godfather monitors users’ keystrokes,
+stealing entered data and tracking user interactions.
+Distribution Methods: This malware often spreads through fake applications or
+malicious websites. It increases infection risks by luring users into traps with deceptive
+content.
+Data Transmission: Godfather can transmit captured data to a command and control
+server.
+
+Before the Analysis
+ 
+
+Godfather Trojan Activity Targeting Financial Sector Detected
+The Group-IB Threat Intelligence team detected that the Godfather Android banking trojan
+targeted more than 400 international financial companies between June 2021 and October
+2022. Half of the targeted financial companies are banks, and the other half are
+cryptocurrency wallets and exchanges. The Godfather’s targets include 49 US-based
+companies, 31 Turkish-based companies, and 30 Spanish-based companies. Financial
+service providers in Canada, France, Germany, England, Italy, and Poland are among the
+hardest-hit companies. [Read More]
+
+1/9
+
+
+
+Fake Web Pages Imitating Mobile Banking Applications Serving in Turkey
+Some activities that Godfather trojan software performs on infected systems;
+
+Recording the device’s screen
+
+2/9
+
+
+
+Creating VNC connections
+Capturing keystrokes (keylogging)
+Leaking push notifications and SMS messages (to bypass 2FA)
+Send SMS messages
+Forward calls
+Execute USSD requests
+Start proxy servers
+Enabling silent mode
+Establishing WebSocket connections
+
+Last 9 months, Godfather Trojan activities have been activated again, especially in Turkey.
+This time attackers mainly have used music apps to infect the victims of the android trojan,
+Godfather.
+
+3/9
+
+
+
+Image Source: twitter.com/0x6rss
+
+Technical Analysis
+Godfather malware requires the following permissions.
+
+Permission List
+
+android.permission.ACCESS_NETWORK_STATE
+android.permission.ACCESS_WIFI_STATE
+android.permission.BIND_ACCESSIBILITY_SERVICE
+android.permission.FOREGROUND_SERVICE
+android.permission.INTERNET
+android.permission.POST_NOTIFICATIONS
+android.permission.QUERY_ALL_PACKAGES
+android.permission.READ_PHONE_STATE
+android.permission.READ_PRIVILEGED_PHONE_STATE
+android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+android.permission.WAKE_LOCK
+
+With the permissions given above, the malware in question is able to perform the following
+actions:
+
+Internet access
+Ability to use Accessibility service
+Installing application
+Access notifications
+Running as a foreground service
+
+Upon execution, the malware requests activation of its accessibility service under the name
+of “Müzik”. It is observed that the malware uses accessibility rights to press buttons on the
+screen, read user inputs such as user clicks, run applications, and monitor what users have
+typed in a certain text field.
+
+4/9
+
+
+
+Figure 1: Accessibility service request
+
+Anti-Analysis Techniques
+The malware uses the encrypted strings at runtime by decrypting them using the blowfish
+algorithm.(secret key: 67d45d2f64)
+
+Figure 2: Accessibility service request
+
+5/9
+
+
+
+It gets the command control address with the encrypted string in the description of a
+telegram account. This method is also often used by other malware.
+
+Figure 3: Telegram Description
+Again, it uses blowfish to decrypt this encrypted string.(key:ABC, IV:abcdefgh)
+
+6/9
+
+
+
+Figure 3: Jump to the extracted malware payload
+
+Application Runtime
+Godfather malware retrieves the list of target applications from the command and control
+server.
+
+Figure 4: Targeted Apps
+Unlike other malware (eg cerberus, hook, ermac), the malware steals information by
+keylogging instead of using an overlay attack.
+
+7/9
+
+
+
+Figure 5: Keylogger
+
+Figure 6: Keylogger output
+
+Targeted Applications
+com[.]tmobtech.halkbank
+com[.]vakifbank.mobile
+com[.]ziraat.ziraatmobil
+com[.]akbank.android.apps.akbankdirekt
+com[.]anadolubank.android
+com[.]fibabanka.Fibabanka.mobile
+tr.com[.]sekerbilisim.mbank
+com[.]teb
+com[.]teb.kurumsal
+com[.]pozitron.iscep
+
+8/9
+
+
+
+com[.]ykb.android
+tr[.]com[.]abank.dijital
+com[.]a2a.android.burgan
+com[.]denizbank.mobildeniz
+com[.]garanti.cepsubesi
+com[.]ingbanktr.ingmobil
+com[.]magiclick.odeabank
+com[.]finansbank.mobile.cepsube
+finansbank[.]enpara
+finansbank[.]enpara.sirketim
+com[.]kuveytturk.mobil
+com[.]ziraatkatilim.mobilebanking
+com[.]tfkb
+com[.]albarakaapp
+com[.]aktifbank.nkolay
+com[.]fibabanka.mobile
+com[.]ininal.wallet
+com[.]intertech.mobilemoneytransfer.activity
+com[.]isbank.isyerim
+com[.]kuveytturk.yourbank
+com[.]mobillium.papara
+com[.]pttfinans
+com[.]turkcell.paycell
+com[.]vakifkatilim.mobil
+paladyum[.]peppara
+tr.com[.]hsbc.hsbcturkey.uk
+tr.com[.]param.android
+
+Conclusion
+Godfather represents a serious instance of malicious software, carrying risks like financial
+loss and personal privacy breach. Users need to enhance their cybersecurity awareness and
+download from reputable sources.
+
+You can find the IoCs on our GitHub repo.

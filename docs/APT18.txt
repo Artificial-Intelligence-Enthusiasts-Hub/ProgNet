@@ -1,0 +1,202 @@
+APT18
+attack.mitre.org/groups/G0026
+
+APT18 is a threat group that has operated since at least 2009 and has targeted a range of industries, including
+technology, manufacturing, human rights groups, government, and medical. [1]
+
+ID: G0026
+
+ⓘ
+
+Associated Groups: TG-0416, Dynamite Panda, Threat Group-0416
+
+Version: 2.1
+
+Created: 31 May 2017
+
+Last Modified: 30 March 2020
+
+Version Permalink
+Live Version
+
+Associated Group Descriptions
+
+Name Description
+[2][3]
+
+TG-0416
+[2][3]
+
+Dynamite Panda
+[2]
+
+Threat Group-0416
+
+Techniques Used
+
+Domain ID Name Use
+
+Enterprise T1071 .001 Application APT18 uses HTTP for C2 communications.[4]
+Layer
+Protocol:
+Web
+Protocols
+
+1/4
+
+
+
+Domain ID Name Use
+
+.004 Application APT18 uses DNS for C2 communications.[4]
+Layer
+Protocol:
+DNS
+
+Enterprise T1547 .001 Boot or APT18 establishes persistence via the
+Logon HKCU\Software\Microsoft\Windows\CurrentVersion\Run
+Autostart key.[3][4]
+
+Execution:
+Registry
+Run Keys /
+Startup
+Folder
+
+Enterprise T1059 .003 Command APT18 uses cmd.exe to execute commands on the victim’s
+and machine.[4][3]
+Scripting
+Interpreter:
+Windows
+Command
+Shell
+
+Enterprise T1133 External APT18
+Remote actors
+Services leverage
+
+legitimate
+credentials
+to log into
+external
+remote
+services.[5]
+
+Enterprise T1083 File and APT18 can
+Directory list files
+Discovery information
+
+for specific
+directories.[4]
+
+Enterprise T1070 .004 Indicator APT18 actors deleted tools and batch files from victim
+Removal on systems.[1]
+Host: File
+Deletion
+
+Enterprise T1105 Ingress APT18 can
+Tool upload a file
+Transfer to the
+
+victim’s
+machine.[4]
+
+Enterprise T1027 Obfuscated APT18
+Files or obfuscates
+Information strings in the
+
+payload.[4]
+
+Enterprise T1053 .002 Scheduled APT18 actors used the native at Windows task scheduler tool
+Task/Job: At to use scheduled tasks for execution on a victim network.[1]
+
+2/4
+
+
+
+Domain ID Name Use
+
+Enterprise T1082 System APT18 can
+Information collect
+Discovery system
+
+information
+from the
+victim’s
+machine.[4]
+
+Enterprise T1078 Valid APT18
+Accounts actors
+
+leverage
+legitimate
+credentials
+to log into
+external
+remote
+services.[5]
+
+Software
+
+ID Name References Techniques
+[1]
+
+S0106 cmd Command and Scripting Interpreter: Windows Command Shell, File
+and Directory Discovery, Indicator Removal on Host: File Deletion,
+Ingress Tool Transfer, Lateral Tool Transfer, System Information
+Discovery
+
+[5]
+S0032 gh0st RAT Boot or Logon Autostart Execution: Registry Run Keys / Startup
+
+Folder, Command and Scripting Interpreter, Create or Modify System
+Process: Windows Service, Data Encoding: Standard Encoding,
+Deobfuscate/Decode Files or Information, Dynamic Resolution: Fast
+Flux DNS, Encrypted Channel: Symmetric Cryptography, Encrypted
+Channel, Hijack Execution Flow: DLL Side-Loading, Indicator
+Removal on Host: File Deletion, Indicator Removal on Host: Clear
+Windows Event Logs, Ingress Tool Transfer, Input Capture:
+Keylogging, Modify Registry, Native API, Non-Application Layer
+Protocol, Process Discovery, Process Injection, Query Registry,
+Screen Capture, Shared Modules, System Binary Proxy Execution:
+Rundll32, System Information Discovery, System Services: Service
+Execution
+
+[1][2]
+S0071 hcdLoader Command and Scripting Interpreter: Windows Command Shell,
+
+Create or Modify System Process: Windows Service
+[5]
+
+S0070 HTTPBrowser Application Layer Protocol: Web Protocols, Application Layer
+Protocol: DNS, Boot or Logon Autostart Execution: Registry Run Keys
+/ Startup Folder, Command and Scripting Interpreter: Windows
+Command Shell, Commonly Used Port, File and Directory Discovery,
+Hijack Execution Flow: DLL Search Order Hijacking, Hijack Execution
+Flow: DLL Side-Loading, Indicator Removal on Host: File Deletion,
+Ingress Tool Transfer, Input Capture: Keylogging, Masquerading:
+Match Legitimate Name or Location, Obfuscated Files or Information
+
+3/4
+
+
+
+ID Name References Techniques
+[6]
+
+S0124 Pisloader Application Layer Protocol: DNS, Boot or Logon Autostart Execution:
+Registry Run Keys / Startup Folder, Command and Scripting
+Interpreter: Windows Command Shell, Data Encoding: Standard
+Encoding, File and Directory Discovery, Ingress Tool Transfer,
+Obfuscated Files or Information, System Information Discovery,
+System Network Configuration Discovery
+
+References
+Carvey, H.. (2014, September 2). Where you AT?: Indicators of lateral movement using at.exe on Windows 7
+systems. Retrieved January 25, 2016. Shelmire, A.. (2015, July 6). Evasive Maneuvers. Retrieved January 22,
+2016. Shelmire, A. (2015, July 06). Evasive Maneuvers by the Wekby group with custom ROP-packing and DNS
+covert channels. Retrieved November 15, 2018. Grunzweig, J., et al. (2016, May 24). New Wekby Attacks Use
+DNS Requests As Command and Control Mechanism. Retrieved November 15, 2018. Adair, S. (2017, February
+17). Detecting and Responding to Advanced Threats within Exchange Environments. Retrieved March 20, 2017.
+Grunzweig, J., et al. (2016, May 24). New Wekby Attacks Use DNS Requests As Command and Control
+Mechanism. Retrieved August 17, 2016.

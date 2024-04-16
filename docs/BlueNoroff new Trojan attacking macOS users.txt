@@ -1,0 +1,260 @@
+BlueNoroff: new Trojan attacking macOS users
+securelist.com/bluenoroff-new-macos-malware/111290/
+
+Malware descriptions
+
+Malware descriptions
+
+05 Dec 2023
+
+minute read
+
+1/11
+
+
+
+Authors
+
+ Sergey Puzan
+
+We recently discovered a new variety of malicious loader that targets macOS, presumably
+linked to the BlueNoroff APT gang and its ongoing campaign known as RustBucket. The
+threat actor is known to attack financial organizations, particularly companies, whose activity
+is in any way related to cryptocurrency, as well as individuals who hold crypto assets or take
+an interest in the subject. Information about the new loader variant first appeared in an X
+(formerly Twitter) post.
+
+Original X (formerly Twitter) post about the new loader
+
+2/11
+
+
+
+Earlier RustBucket versions spread its malicious payload via an app disguised as a PDF
+viewer. By contrast, this new variety was found inside a ZIP archive that contained a PDF file
+named, “Crypto-assets and their risks for financial stability”, with a thumbnail that showed a
+corresponding title page. The metadata preserved inside the ZIP archive suggests the app
+was created on October 21, 2023.
+
+App structure
+
+Document thumbnail
+
+Exactly how the archive spread is unknown. The cybercriminals might have emailed it to
+targets as they did with past campaigns.
+
+The app had a valid signature when it was discovered, but the certificate has since been
+revoked.
+
+1 Signature #1: Valid
+
+2     Chain   #1:
+
+3       Verified:           True
+
+4       Serial:               6210670360873047962
+
+5       Issuer:              CN=Developer ID Certification Authority,OU=Apple Certification
+Authority,O=Apple Inc.,C=US
+
+6
+
+3/11
+
+
+
+7       Validity:            from = 20.10.2023 3:11:55
+
+8                                  to = 01.02.2027 22:12:15
+
+9       Subject:            UID=2C4CB2P247,CN=Developer ID Application: Northwest
+Tech-Con Systems Ltd (2C4CB2P247),OU=2C4CB2P247,O=Northwest Tech-Con
+
+10 Systems Ltd,C=CA
+11       SHA-1 Fingerprint:   da96876f9535e3946aff3875c5e5c05e48ecb49c
+12  
+13       Verified:          True
+14       Serial:              1763908746353189132
+15       Issuer:             C=US,O=Apple Inc.,OU=Apple Certification Authority,CN=Apple
+
+Root CA
+16
+
+      Validity:            from = 01.02.2012 22:12:15
+17
+
+                                 to = 01.02.2027 22:12:15
+18
+
+      Subject:             CN=Developer ID Certification Authority,OU=Apple Certification
+19 Authority,O=Apple Inc.,C=US
+20       SHA-1 Fingerprint:   3b166c3b7dc4b751c9fe2afab9135641e388e186
+21  
+22       Verified:            True (self-signed)
+23       Serial:                2
+24       Issuer:               C=US,O=Apple Inc.,OU=Apple Certification Authority,CN=Apple
+
+Root CA
+25
+
+      Validity:            from = 25.04.2006 21:40:36
+
+                                 to = 09.02.2035 21:40:36
+
+      Subject:             C=US,O=Apple Inc.,OU=Apple Certification Authority,CN=Apple
+Root CA
+
+      SHA-1 Fingerprint:   611e5b662c593a08ff58d14ae22452d198df6c60
+
+App signature details
+
+Written in Swift and named “EdoneViewer”, the executable is a universal format file that
+contains versions for both Intel and Apple Silicon chips. Decryption of the XOR-encrypted
+payload is handled by the main function, CalculateExtameGCD. While the decryption
+
+4/11
+
+
+
+process is running, the app puts out unrelated messages to the terminal to try and lull the
+analyst’s vigilance.
+
+The decrypted payload has the AppleScript format:
+
+AppleScript code executed after the payload is deciphered
+
+The script assembles and runs the following shell command:
+
+Shell command
+
+Once assembled, the shell command goes through the following steps:
+
+5/11
+
+
+
+Downloads a PDF file, save it at /Users/Shared/Crypto-assets and their risks for
+financial stability.pdf, and opens it. This is a benign file launched as a diversion.
+
+Title page of the PDF decoy
+
+Sends a POST request to the server and saves the response to a hidden file named
+“.pw” and located at /Users/Shared/.
+Grants permissions to the file and executes it with the C&C address as an argument.
+
+The C&C server is hosted at hxxp://on-global[.]xyz, a domain name registered fairly recently,
+on October 20, 2023. We were unable to find any links between the domain and any other
+files or threats.
+
+The .pw file is a Trojan we detected back in August. Like the loader, this is a universal format
+file:
+
+Details of the .pw file
+
+The file collects and sends the following system information to the C&C:
+
+Computer name
+OS version
+Time zone
+Device startup date
+OS installation date
+Current time
+List of running processes
+
+6/11
+
+
+
+The data is collected and forwarded in cycles every minute. The Trojan expects one of the
+following three commands in response:
+
+Command # Description
+
+0x0 Save response to file and run
+
+0x1 Delete local copy and shut down
+
+Any other number Keep waiting for command
+
+After receiving a 0x0 command, the program saves data sent with the command to the
+shared file named “.pld” and located at /Users/Shared/, gives it the read/write/run
+permissions and executes it:
+
+Code snippet that writes and runs the downloaded file
+
+Unfortunately, we did not receive a single command from the server during our analysis, so
+we were unable to find out the content of the following attack stage. The Trojan can now be
+detected by most anti-malware solutions:
+
+7/11
+
+
+
+Details of the second download as posted on VirusTotal
+
+Indicators of compromise
+Files
+
+MD5 hash File File name
+format
+
+1fddf14984c6b57358401a4587e7b950 Mach-O EdoneViewer
+Fat
+
+d8011dcca570689d72064b156647fa82 Mach-O .pw
+Fat
+
+90385d612877e9d360196770d73d22d6 Zip Crypto-assets and their risks for
+financial stability.zip
+
+3b3b3b9f7c71fcd7239abe90c97751c0 Zip Crypto-assets and their risks for
+financial stability.zip
+
+b1e01ae0006f449781a05f4704546b34 Zip Crypto-assets and their risks for
+financial stability.zip
+
+80c1256f8bb2a9572e20dd480ac68759 PDF Crypto-assets and their risks for
+financial stability.pdf
+
+8/11
+
+
+
+Links
+
+URL Description
+
+hxxp://on- PDF file
+global[.]xyz/Ov56cYsfVV8/OJITWH2WFx/Jy5S7hSx0K/fP7saoiPBc/A== URL
+
+hxxp://on- Trojan URL
+global[.]xyz/Of56cYsfVV8/OJITWH2WFx/Jy5S7hSx0K/fP7saoiPBc/A==
+
+Apple MacOS
+BlueNoroff
+Malware
+Malware Descriptions
+Malware Technologies
+Trojan
+
+Authors
+
+ Sergey Puzan
+
+BlueNoroff: new Trojan attacking macOS users
+
+Your email address will not be published. Required fields are marked *
+
+GReAT webinars
+
+From the same authors
+
+9/11
+
+
+
+New macOS Trojan-Proxy piggybacking on cracked software
+Subscribe to our weekly e-mails
+The hottest research right in your inbox
+
+10/11
