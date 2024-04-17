@@ -1,9 +1,10 @@
 # ProgNet
 
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
-![Pandas](https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white)
-![scikit-learn](https://img.shields.io/badge/scikit--learn-%23F7931E.svg?style=for-the-badge&logo=scikit-learn&logoColor=white)
+![LangChain](https://img.shields.io/badge/LangChain-white?style=for-the-badge&)
+![uvicorn](https://img.shields.io/badge/uvicorn-purple?style=for-the-badge&)
 ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
+![uvicorn](https://img.shields.io/badge/GigaChain-AA3000?style=for-the-badge&)
 
 ProgNet - это языковая модель, обученная на репозиториях GitHub, которая может помочь программистам писать код, исправлять ошибки и улучшать качество своих проектов.
  
